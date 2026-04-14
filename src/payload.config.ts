@@ -1,0 +1,69 @@
+import { postgresAdapter } from '@payloadcms/db-postgres'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
+import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import path from 'path'
+import { buildConfig } from 'payload'
+import { fileURLToPath } from 'url'
+import sharp from 'sharp'
+
+import { CaseStudies } from './collections/CaseStudies'
+import { Users } from './collections/Users'
+import { Media } from './collections/Media'
+import { Partners } from './collections/Partners'
+import { Proposals } from './collections/Proposals'
+import { TechNeeds } from './collections/TechNeeds'
+import { UserGroups } from './collections/UserGroups'
+import { appEnv } from './lib/env'
+
+const filename = fileURLToPath(import.meta.url)
+const dirname = path.dirname(filename)
+
+export default buildConfig({
+  admin: {
+    user: Users.slug,
+    importMap: {
+      baseDir: path.resolve(dirname),
+    },
+  },
+  collections: [Users, UserGroups, TechNeeds, Proposals, Partners, CaseStudies, Media],
+  csrf: [appEnv.NEXT_PUBLIC_SERVER_URL],
+  db: postgresAdapter({
+    pool: {
+      connectionString: appEnv.databaseURL,
+    },
+  }),
+  email: await nodemailerAdapter({
+    defaultFromAddress: appEnv.SMTP_FROM_ADDRESS || appEnv.SMTP_USER || 'innovation@example.com',
+    defaultFromName: appEnv.SMTP_FROM_NAME || 'H&T Innovation Platform',
+    skipVerify: true,
+    transportOptions: appEnv.smtpEnabled
+      ? {
+          auth: {
+            pass: appEnv.SMTP_PASS,
+            user: appEnv.SMTP_USER,
+          },
+          host: appEnv.SMTP_HOST,
+          port: appEnv.SMTP_PORT || 25,
+          secure: false,
+        }
+      : undefined,
+  }),
+  editor: lexicalEditor(),
+  graphQL: {
+    disablePlaygroundInProduction: true,
+  },
+  onInit: async (payload) => {
+    payload.logger.info('H&T Open Innovation Platform initialized')
+  },
+  routes: {
+    admin: '/admin',
+    api: '/api',
+  },
+  secret: appEnv.PAYLOAD_SECRET,
+  serverURL: appEnv.NEXT_PUBLIC_SERVER_URL,
+  sharp,
+  typescript: {
+    outputFile: path.resolve(dirname, 'payload-types.ts'),
+  },
+  plugins: [],
+})

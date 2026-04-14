@@ -1,0 +1,88 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-ht-blue: #004098;
+  --color-ht-light-blue: #00a0e9;
+  --color-ht-grey: #f3f4f6;
+  --color-ht-ink: #1f2937;
+  --color-ht-muted: #6b7280;
+  --font-sans: var(--font-body), 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-display: var(--font-display), 'Arial Narrow', sans-serif;
+}
+
+:root {
+  --ht-blue: #004098;
+  --ht-light-blue: #00a0e9;
+  --ht-grey: #f3f4f6;
+  --ht-ink: #1f2937;
+  --ht-muted: #6b7280;
+  --ht-surface: #f5f7fb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background:
+    radial-gradient(circle at top left, rgba(0, 160, 233, 0.14), transparent 28%),
+    linear-gradient(180deg, #f7fafc 0%, #eef4fb 100%);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.container-shell {
+  margin-inline: auto;
+  width: min(1200px, calc(100% - 2rem));
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(18px);
+}
+
+.prose-innovation {
+  color: var(--ht-ink);
+  line-height: 1.75;
+}
+
+.prose-innovation h2,
+.prose-innovation h3 {
+  color: var(--ht-blue);
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
+}
+
+.prose-innovation p,
+.prose-innovation li {
+  color: #334155;
+}
+
+.hero-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-position: center;
+  background-size: 40px 40px;
+}
