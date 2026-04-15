@@ -35,6 +35,14 @@ pnpm seed
 pnpm dev
 ```
 
+6. 生产模式本地验收：
+
+```bash
+PORT=3005 pnpm start
+```
+
+`pnpm start` 现在会先自动同步 `.next/static` 和 `public/` 到 `standalone` 运行目录，再启动 Next.js 生产服务，避免样式与字体资源 404。
+
 ## 当前环境状态（2026-04-15）
 
 - 当前机器的 `3000` 端口已被其他项目占用，返回内容不是本项目。
