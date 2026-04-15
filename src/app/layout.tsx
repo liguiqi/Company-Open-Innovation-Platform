@@ -25,8 +25,8 @@ export const metadata: Metadata = {
     'Open Innovation Platform，连接全球产业链伙伴，共创智能控制、汽车电子与电动工具领域的联合创新方案。',
   metadataBase: new URL(process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'),
   title: {
-    default: 'H&T Open Innovation Platform',
-    template: '%s | H&T Open Innovation Platform',
+    default: 'HET Open Innovation Platform',
+    template: '%s | HET Open Innovation Platform',
   },
 }
 

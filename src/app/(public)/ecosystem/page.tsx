@@ -21,7 +21,7 @@ export default async function EcosystemPage() {
         align="center"
         description="加入Open Innovation供应链生态，您的技术将进入从需求澄清、联合评估到 PoC 验证和导入量产的完整通道。"
         eyebrow="Ecosystem"
-        title="H&T 全球合作伙伴联盟"
+        title="HET 全球合作伙伴联盟"
       />
 
       <div className="mt-10 grid gap-4 md:grid-cols-4">

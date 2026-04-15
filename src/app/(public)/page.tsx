@@ -26,7 +26,7 @@ export default async function HomePage() {
         <div className="container-shell relative py-24 md:py-32">
           <div className="max-w-3xl text-white">
             <p className="text-xs uppercase tracking-[0.4em] text-sky-200">
-              H&T Open Innovation Platform
+              HET Open Innovation Platform
             </p>
             <h1 className="mt-6 font-display text-5xl font-semibold leading-none md:text-7xl">
               连接全球智慧，
@@ -107,7 +107,7 @@ export default async function HomePage() {
         <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="rounded-[2rem] bg-slate-950 p-8 text-white shadow-2xl shadow-slate-300/40">
             <p className="text-xs uppercase tracking-[0.35em] text-sky-200">Ecosystem</p>
-            <h2 className="mt-4 font-display text-4xl font-semibold">H&T 全球合作伙伴联盟</h2>
+            <h2 className="mt-4 font-display text-4xl font-semibold">HET 全球合作伙伴联盟</h2>
             <p className="mt-5 max-w-2xl text-sm leading-8 text-slate-300">
               平台目前覆盖芯片、功率、电源、连接与传感、产学研合作机构等多类生态角色，可在供应链导入和联合研发之间实现快速闭环。
             </p>
