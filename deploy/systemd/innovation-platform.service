@@ -1,0 +1,17 @@
+[Unit]
+Description=H&T Open Innovation Platform
+After=network.target
+
+[Service]
+Type=simple
+User=lgq
+WorkingDirectory=/home/deploy/apps/open-innovation-platform
+Environment=HOME=/home/deploy
+Environment=PORT=3005
+Environment=PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStart=/usr/local/bin/node /usr/local/lib/node_modules/corepack/dist/pnpm.js start
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

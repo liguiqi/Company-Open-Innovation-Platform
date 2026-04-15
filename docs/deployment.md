@@ -45,21 +45,29 @@ PORT=3005 pnpm start
 
 ## 当前环境状态（2026-04-15）
 
-- 当前机器的 `3000` 端口已被其他项目占用，返回内容不是本项目。
-- 本项目可通过以下方式临时验收：
+- 当前机器的 `3000` 端口由 `bothub` 项目占用。
+- 当前项目 `innovation-platform` 已通过 `systemd` 服务固定运行在 `3005` 端口：
 
 ```bash
-PORT=3005 pnpm start
+sudo systemctl status innovation-platform.service
 ```
 
-- 启动后可通过 `http://127.0.0.1:3005` 或局域网地址 `http://10.0.0.2:3005` 访问。
-- 若要正式绑定 `https://innovation.example.com`，需先释放或改写 Nginx 到正确的应用端口，并确保 `80/443` 由 Nginx 接管。
+- `pnpm start` 现在会先自动同步 `.next/static` 和 `public/` 到 `standalone` 运行目录，再启动 Next.js 生产服务，避免样式与字体资源 404。
+- `nginx` 已安装并接管 `80/443`：
+  - `innovation.example.com` -> `127.0.0.1:3005`
+  - `bothub.example.com` -> `127.0.0.1:3000`
+- 当前系统配置文件：
+  - `systemd`：`/etc/systemd/system/innovation-platform.service`
+  - `nginx`：`/etc/nginx/sites-available/innovation-platform-apps.conf`
 
 ## 域名与证书
 
 - 统一域名：`innovation.example.com`
+- bothub 域名：`bothub.example.com`
 - 现有证书文件目录：`./example.com_nginx`
 - Nginx 参考配置：`./deploy/nginx/innovation.example.com.conf`
+- bothub 参考配置：`./deploy/nginx/bothub.example.com.conf`
+- systemd 参考配置：`./deploy/systemd/innovation-platform.service`
 
 ## 生产建议
 
