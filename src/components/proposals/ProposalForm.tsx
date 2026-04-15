@@ -26,21 +26,27 @@ export function ProposalForm({
     setIsSubmitting(true)
     setError(null)
 
-    const response = await fetch('/api/proposals', {
-      body: formData,
-      method: 'POST',
-    })
+    try {
+      const response = await fetch('/api/proposals', {
+        body: formData,
+        method: 'POST',
+      })
 
-    const data = await response.json()
-    setIsSubmitting(false)
+      const rawText = await response.text()
+      const data = rawText ? JSON.parse(rawText) : null
 
-    if (!response.ok) {
-      setError(data.error || '提交失败，请稍后重试')
-      return
+      if (!response.ok) {
+        setError(data?.error || '提交失败，请稍后重试')
+        return
+      }
+
+      router.push(`/dashboard/proposals/${data.id}`)
+      router.refresh()
+    } catch {
+      setError('提交失败，请稍后重试')
+    } finally {
+      setIsSubmitting(false)
     }
-
-    router.push(`/dashboard/proposals/${data.id}`)
-    router.refresh()
   }
 
   return (

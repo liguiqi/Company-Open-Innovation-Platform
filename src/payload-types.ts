@@ -255,7 +255,10 @@ export interface Proposal {
  */
 export interface TechNeed {
   id: number
-  needId: string
+  /**
+   * 系统按 RD-年份-流水号 自动生成，创建后不可修改。
+   */
+  needId?: string | null
   title: string
   priority: 'urgent' | 'open' | 'joint-research'
   domain: 'motor-control' | 'sensor' | 'materials' | 'ai'

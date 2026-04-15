@@ -41,7 +41,7 @@ pnpm dev
 PORT=3005 pnpm start
 ```
 
-`pnpm start` 现在会先自动同步 `.next/static`、`public/` 和 `media/` 到 `standalone` 运行目录，再启动 Next.js 生产服务，避免样式、字体和上传文件在生产模式下丢失。
+`pnpm build` 完成后会自动同步 `.next/static`、`public/` 与 `media/` 到 `standalone` 运行目录；`pnpm start` 也会再次兜底同步，然后再启动 Next.js 生产服务，避免样式、品牌资源或媒体附件在 standalone 目录中缺失。
 
 ## 当前环境状态（2026-04-15）
 

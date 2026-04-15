@@ -34,6 +34,8 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
   const attachments = Array.isArray(proposal.attachments)
     ? proposal.attachments.filter((item) => typeof item !== 'number')
     : []
+  const reviewNotesText = proposal.reviewNotes ? lexicalToPlainText(proposal.reviewNotes) : ''
+  const reviewFormKey = `${proposal.id}-${proposal.status || 'pending'}-${reviewNotesText}`
 
   return (
     <div className="space-y-6">
@@ -114,9 +116,7 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
           <section>
             <h3 className="text-xl font-semibold text-slate-950">评审意见</h3>
             <p className="mt-3 whitespace-pre-line text-sm leading-8 text-slate-600">
-              {proposal.reviewNotes
-                ? lexicalToPlainText(proposal.reviewNotes)
-                : '当前尚未填写评审意见。'}
+              {reviewNotesText || '当前尚未填写评审意见。'}
             </p>
           </section>
         </div>
@@ -124,7 +124,8 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
 
       {(user.role === 'admin' || user.role === 'reviewer') && (
         <ProposalReviewForm
-          defaultNotes={proposal.reviewNotes ? lexicalToPlainText(proposal.reviewNotes) : ''}
+          defaultNotes={reviewNotesText}
+          key={reviewFormKey}
           proposalId={proposal.id}
           status={proposal.status}
         />
