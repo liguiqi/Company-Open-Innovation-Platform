@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+import { HetWordmark } from '@/components/shared/HetWordmark'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -20,9 +21,7 @@ export function PublicHeader({ isLoggedIn }: { isLoggedIn: boolean }) {
     <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/90 backdrop-blur-xl">
       <div className="container-shell flex min-h-20 flex-wrap items-center justify-between gap-4 py-4">
         <Link className="flex items-center gap-3" href="/">
-          <div className="font-display text-4xl font-bold italic tracking-tight text-ht-blue">
-            H&T
-          </div>
+          <HetWordmark className="h-12" />
           <div className="h-9 w-px bg-slate-200" />
           <div className="space-y-1">
             <p className="text-[11px] uppercase tracking-[0.35em] text-slate-500">

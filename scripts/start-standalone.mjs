@@ -11,6 +11,8 @@ const sourceStaticDir = path.join(buildDir, 'static')
 const targetStaticDir = path.join(standaloneNextDir, 'static')
 const sourcePublicDir = path.join(rootDir, 'public')
 const targetPublicDir = path.join(standaloneDir, 'public')
+const sourceMediaDir = path.join(rootDir, 'media')
+const targetMediaDir = path.join(standaloneDir, 'media')
 
 if (!existsSync(path.join(standaloneDir, 'server.js'))) {
   console.error('Missing standalone build output. Run `pnpm build` before `pnpm start`.')
@@ -24,6 +26,10 @@ if (existsSync(sourceStaticDir)) {
 
 if (existsSync(sourcePublicDir)) {
   cpSync(sourcePublicDir, targetPublicDir, { recursive: true, force: true })
+}
+
+if (existsSync(sourceMediaDir)) {
+  cpSync(sourceMediaDir, targetMediaDir, { recursive: true, force: true })
 }
 
 await import(path.join(standaloneDir, 'server.js'))

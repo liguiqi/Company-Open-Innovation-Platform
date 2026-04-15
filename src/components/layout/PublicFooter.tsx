@@ -1,11 +1,13 @@
 import Link from 'next/link'
 
+import { HetWordmark } from '@/components/shared/HetWordmark'
+
 export function PublicFooter() {
   return (
     <footer className="mt-20 bg-slate-950 text-white">
       <div className="container-shell grid gap-10 py-14 md:grid-cols-4">
         <div className="space-y-4">
-          <div className="font-display text-3xl font-bold italic">H&T</div>
+          <HetWordmark className="h-10 text-white" />
           <p className="text-sm leading-7 text-slate-400">
             Open Innovation（002402.SZ）致力于成为全球智能控制器领域的领导者，通过开放创新连接产业链资源，共创智慧生活。
           </p>

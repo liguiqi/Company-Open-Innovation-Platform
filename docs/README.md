@@ -7,7 +7,7 @@
 - `progress/2026-04-14.md`：本轮开发日志、关键决策和风险记录
 - `progress/2026-04-15.md`：域名接入、systemd 与 nginx 部署记录
 - `deployment.md`：本地与服务器部署说明
-- `testing.md`：验收与回归检查清单
+- `testing.md`：完整验收测试文档与回归清单
 
 ## 记录规范
 

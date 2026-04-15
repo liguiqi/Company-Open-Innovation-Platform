@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Blocks, BriefcaseBusiness, LayoutDashboard, Settings, Users } from 'lucide-react'
 
+import { HetWordmark } from '@/components/shared/HetWordmark'
 import type { User } from '@/payload-types'
 
 import { cn } from '@/lib/utils'
@@ -26,7 +27,7 @@ export function DashboardSidebar({ role }: { role: User['role'] }) {
   return (
     <aside className="glass-panel sticky top-4 rounded-[2rem] border border-white/60 p-5 shadow-2xl shadow-slate-200/80">
       <div className="mb-8 border-b border-slate-200 pb-5">
-        <p className="font-display text-3xl font-bold italic text-ht-blue">H&T</p>
+        <HetWordmark className="h-9" />
         <p className="mt-2 text-sm text-slate-500">Innovation Workspace</p>
       </div>
 
