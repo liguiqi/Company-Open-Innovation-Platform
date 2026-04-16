@@ -34,21 +34,21 @@ export function VerifyClient({ token }: { token?: string }) {
   }, [token])
 
   return (
-    <div className="w-full rounded-[2rem] border border-white/60 bg-white/90 p-8 text-center shadow-2xl shadow-slate-200/80 backdrop-blur">
-      <p className="font-display text-3xl font-semibold text-slate-950">邮箱验证</p>
-      <p className="mt-4 text-sm leading-7 text-slate-500">{message}</p>
+    <div className="auth-panel w-full rounded-[1rem] p-8 text-center">
+      <p className="font-display text-3xl font-semibold text-[var(--ht-text-primary)]">邮箱验证</p>
+      <p className="mt-4 text-sm leading-7 text-[var(--ht-text-muted)]">{message}</p>
 
       <div className="mt-6 flex justify-center gap-3">
         {state === 'success' ? (
           <Link
-            className="rounded-full bg-ht-blue px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-950"
+            className="theme-primary-button rounded-md px-5 py-3 text-sm font-semibold"
             href="/dashboard"
           >
             进入工作台
           </Link>
         ) : (
           <Link
-            className="rounded-full border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-ht-blue hover:text-ht-blue"
+            className="theme-outline-button rounded-md px-5 py-3 text-sm font-semibold"
             href="/login"
           >
             返回登录

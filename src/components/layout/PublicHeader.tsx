@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-import { HetWordmark } from '@/components/shared/HetWordmark'
+import { HetBrandLogo } from '@/components/shared/HetBrandLogo'
+import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -18,20 +19,24 @@ export function PublicHeader({ isLoggedIn }: { isLoggedIn: boolean }) {
   const pathname = usePathname()
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/90 backdrop-blur-xl">
+    <header className="theme-header sticky top-0 z-40 backdrop-blur-sm">
       <div className="container-shell flex min-h-20 flex-wrap items-center justify-between gap-4 py-4">
-        <Link className="flex items-center gap-3" href="/">
-          <HetWordmark className="h-12" />
-          <div className="h-9 w-px bg-slate-200" />
-          <div className="space-y-1">
-            <p className="text-[11px] uppercase tracking-[0.35em] text-slate-500">
-              Open Innovation
-            </p>
-            <p className="text-sm font-semibold text-slate-900">Open Innovation Platform</p>
-          </div>
-        </Link>
+        <div className="flex shrink-0 items-center gap-3">
+          <Link className="flex items-center gap-3" href="/">
+            <HetBrandLogo className="theme-logo-adaptive w-[168px] lg:w-[182px]" priority />
+            <div className="h-9 w-px bg-[color:var(--ht-border-soft)]" />
+            <div className="space-y-1 leading-tight">
+              <p className="text-[11px] uppercase tracking-[0.35em] text-[var(--ht-text-muted)]">
+                Open Innovation
+              </p>
+              <p className="text-sm font-semibold text-[var(--ht-text-primary)]">
+                Open Innovation Platform
+              </p>
+            </div>
+          </Link>
+        </div>
 
-        <nav className="hidden items-center gap-8 text-sm font-medium text-slate-600 lg:flex">
+        <nav className="hidden items-center gap-8 text-sm font-medium text-[var(--ht-text-secondary)] lg:flex">
           {navItems.map((item) => {
             const active =
               pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
@@ -53,26 +58,27 @@ export function PublicHeader({ isLoggedIn }: { isLoggedIn: boolean }) {
         </nav>
 
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           {isLoggedIn ? (
             <Link
-              className="rounded-full border border-slate-200 px-5 py-2 text-sm font-semibold text-slate-700 transition hover:border-ht-blue hover:text-ht-blue"
+              className="theme-outline-button rounded-md px-5 py-2 text-sm font-semibold"
               href="/dashboard"
             >
               进入工作台
             </Link>
           ) : (
             <Link
-              className="rounded-full border border-slate-200 px-5 py-2 text-sm font-semibold text-slate-700 transition hover:border-ht-blue hover:text-ht-blue"
+              className="theme-outline-button rounded-md px-5 py-2 text-sm font-semibold"
               href="/login"
             >
               登录
             </Link>
           )}
           <Link
-            className="rounded-full bg-ht-light-blue px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-200 transition hover:bg-ht-blue"
+            className="theme-accent-button rounded-md px-5 py-2 text-sm font-semibold shadow-sm shadow-sky-200/30"
             href="/submit"
           >
-            提交创新方案
+            提交方案
           </Link>
         </div>
       </div>

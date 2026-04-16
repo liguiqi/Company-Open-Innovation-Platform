@@ -68,9 +68,14 @@ export async function getDashboardMetrics(user: User) {
 
 export async function resolveLoginEmail(identifier: string) {
   const payload = await getPayloadClient()
+  const normalizedIdentifier = identifier.trim()
 
-  if (identifier.includes('@')) {
-    return identifier
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedIdentifier)) {
+    return normalizedIdentifier.toLowerCase()
+  }
+
+  if (!/^1\d{10}$/.test(normalizedIdentifier)) {
+    return null
   }
 
   const user = await payload.find({
@@ -80,18 +85,9 @@ export async function resolveLoginEmail(identifier: string) {
     overrideAccess: true,
     pagination: false,
     where: {
-      or: [
-        {
-          username: {
-            equals: identifier,
-          },
-        },
-        {
-          email: {
-            equals: identifier,
-          },
-        },
-      ],
+      phone: {
+        equals: normalizedIdentifier,
+      },
     },
   })
 

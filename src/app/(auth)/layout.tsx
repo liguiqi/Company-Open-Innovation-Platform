@@ -5,28 +5,63 @@ import { HetWordmark } from '@/components/shared/HetWordmark'
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-slate-950">
-      <div className="mx-auto grid min-h-screen max-w-7xl gap-8 px-4 py-8 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="hidden rounded-[2.5rem] border border-white/10 bg-gradient-to-br from-[#00316f] via-[#004098] to-[#00A0E9] p-10 text-white shadow-2xl shadow-slate-950/30 lg:flex lg:flex-col lg:justify-between">
-          <div>
-            <Link href="/">
-              <HetWordmark className="h-14 text-white" />
-            </Link>
-            <p className="mt-4 text-sm uppercase tracking-[0.4em] text-sky-100">
-              Open Innovation Platform
-            </p>
-          </div>
-          <div>
-            <h1 className="font-display text-6xl font-semibold leading-none">
-              开放协同，快速导入。
-            </h1>
-            <p className="mt-6 max-w-xl text-base leading-8 text-blue-50">
-              统一的合作伙伴认证入口，连接公开需求、联合创新案例与方案评审工作台。
-            </p>
+    <div className="theme-auth-shell relative min-h-screen overflow-hidden">
+      <div
+        className="theme-auth-shell__media absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage:
+            "url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')",
+        }}
+      />
+      <div className="hero-grid absolute inset-0 opacity-20" />
+      <div className="theme-auth-shell__overlay absolute inset-0" />
+
+      <div className="container-shell relative flex min-h-screen flex-col py-8 lg:py-12">
+        <div className="grid flex-1 w-full items-center gap-10 lg:grid-cols-[minmax(0,1fr)_460px] lg:gap-14">
+          <div className="space-y-10 text-[var(--ht-auth-text)]">
+            <div className="space-y-4">
+              <Link className="inline-flex" href="/">
+                <HetBrandLogo className="theme-logo-adaptive w-[180px] md:w-[210px]" priority />
+              </Link>
+              <div className="space-y-2">
+                <p className="text-xs uppercase tracking-[0.42em] text-[var(--ht-auth-muted)]">
+                  Open Innovation Platform
+                </p>
+                <p className="text-sm font-semibold text-[var(--ht-auth-text)]">
+                  Open Innovation Platform
+                </p>
+              </div>
+            </div>
+
+            <div className="max-w-2xl space-y-6">
+              <h1 className="font-display text-5xl font-semibold leading-none md:text-7xl">
+                开放协同，
+                <br />
+                快速导入。
+              </h1>
+              <p className="max-w-xl text-base leading-8 text-[var(--ht-auth-muted)] md:text-lg">
+                从公开需求发布、伙伴方案提交到内部评审流转，登录后即可进入Open Innovation开放创新工作台，与官网首页保持一致的创新协作入口。
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-3 text-sm">
+              <div className="theme-auth-chip rounded-md px-4 py-2 backdrop-blur-sm">
+                公开需求对接
+              </div>
+              <div className="theme-auth-chip rounded-md px-4 py-2 backdrop-blur-sm">
+                创新方案提交
+              </div>
+              <div className="theme-auth-chip rounded-md px-4 py-2 backdrop-blur-sm">
+                评审工作台
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-center">{children}</div>
+        <p className="theme-auth-footer mt-8 text-center text-xs">
+          © 2026 Shenzhen HET Intelligent Control Co., Ltd. All rights reserved. Power By LGQ
+          2026-04
+        </p>
       </div>
     </div>
   )

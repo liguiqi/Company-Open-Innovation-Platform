@@ -41,68 +41,50 @@ export function RegisterForm() {
   }
 
   return (
-    <form
-      action={onSubmit}
-      className="w-full space-y-5 rounded-[2rem] border border-white/60 bg-white/90 p-8 shadow-2xl shadow-slate-200/80 backdrop-blur"
-    >
+    <form action={onSubmit} className="auth-panel w-full space-y-5 rounded-[1rem] p-8">
       <div className="grid gap-5 md:grid-cols-2">
-        <label className="space-y-2 text-sm font-medium text-slate-700">
+        <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
           联系人姓名
-          <input
-            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"
-            name="name"
-            required
-          />
+          <input className="theme-input w-full rounded-lg px-4 py-3" name="name" required />
         </label>
-        <label className="space-y-2 text-sm font-medium text-slate-700">
+        <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
           用户名
-          <input
-            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"
-            name="username"
-            required
-          />
+          <input className="theme-input w-full rounded-lg px-4 py-3" name="username" required />
         </label>
-        <label className="space-y-2 text-sm font-medium text-slate-700">
+        <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
           联系邮箱
           <input
-            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"
+            className="theme-input w-full rounded-lg px-4 py-3"
             name="email"
             required
             type="email"
           />
         </label>
-        <label className="space-y-2 text-sm font-medium text-slate-700">
+        <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
           联系手机
-          <input
-            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"
-            name="phone"
-          />
+          <input className="theme-input w-full rounded-lg px-4 py-3" name="phone" />
         </label>
       </div>
 
-      <label className="block space-y-2 text-sm font-medium text-slate-700">
+      <label className="block space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
         公司名称
-        <input
-          className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"
-          name="company"
-          required
-        />
+        <input className="theme-input w-full rounded-lg px-4 py-3" name="company" required />
       </label>
 
       <div className="grid gap-5 md:grid-cols-2">
-        <label className="space-y-2 text-sm font-medium text-slate-700">
+        <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
           登录密码
           <input
-            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"
+            className="theme-input w-full rounded-lg px-4 py-3"
             name="password"
             required
             type="password"
           />
         </label>
-        <label className="space-y-2 text-sm font-medium text-slate-700">
+        <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
           确认密码
           <input
-            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"
+            className="theme-input w-full rounded-lg px-4 py-3"
             name="passwordConfirm"
             required
             type="password"
@@ -111,7 +93,7 @@ export function RegisterForm() {
       </div>
 
       <button
-        className="w-full rounded-full bg-ht-blue px-5 py-3 font-semibold text-white transition hover:bg-slate-950 disabled:opacity-60"
+        className="theme-primary-button w-full rounded-md px-5 py-3 font-semibold disabled:opacity-60"
         disabled={loading}
         type="submit"
       >
@@ -119,13 +101,17 @@ export function RegisterForm() {
       </button>
 
       {error ? (
-        <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>
+        <p className="rounded-lg border border-rose-200/70 bg-rose-50/85 px-4 py-3 text-sm text-rose-700">
+          {error}
+        </p>
       ) : null}
       {success ? (
-        <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{success}</p>
+        <p className="rounded-lg border border-emerald-200/70 bg-emerald-50/85 px-4 py-3 text-sm text-emerald-700">
+          {success}
+        </p>
       ) : null}
 
-      <p className="text-sm text-slate-500">
+      <p className="text-sm text-[var(--ht-text-muted)]">
         已有账号？{' '}
         <Link className="font-semibold text-ht-blue" href="/login">
           返回登录

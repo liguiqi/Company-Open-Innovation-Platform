@@ -34,7 +34,7 @@ export default async function CaseDetailPage({ params }: { params: Promise<{ slu
 
   return (
     <div className="container-shell py-16">
-      <div className="overflow-hidden rounded-[2.5rem] border border-white/70 bg-white shadow-2xl shadow-slate-200/70">
+      <div className="theme-card overflow-hidden rounded-[1rem]">
         <div
           className="h-72 bg-cover bg-center"
           style={{
@@ -56,7 +56,7 @@ export default async function CaseDetailPage({ params }: { params: Promise<{ slu
           <div className="mt-10 flex flex-wrap gap-4">
             {caseStudy.whitePaperUrl ? (
               <a
-                className="rounded-full bg-ht-blue px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-950"
+                className="theme-primary-button rounded-md px-6 py-3 text-sm font-semibold"
                 href={caseStudy.whitePaperUrl}
                 rel="noreferrer"
                 target="_blank"
@@ -65,7 +65,7 @@ export default async function CaseDetailPage({ params }: { params: Promise<{ slu
               </a>
             ) : null}
             <Link
-              className="rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-ht-blue hover:text-ht-blue"
+              className="theme-outline-button rounded-md px-6 py-3 text-sm font-semibold"
               href="/cases"
             >
               返回案例列表

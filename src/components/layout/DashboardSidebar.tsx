@@ -7,6 +7,8 @@ import { Blocks, BriefcaseBusiness, LayoutDashboard, Settings, Users } from 'luc
 import { HetWordmark } from '@/components/shared/HetWordmark'
 import type { User } from '@/payload-types'
 
+import { HetBrandLogo } from '@/components/shared/HetBrandLogo'
+import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { cn } from '@/lib/utils'
 
 const baseItems = [
@@ -25,10 +27,29 @@ export function DashboardSidebar({ role }: { role: User['role'] }) {
   const items = role === 'admin' ? [...baseItems, ...adminItems] : baseItems
 
   return (
-    <aside className="glass-panel sticky top-4 rounded-[2rem] border border-white/60 p-5 shadow-2xl shadow-slate-200/80">
-      <div className="mb-8 border-b border-slate-200 pb-5">
-        <HetWordmark className="h-9" />
-        <p className="mt-2 text-sm text-slate-500">Innovation Workspace</p>
+    <aside className="theme-dashboard-panel sticky top-4 overflow-hidden rounded-xl p-5">
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-24"
+        style={{
+          background:
+            'radial-gradient(circle at top left, var(--ht-dashboard-shell-glow), transparent 72%)',
+        }}
+      />
+
+      <div className="theme-dashboard-highlight relative mb-8 rounded-lg p-4">
+        <Link aria-label="返回首页" className="block" href="/">
+          <HetBrandLogo className="w-[152px] sm:w-[164px]" priority />
+        </Link>
+        <div className="mt-3 flex items-center gap-3">
+          <span className="h-px flex-1 bg-[color:var(--ht-border-soft)]" />
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[var(--ht-text-muted)]">
+            Workspace
+          </p>
+        </div>
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <p className="text-sm text-[var(--ht-text-secondary)]">开放创新工作台</p>
+          <ThemeToggle className="shrink-0" />
+        </div>
       </div>
 
       <nav className="space-y-2">
@@ -41,21 +62,28 @@ export function DashboardSidebar({ role }: { role: User['role'] }) {
             <Link
               key={item.href}
               className={cn(
-                'flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-ht-blue',
-                active && 'bg-slate-950 text-white hover:bg-slate-950 hover:text-white',
+                'theme-dashboard-nav-link group flex items-center gap-3 rounded-lg border border-transparent px-3 py-3 text-sm font-medium',
+                active && 'is-active',
               )}
               href={item.href}
             >
-              <Icon size={18} />
-              {item.label}
+              <span className="theme-dashboard-nav-icon flex h-10 w-10 items-center justify-center rounded-lg">
+                <Icon size={18} />
+              </span>
+              <span className="flex-1">{item.label}</span>
+              {active ? <span className="h-2.5 w-2.5 rounded-sm bg-ht-light-blue" /> : null}
             </Link>
           )
         })}
       </nav>
 
-      <div className="mt-8 rounded-2xl bg-slate-950 p-4 text-sm text-slate-300">
-        <p className="font-semibold text-white">Payload Admin</p>
-        <p className="mt-2 leading-6">内容结构、媒体资产和权限策略仍可直接在 `/admin` 中维护。</p>
+      <div className="theme-dashboard-info mt-8 rounded-lg p-4 text-sm text-[var(--ht-text-secondary)]">
+        <p className="text-xs uppercase tracking-[0.3em] text-ht-light-blue">Content Ops</p>
+        <p className="mt-2 font-semibold text-[var(--ht-text-primary)]">Payload Admin</p>
+        <p className="mt-2 leading-6 text-[var(--ht-text-secondary)]">
+          内容结构、媒体资产和权限策略仍可直接在{' '}
+          <span className="font-semibold text-ht-blue">/admin</span> 中维护。
+        </p>
       </div>
     </aside>
   )

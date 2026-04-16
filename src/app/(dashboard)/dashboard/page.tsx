@@ -41,23 +41,24 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         {cards.map((card) => (
-          <div
-            key={card.label}
-            className="rounded-[2rem] border border-white/70 bg-white p-6 shadow-lg shadow-slate-200/60"
-          >
-            <p className="text-sm text-slate-500">{card.label}</p>
-            <p className="mt-4 font-display text-5xl font-semibold text-slate-950">{card.value}</p>
+          <div key={card.label} className="theme-dashboard-panel rounded-xl p-6">
+            <p className="text-sm text-[var(--ht-text-muted)]">{card.label}</p>
+            <p className="mt-4 font-display text-5xl font-semibold text-[var(--ht-text-primary)]">
+              {card.value}
+            </p>
           </div>
         ))}
       </div>
 
-      <div className="rounded-[2rem] border border-white/70 bg-white p-6 shadow-lg shadow-slate-200/60">
+      <div className="theme-dashboard-panel rounded-xl p-6">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-semibold text-slate-950">最近方案</h2>
-            <p className="mt-2 text-sm text-slate-500">展示最近提交或最近变更状态的方案记录。</p>
+            <h2 className="text-2xl font-semibold text-[var(--ht-text-primary)]">最近方案</h2>
+            <p className="mt-2 text-sm text-[var(--ht-text-muted)]">
+              展示最近提交或最近变更状态的方案记录。
+            </p>
           </div>
-          <Link className="text-sm font-semibold text-ht-blue" href="/dashboard/proposals">
+          <Link className="text-sm font-semibold text-ht-light-blue" href="/dashboard/proposals">
             查看全部
           </Link>
         </div>
@@ -67,18 +68,20 @@ export default async function DashboardPage() {
             proposals.docs.map((proposal) => (
               <div
                 key={proposal.id}
-                className="flex flex-col gap-3 rounded-[1.5rem] border border-slate-200 p-5 md:flex-row md:items-center md:justify-between"
+                className="theme-dashboard-panel-soft flex flex-col gap-3 rounded-lg p-5 md:flex-row md:items-center md:justify-between"
               >
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-950">{proposal.title}</h3>
-                  <p className="mt-2 text-sm text-slate-500">
+                  <h3 className="text-lg font-semibold text-[var(--ht-text-primary)]">
+                    {proposal.title}
+                  </h3>
+                  <p className="mt-2 text-sm text-[var(--ht-text-muted)]">
                     {proposal.contactCompany} · {formatDate(proposal.createdAt, '刚刚')}
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
                   <ProposalStatusBadge status={proposal.status} />
                   <Link
-                    className="text-sm font-semibold text-ht-blue"
+                    className="text-sm font-semibold text-ht-light-blue"
                     href={`/dashboard/proposals/${proposal.id}`}
                   >
                     查看详情

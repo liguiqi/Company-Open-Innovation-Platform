@@ -32,15 +32,15 @@ export default async function ProposalsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="text-3xl font-semibold text-slate-950">方案管理</h2>
-          <p className="mt-2 text-sm text-slate-500">
+          <h2 className="theme-page-title text-3xl font-semibold">方案管理</h2>
+          <p className="theme-page-description mt-2 text-sm">
             {user.role === 'admin' || user.role === 'reviewer'
               ? '查看并处理全量方案记录。'
               : '查看您已提交的方案、附件和评审状态。'}
           </p>
         </div>
         <Link
-          className="rounded-full bg-ht-blue px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-950"
+          className="theme-primary-button rounded-md px-5 py-3 text-sm font-semibold"
           href="/dashboard/proposals/new"
         >
           提交新方案
@@ -50,14 +50,13 @@ export default async function ProposalsPage() {
       {proposals.docs.length ? (
         <div className="space-y-4">
           {proposals.docs.map((proposal) => (
-            <div
-              key={proposal.id}
-              className="rounded-[2rem] border border-white/70 bg-white p-6 shadow-lg shadow-slate-200/60"
-            >
+            <div key={proposal.id} className="theme-dashboard-panel rounded-[1rem] p-6">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <h3 className="text-2xl font-semibold text-slate-950">{proposal.title}</h3>
-                  <p className="mt-2 text-sm text-slate-500">
+                  <h3 className="text-2xl font-semibold text-[var(--ht-text-primary)]">
+                    {proposal.title}
+                  </h3>
+                  <p className="mt-2 text-sm text-[var(--ht-text-muted)]">
                     {proposalTypeMap[proposal.type]} · {proposal.contactCompany} · 提交时间{' '}
                     {formatDate(proposal.createdAt)}
                   </p>
@@ -65,7 +64,7 @@ export default async function ProposalsPage() {
                 <ProposalStatusBadge status={proposal.status} />
               </div>
 
-              <div className="mt-5 flex flex-wrap gap-4 text-sm text-slate-500">
+              <div className="mt-5 flex flex-wrap gap-4 text-sm text-[var(--ht-text-muted)]">
                 <span>联系人：{proposal.contactName}</span>
                 <span>邮箱：{proposal.contactEmail}</span>
                 {proposal.relatedNeed && typeof proposal.relatedNeed !== 'number' ? (
@@ -75,7 +74,7 @@ export default async function ProposalsPage() {
 
               <div className="mt-5">
                 <Link
-                  className="text-sm font-semibold text-ht-blue"
+                  className="text-sm font-semibold text-ht-light-blue"
                   href={`/dashboard/proposals/${proposal.id}`}
                 >
                   查看详情

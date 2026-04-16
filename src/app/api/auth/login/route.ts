@@ -53,6 +53,6 @@ export async function POST(request: Request) {
     response.headers.append('Set-Cookie', await createAuthCookie(result.user))
     return response
   } catch {
-    return NextResponse.json({ error: '邮箱或密码错误' }, { status: 401 })
+    return NextResponse.json({ error: '邮箱/手机号或密码错误' }, { status: 401 })
   }
 }

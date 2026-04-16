@@ -1,7 +1,14 @@
 import { z } from 'zod'
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const phoneRegex = /^1\d{10}$/
+
 export const loginSchema = z.object({
-  identifier: z.string().trim().min(1, '请输入邮箱或用户名'),
+  identifier: z
+    .string()
+    .trim()
+    .min(1, '请输入邮箱或手机号')
+    .refine((value) => emailRegex.test(value) || phoneRegex.test(value), '请输入邮箱或手机号'),
   password: z.string().min(6, '密码至少 6 位'),
 })
 
@@ -12,12 +19,7 @@ export const registerSchema = z
     name: z.string().trim().min(2, '请输入联系人姓名'),
     password: z.string().min(6, '密码至少 6 位'),
     passwordConfirm: z.string().min(6, '请再次输入密码'),
-    phone: z
-      .string()
-      .trim()
-      .regex(/^1\d{10}$/, '请输入正确的手机号码')
-      .optional()
-      .or(z.literal('')),
+    phone: z.string().trim().regex(phoneRegex, '请输入正确的手机号码').optional().or(z.literal('')),
     username: z
       .string()
       .trim()
@@ -30,10 +32,7 @@ export const registerSchema = z
   })
 
 export const smsSendSchema = z.object({
-  phone: z
-    .string()
-    .trim()
-    .regex(/^1\d{10}$/, '请输入正确的手机号码'),
+  phone: z.string().trim().regex(phoneRegex, '请输入正确的手机号码'),
 })
 
 export const smsVerifySchema = z.object({
@@ -42,10 +41,7 @@ export const smsVerifySchema = z.object({
     .trim()
     .regex(/^\d{6}$/, '请输入 6 位验证码'),
   name: z.string().trim().optional(),
-  phone: z
-    .string()
-    .trim()
-    .regex(/^1\d{10}$/, '请输入正确的手机号码'),
+  phone: z.string().trim().regex(phoneRegex, '请输入正确的手机号码'),
 })
 
 export const proposalCreateSchema = z.object({

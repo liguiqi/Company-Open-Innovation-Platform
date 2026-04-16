@@ -39,20 +39,22 @@ export default function ProcessPage() {
         {steps.map((step, index) => (
           <article
             key={step.number}
-            className={`rounded-[2rem] border border-white/70 bg-white p-7 text-center shadow-lg shadow-slate-200/60 ${index === 1 ? 'border-t-4 border-t-ht-light-blue' : index === 2 ? 'border-t-4 border-t-ht-blue' : index === 3 ? 'border-t-4 border-t-emerald-500' : 'border-t-4 border-t-slate-300'}`}
+            className={`theme-card rounded-[1rem] border-t-4 p-7 text-center ${index === 1 ? 'border-t-ht-light-blue' : index === 2 ? 'border-t-ht-blue' : index === 3 ? 'border-t-emerald-500' : 'border-t-slate-300'}`}
           >
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-lg font-semibold text-slate-700">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-md bg-[var(--ht-input-bg)] text-lg font-semibold text-[var(--ht-text-secondary)]">
               {step.number}
             </div>
-            <h3 className="mt-4 text-xl font-semibold text-slate-950">{step.title}</h3>
-            <p className="mt-3 text-sm leading-7 text-slate-500">{step.description}</p>
+            <h3 className="mt-4 text-xl font-semibold text-[var(--ht-text-primary)]">
+              {step.title}
+            </h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ht-text-muted)]">{step.description}</p>
           </article>
         ))}
       </div>
 
       <div className="mt-12 text-center">
         <Link
-          className="rounded-full bg-ht-light-blue px-6 py-3 text-sm font-semibold text-white transition hover:bg-ht-blue"
+          className="theme-accent-button rounded-md px-6 py-3 text-sm font-semibold"
           href="/submit"
         >
           立即开始提交

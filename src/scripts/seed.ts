@@ -18,7 +18,7 @@ function createSVGBuffer(title: string, subtitle: string, color: string) {
       <circle cx="1040" cy="520" r="180" fill="rgba(255,255,255,0.06)" />
       <text x="90" y="270" fill="white" font-size="58" font-family="Arial, Microsoft YaHei, sans-serif" font-weight="700">${title}</text>
       <text x="90" y="340" fill="rgba(255,255,255,0.78)" font-size="28" font-family="Arial, Microsoft YaHei, sans-serif">${subtitle}</text>
-      <text x="90" y="580" fill="rgba(255,255,255,0.55)" font-size="22" font-family="Arial, Microsoft YaHei, sans-serif">H&T Open Innovation Platform</text>
+      <text x="90" y="580" fill="rgba(255,255,255,0.55)" font-size="22" font-family="Arial, Microsoft YaHei, sans-serif">HeT Open Innovation Platform</text>
     </svg>
   `
 
@@ -115,7 +115,7 @@ async function ensureMedia({
 
 async function main() {
   const payload = await getPayloadClient()
-  payload.logger.info('Seeding H&T Open Innovation Platform ...')
+  payload.logger.info('Seeding HeT Open Innovation Platform ...')
 
   const reviewGroup = await upsertByField({
     collection: 'user-groups',
@@ -140,7 +140,7 @@ async function main() {
   const admin = await upsertByField({
     collection: 'users',
     data: {
-      company: 'H&T',
+      company: 'HeT',
       email: appEnv.DEFAULT_ADMIN_EMAIL || 'admin@innovation.local',
       emailVerificationExpiresAt: null,
       emailVerificationToken: '',
@@ -158,7 +158,7 @@ async function main() {
   const reviewer = await upsertByField({
     collection: 'users',
     data: {
-      company: 'H&T',
+      company: 'HeT',
       email: appEnv.DEFAULT_REVIEWER_EMAIL || 'reviewer@innovation.local',
       emailVerificationExpiresAt: null,
       emailVerificationToken: '',
@@ -263,13 +263,13 @@ async function main() {
     alt: '洗衣机直驱变频方案',
     color: '#004098',
     filename: 'case-washer.svg',
-    subtitle: 'H&T × Partner A',
+    subtitle: 'HeT × Partner A',
   })
   const caseCoverB = await ensureMedia({
     alt: '低成本离线语音控制模组',
     color: '#00A0E9',
     filename: 'case-voice.svg',
-    subtitle: 'H&T × Partner B',
+    subtitle: 'HeT × Partner B',
   })
 
   await upsertByField({
@@ -351,7 +351,7 @@ async function main() {
       partnerName: 'Partner B (AI Startup)',
       publishedAt: '2026-02-06T10:00:00.000Z',
       slug: 'offline-voice-module',
-      summary: '借助轻量级 NLP 模型和 H&T 平台算法，在低成本 MCU 平台实现高识别率离线语音交互。',
+      summary: '借助轻量级 NLP 模型和 HeT 平台算法，在低成本 MCU 平台实现高识别率离线语音交互。',
       title: '低成本离线语音控制模组',
       whitePaperUrl: 'https://example.com/whitepapers/offline-voice-module.pdf',
     },

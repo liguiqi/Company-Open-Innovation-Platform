@@ -39,33 +39,43 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
 
   return (
     <div className="space-y-6">
-      <div className="rounded-[2rem] border border-white/70 bg-white p-8 shadow-lg shadow-slate-200/60">
+      <div className="theme-dashboard-panel rounded-[1rem] p-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.35em] text-ht-light-blue">
               {proposalTypeMap[proposal.type]}
             </p>
-            <h2 className="mt-3 text-4xl font-semibold text-slate-950">{proposal.title}</h2>
+            <h2 className="mt-3 text-4xl font-semibold text-[var(--ht-text-primary)]">
+              {proposal.title}
+            </h2>
           </div>
           <ProposalStatusBadge status={proposal.status} />
         </div>
 
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-[1.5rem] bg-slate-50 p-4">
-            <p className="text-xs uppercase tracking-[0.3em] text-slate-400">联系人</p>
-            <p className="mt-2 text-sm font-medium text-slate-900">{proposal.contactName}</p>
+          <div className="theme-dashboard-panel-soft rounded-[0.75rem] p-4">
+            <p className="text-xs uppercase tracking-[0.3em] text-[var(--ht-text-muted)]">联系人</p>
+            <p className="mt-2 text-sm font-medium text-[var(--ht-text-primary)]">
+              {proposal.contactName}
+            </p>
           </div>
-          <div className="rounded-[1.5rem] bg-slate-50 p-4">
-            <p className="text-xs uppercase tracking-[0.3em] text-slate-400">邮箱</p>
-            <p className="mt-2 text-sm font-medium text-slate-900">{proposal.contactEmail}</p>
+          <div className="theme-dashboard-panel-soft rounded-[0.75rem] p-4">
+            <p className="text-xs uppercase tracking-[0.3em] text-[var(--ht-text-muted)]">邮箱</p>
+            <p className="mt-2 text-sm font-medium text-[var(--ht-text-primary)]">
+              {proposal.contactEmail}
+            </p>
           </div>
-          <div className="rounded-[1.5rem] bg-slate-50 p-4">
-            <p className="text-xs uppercase tracking-[0.3em] text-slate-400">公司</p>
-            <p className="mt-2 text-sm font-medium text-slate-900">{proposal.contactCompany}</p>
+          <div className="theme-dashboard-panel-soft rounded-[0.75rem] p-4">
+            <p className="text-xs uppercase tracking-[0.3em] text-[var(--ht-text-muted)]">公司</p>
+            <p className="mt-2 text-sm font-medium text-[var(--ht-text-primary)]">
+              {proposal.contactCompany}
+            </p>
           </div>
-          <div className="rounded-[1.5rem] bg-slate-50 p-4">
-            <p className="text-xs uppercase tracking-[0.3em] text-slate-400">提交时间</p>
-            <p className="mt-2 text-sm font-medium text-slate-900">
+          <div className="theme-dashboard-panel-soft rounded-[0.75rem] p-4">
+            <p className="text-xs uppercase tracking-[0.3em] text-[var(--ht-text-muted)]">
+              提交时间
+            </p>
+            <p className="mt-2 text-sm font-medium text-[var(--ht-text-primary)]">
               {formatDate(proposal.createdAt)}
             </p>
           </div>
@@ -73,18 +83,20 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
 
         <div className="mt-8 space-y-8">
           <section>
-            <h3 className="text-xl font-semibold text-slate-950">技术描述</h3>
-            <p className="mt-3 whitespace-pre-line text-sm leading-8 text-slate-600">
+            <h3 className="text-xl font-semibold text-[var(--ht-text-primary)]">技术描述</h3>
+            <p className="mt-3 whitespace-pre-line text-sm leading-8 text-[var(--ht-text-secondary)]">
               {lexicalToPlainText(proposal.description)}
             </p>
           </section>
 
           {proposal.relatedNeed && typeof proposal.relatedNeed !== 'number' ? (
             <section>
-              <h3 className="text-xl font-semibold text-slate-950">关联需求</h3>
-              <p className="mt-3 text-sm text-slate-600">{proposal.relatedNeed.title}</p>
+              <h3 className="text-xl font-semibold text-[var(--ht-text-primary)]">关联需求</h3>
+              <p className="mt-3 text-sm text-[var(--ht-text-secondary)]">
+                {proposal.relatedNeed.title}
+              </p>
               <Link
-                className="mt-2 inline-flex text-sm font-semibold text-ht-blue"
+                className="mt-2 inline-flex text-sm font-semibold text-ht-light-blue"
                 href={`/needs/${proposal.relatedNeed.needId}`}
               >
                 查看需求详情
@@ -93,13 +105,13 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
           ) : null}
 
           <section>
-            <h3 className="text-xl font-semibold text-slate-950">附件</h3>
+            <h3 className="text-xl font-semibold text-[var(--ht-text-primary)]">附件</h3>
             <div className="mt-3 flex flex-wrap gap-3">
               {attachments.length ? (
                 attachments.map((item) => (
                   <a
                     key={item.id}
-                    className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:border-ht-blue hover:text-ht-blue"
+                    className="theme-file-link rounded-md px-4 py-2 text-sm font-medium"
                     href={item.url || '#'}
                     rel="noreferrer"
                     target="_blank"
@@ -108,14 +120,14 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
                   </a>
                 ))
               ) : (
-                <p className="text-sm text-slate-500">当前没有上传附件。</p>
+                <p className="text-sm text-[var(--ht-text-muted)]">当前没有上传附件。</p>
               )}
             </div>
           </section>
 
           <section>
-            <h3 className="text-xl font-semibold text-slate-950">评审意见</h3>
-            <p className="mt-3 whitespace-pre-line text-sm leading-8 text-slate-600">
+            <h3 className="text-xl font-semibold text-[var(--ht-text-primary)]">评审意见</h3>
+            <p className="mt-3 whitespace-pre-line text-sm leading-8 text-[var(--ht-text-secondary)]">
               {reviewNotesText || '当前尚未填写评审意见。'}
             </p>
           </section>

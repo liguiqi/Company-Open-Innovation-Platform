@@ -64,15 +64,12 @@ export function ProposalReviewForm({
   }
 
   return (
-    <form
-      action={onSubmit}
-      className="space-y-5 rounded-[2rem] border border-white/70 bg-white p-6 shadow-lg shadow-slate-200/60"
-    >
+    <form action={onSubmit} className="theme-dashboard-panel space-y-5 rounded-[1rem] p-6">
       <div className="grid gap-4 md:grid-cols-[220px_1fr]">
-        <label className="space-y-2 text-sm font-medium text-slate-700">
+        <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
           状态流转
           <select
-            className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-ht-blue"
+            className="theme-input w-full rounded-lg px-4 py-3"
             name="status"
             onChange={(event) => setStatusValue(event.target.value)}
             value={statusValue}
@@ -84,10 +81,10 @@ export function ProposalReviewForm({
           </select>
         </label>
 
-        <label className="space-y-2 text-sm font-medium text-slate-700">
+        <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
           评审意见
           <textarea
-            className="min-h-36 w-full rounded-[0.75rem] border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-ht-blue"
+            className="theme-input min-h-36 w-full rounded-[0.75rem] px-4 py-3"
             name="reviewNotes"
             onChange={(event) => setReviewNotesValue(event.target.value)}
             placeholder="请填写技术可行性、推进建议、PoC 条件或驳回原因。"
@@ -98,11 +95,20 @@ export function ProposalReviewForm({
       </div>
 
       {error ? (
-        <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>
+        <p
+          className="rounded-lg border px-4 py-3 text-sm"
+          style={{
+            background: 'var(--ht-danger-bg)',
+            borderColor: 'var(--ht-danger-border)',
+            color: 'var(--ht-danger-text)',
+          }}
+        >
+          {error}
+        </p>
       ) : null}
 
       <button
-        className="rounded-full bg-ht-blue px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-950 disabled:opacity-60"
+        className="theme-primary-button rounded-md px-5 py-3 text-sm font-semibold disabled:opacity-60"
         disabled={isSubmitting}
         type="submit"
       >

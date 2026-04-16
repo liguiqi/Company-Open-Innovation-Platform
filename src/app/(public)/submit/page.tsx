@@ -19,13 +19,14 @@ export default async function SubmitPage({
   return (
     <div className="container-shell py-16">
       <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="rounded-[2.5rem] bg-slate-950 p-10 text-white shadow-2xl shadow-slate-300/50">
+        <div className="theme-card-contrast rounded-[1rem] p-10 shadow-sm shadow-slate-300/50">
           <SectionHeading
             description="方案提交需要先登录合作伙伴账号。登录后可上传资料、关联公开需求，并在工作台中追踪评审状态。"
             eyebrow="Submit"
+            tone="contrast"
             title="提交您的创新方案"
           />
-          <div className="mt-10 space-y-5 text-sm leading-7 text-slate-300">
+          <div className="mt-10 space-y-5 text-sm leading-7 text-[var(--ht-contrast-muted)]">
             <p>1. 使用邮箱密码或手机短信完成认证。</p>
             <p>2. 选择公开需求或开放式技术自荐类型。</p>
             <p>3. 填写技术摘要、联系人信息并上传附件。</p>
@@ -33,13 +34,13 @@ export default async function SubmitPage({
           </div>
           <div className="mt-10 flex flex-wrap gap-4">
             <Link
-              className="rounded-full bg-ht-light-blue px-6 py-3 text-sm font-semibold text-white transition hover:bg-white hover:text-ht-blue"
+              className="theme-accent-button rounded-md px-6 py-3 text-sm font-semibold"
               href={`/login${need ? `?redirect=/dashboard/proposals/new?need=${need}` : ''}`}
             >
               登录后提交
             </Link>
             <Link
-              className="rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white hover:text-ht-blue"
+              className="rounded-md border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10 hover:text-white"
               href="/register"
             >
               注册合作伙伴账号
@@ -47,10 +48,12 @@ export default async function SubmitPage({
           </div>
         </div>
 
-        <div className="rounded-[2.5rem] border border-white/70 bg-white p-8 shadow-xl shadow-slate-200/70">
+        <div className="theme-card rounded-[1rem] p-8">
           <p className="text-xs uppercase tracking-[0.35em] text-ht-light-blue">Notice</p>
-          <h2 className="mt-4 font-display text-4xl font-semibold text-slate-950">提交前说明</h2>
-          <div className="mt-6 space-y-4 text-sm leading-7 text-slate-600">
+          <h2 className="mt-4 font-display text-4xl font-semibold text-[var(--ht-text-primary)]">
+            提交前说明
+          </h2>
+          <div className="mt-6 space-y-4 text-sm leading-7 text-[var(--ht-text-secondary)]">
             <p>平台接受 PDF、PPT、Word 等附件，建议控制在 20MB 以内。</p>
             <p>评审时效通常为 3 至 5 个工作日，特殊需求会触发评审员加速流程。</p>
             <p>未签署 NDA 前，请勿直接上传源代码、未公开电路图或其他核心机密资料。</p>

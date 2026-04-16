@@ -100,17 +100,27 @@ export function LoginPanel({ redirectTo }: { redirectTo?: string }) {
   }
 
   return (
-    <div className="w-full rounded-[2rem] border border-white/60 bg-white/90 p-8 shadow-2xl shadow-slate-200/80 backdrop-blur">
-      <div className="inline-flex rounded-full bg-slate-100 p-1">
+    <div className="auth-panel w-full max-w-[460px] rounded-[1rem] p-7 md:p-8">
+      <div className="space-y-3">
+        <p className="text-xs uppercase tracking-[0.35em] text-[var(--ht-text-muted)]">
+          Workspace Access
+        </p>
+        <h2 className="text-3xl font-semibold text-[var(--ht-text-primary)]">登录工作台</h2>
+        <p className="text-sm leading-7 text-[var(--ht-text-muted)]">
+          使用邮箱/手机号密码，或短信验证码进入开放创新平台工作台。
+        </p>
+      </div>
+
+      <div className="auth-tabset mt-6 inline-flex rounded-md p-1">
         <button
-          className={`rounded-full px-4 py-2 text-sm font-semibold transition ${mode === 'password' ? 'bg-slate-950 text-white' : 'text-slate-500'}`}
+          className={`auth-tab rounded-md px-4 py-2 text-sm font-semibold ${mode === 'password' ? 'is-active' : ''}`}
           onClick={() => setMode('password')}
           type="button"
         >
-          邮箱 / 用户名
+          邮箱 / 手机
         </button>
         <button
-          className={`rounded-full px-4 py-2 text-sm font-semibold transition ${mode === 'sms' ? 'bg-slate-950 text-white' : 'text-slate-500'}`}
+          className={`auth-tab rounded-md px-4 py-2 text-sm font-semibold ${mode === 'sms' ? 'is-active' : ''}`}
           onClick={() => setMode('sms')}
           type="button"
         >
@@ -121,19 +131,19 @@ export function LoginPanel({ redirectTo }: { redirectTo?: string }) {
       <div className="mt-6">
         {mode === 'password' ? (
           <form action={onPasswordLogin} className="space-y-5">
-            <label className="block space-y-2 text-sm font-medium text-slate-700">
-              邮箱或用户名
+            <label className="block space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+              邮箱或手机号
               <input
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-ht-blue"
+                className="theme-input w-full rounded-lg px-4 py-3"
                 name="identifier"
-                placeholder="请输入邮箱或用户名"
+                placeholder="请输入邮箱或手机号"
                 required
               />
             </label>
-            <label className="block space-y-2 text-sm font-medium text-slate-700">
+            <label className="block space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
               登录密码
               <input
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-ht-blue"
+                className="theme-input w-full rounded-lg px-4 py-3"
                 name="password"
                 placeholder="请输入密码"
                 required
@@ -141,7 +151,7 @@ export function LoginPanel({ redirectTo }: { redirectTo?: string }) {
               />
             </label>
             <button
-              className="w-full rounded-full bg-ht-blue px-5 py-3 font-semibold text-white transition hover:bg-slate-950 disabled:opacity-60"
+              className="theme-primary-button w-full rounded-md px-5 py-3 font-semibold disabled:opacity-60"
               disabled={loading}
               type="submit"
             >
@@ -150,11 +160,11 @@ export function LoginPanel({ redirectTo }: { redirectTo?: string }) {
           </form>
         ) : (
           <form action={onSMSLogin} className="space-y-5">
-            <label className="block space-y-2 text-sm font-medium text-slate-700">
+            <label className="block space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
               手机号码
               <div className="flex gap-3">
                 <input
-                  className="min-w-0 flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-ht-blue"
+                  className="theme-input min-w-0 flex-1 rounded-lg px-4 py-3"
                   name="phone"
                   onChange={(event) => setPhone(event.target.value)}
                   placeholder="请输入 11 位手机号"
@@ -162,7 +172,7 @@ export function LoginPanel({ redirectTo }: { redirectTo?: string }) {
                   value={phone}
                 />
                 <button
-                  className="rounded-full border border-ht-light-blue px-4 py-2 text-sm font-semibold text-ht-light-blue transition hover:bg-sky-50 disabled:opacity-60"
+                  className="rounded-md border border-ht-light-blue px-4 py-2 text-sm font-semibold text-ht-light-blue transition hover:bg-[var(--ht-hover-soft)] disabled:opacity-60"
                   disabled={loading || phone.length !== 11}
                   onClick={sendCode}
                   type="button"
@@ -171,17 +181,17 @@ export function LoginPanel({ redirectTo }: { redirectTo?: string }) {
                 </button>
               </div>
             </label>
-            <label className="block space-y-2 text-sm font-medium text-slate-700">
+            <label className="block space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
               验证码
               <input
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-ht-blue"
+                className="theme-input w-full rounded-lg px-4 py-3"
                 name="code"
                 placeholder="请输入短信验证码"
                 required
               />
             </label>
             <button
-              className="w-full rounded-full bg-ht-blue px-5 py-3 font-semibold text-white transition hover:bg-slate-950 disabled:opacity-60"
+              className="theme-primary-button w-full rounded-md px-5 py-3 font-semibold disabled:opacity-60"
               disabled={loading}
               type="submit"
             >
@@ -192,25 +202,31 @@ export function LoginPanel({ redirectTo }: { redirectTo?: string }) {
       </div>
 
       {error ? (
-        <p className="mt-5 rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>
+        <p className="mt-5 rounded-lg border border-rose-200/70 bg-rose-50/85 px-4 py-3 text-sm text-rose-700">
+          {error}
+        </p>
       ) : null}
       {success ? (
-        <p className="mt-5 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+        <p className="mt-5 rounded-lg border border-emerald-200/70 bg-emerald-50/85 px-4 py-3 text-sm text-emerald-700">
           {success}
         </p>
       ) : null}
       {debugCode ? (
-        <p className="mt-3 rounded-2xl bg-sky-50 px-4 py-3 text-sm text-sky-700">
+        <p className="mt-3 rounded-lg border border-sky-200/70 bg-sky-50/85 px-4 py-3 text-sm text-sky-700">
           当前为开发联调模式，验证码：<strong>{debugCode}</strong>
         </p>
       ) : null}
 
-      <p className="mt-6 text-sm text-slate-500">
+      <p className="mt-6 text-sm text-[var(--ht-text-muted)]">
         还没有账号？{' '}
         <Link className="font-semibold text-ht-blue" href="/register">
           立即注册
         </Link>
       </p>
+
+      <div className="mt-4 border-t border-[color:var(--ht-border-soft)] pt-4 text-xs text-[var(--ht-text-muted)]">
+        登录后可查看公开需求、提交方案并进入内部评审流转。
+      </div>
     </div>
   )
 }
