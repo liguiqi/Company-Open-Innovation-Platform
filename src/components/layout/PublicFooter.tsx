@@ -57,8 +57,8 @@ export function PublicFooter() {
       <div className="border-t border-white/10">
         <div className="container-shell flex flex-col gap-3 py-5 text-xs text-[color:var(--ht-footer-muted)] md:flex-row md:items-center md:justify-between">
           <p>
-            © 2026 Shenzhen HET Intelligent Control Co., Ltd. All rights reserved. Power By LGQ
-            2026-04
+            © 2026 Shenzhen HET Intelligent Control Co., Ltd. All rights reserved. Powered by LGQ
+            {' | '}Ver 2026.04
           </p>
           <div className="flex gap-4">
             <Link href="/process">合作流程</Link>

@@ -50,8 +50,27 @@
     padding: 2rem;
   }
 
-  .login__brand .graphic-logo path {
-    fill: #004098;
+  .login__brand {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.4rem;
+  }
+
+  .payload-brand-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(100%, 24rem);
+  }
+
+  .payload-brand-logo__image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .payload-brand-logo__image--inverted {
+    filter: brightness(0) invert(1);
   }
 
   .template-minimal label,
@@ -152,11 +171,6 @@
     border: 1px solid rgba(148, 163, 184, 0.18);
     box-shadow: 0 24px 56px rgba(0, 0, 0, 0.42);
   }
-
-  .login__brand .graphic-logo path {
-    fill: #f8fbff;
-  }
-
   .template-minimal label,
   .template-minimal .field-label,
   .template-minimal .login__forgotPassword,

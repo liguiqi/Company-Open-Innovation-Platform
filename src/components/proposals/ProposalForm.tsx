@@ -5,6 +5,8 @@ import type { ChangeEvent, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 
+import { emitRouteTransitionStart } from '@/lib/navigation'
+
 type NeedOption = {
   id: number | string
   needId?: string | null
@@ -103,6 +105,7 @@ export function ProposalForm({
         return
       }
 
+      emitRouteTransitionStart()
       router.push(`/dashboard/proposals/${data.id}`)
       router.refresh()
     } catch {

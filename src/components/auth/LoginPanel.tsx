@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+import { emitRouteTransitionStart } from '@/lib/navigation'
+
 type Mode = 'password' | 'sms'
 
 export function LoginPanel({ redirectTo }: { redirectTo?: string }) {
@@ -39,6 +41,7 @@ export function LoginPanel({ redirectTo }: { redirectTo?: string }) {
       return
     }
 
+    emitRouteTransitionStart()
     router.push(redirectTo || data.redirectTo || '/dashboard')
     router.refresh()
   }
@@ -95,6 +98,7 @@ export function LoginPanel({ redirectTo }: { redirectTo?: string }) {
       return
     }
 
+    emitRouteTransitionStart()
     router.push(redirectTo || data.redirectTo || '/dashboard')
     router.refresh()
   }

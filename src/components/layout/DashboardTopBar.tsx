@@ -6,12 +6,14 @@ import { useRouter } from 'next/navigation'
 import type { User } from '@/payload-types'
 
 import { roleLabelMap } from '@/lib/constants'
+import { emitRouteTransitionStart } from '@/lib/navigation'
 
 export function DashboardTopBar({ user }: { user: Pick<User, 'name' | 'role' | 'email'> }) {
   const router = useRouter()
 
   async function logout() {
     await fetch('/api/auth/logout', { method: 'POST' })
+    emitRouteTransitionStart()
     router.push('/login')
     router.refresh()
   }
