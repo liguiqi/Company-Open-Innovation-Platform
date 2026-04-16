@@ -8,11 +8,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const user = await requireUser()
 
   return (
-    <div className="container-shell grid gap-6 py-6 lg:grid-cols-[280px_minmax(0,1fr)]">
-      <DashboardSidebar role={user.role} />
-      <div>
-        <DashboardTopBar user={user} />
-        {children}
+    <div className="container-shell py-6">
+      <div className="dashboard-workspace grid gap-6 lg:h-[calc(100vh-3rem)] lg:grid-cols-[280px_minmax(0,1fr)] lg:overflow-hidden">
+        <DashboardSidebar role={user.role} />
+        <div className="dashboard-main-scroll min-h-0 min-w-0 lg:overflow-y-auto lg:pr-2">
+          <DashboardTopBar user={user} />
+          {children}
+        </div>
       </div>
     </div>
   )

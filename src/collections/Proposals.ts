@@ -49,7 +49,7 @@ export const Proposals: CollectionConfig = {
     delete: ({ req }) => req.user?.role === 'admin',
   },
   admin: {
-    defaultColumns: ['title', 'type', 'status', 'contactCompany', 'updatedAt'],
+    defaultColumns: ['title', 'type', 'status', 'contactCompany', 'attachments', 'updatedAt'],
     group: '业务流程',
     useAsTitle: 'title',
   },
@@ -82,6 +82,9 @@ export const Proposals: CollectionConfig = {
     },
     {
       name: 'attachments',
+      admin: {
+        description: '附件文件统一保存在 media 集合中，可直接复用已上传的文档媒体记录。',
+      },
       type: 'relationship',
       hasMany: true,
       relationTo: 'media',

@@ -20,6 +20,7 @@ export default async function CasesPage() {
     <div className="container-shell py-16">
       <SectionHeading
         description="平台沉淀了Open Innovation与芯片厂商、算法公司和实验室合作完成的典型联合创新案例，用于展示协同研发和量产导入能力。"
+        descriptionClassName="lg:max-w-none lg:whitespace-nowrap"
         eyebrow="Success Stories"
         title="联合创新案例"
       />

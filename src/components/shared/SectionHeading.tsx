@@ -3,12 +3,14 @@ import { cn } from '@/lib/utils'
 export function SectionHeading({
   align = 'left',
   description,
+  descriptionClassName,
   eyebrow,
   tone = 'default',
   title,
 }: {
   align?: 'center' | 'left'
   description: string
+  descriptionClassName?: string
   eyebrow?: string
   tone?: 'contrast' | 'default'
   title: string
@@ -29,7 +31,9 @@ export function SectionHeading({
       <p
         className={cn(
           'max-w-3xl text-base leading-7',
+          align === 'center' && 'mx-auto',
           tone === 'contrast' ? 'text-[var(--ht-contrast-muted)]' : 'text-[var(--ht-text-muted)]',
+          descriptionClassName,
         )}
       >
         {description}

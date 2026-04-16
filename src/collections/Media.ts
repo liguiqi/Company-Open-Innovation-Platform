@@ -1,4 +1,6 @@
 import type { CollectionConfig } from 'payload'
+import fsPromises from 'fs/promises'
+import path from 'path'
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -36,7 +38,7 @@ export const Media: CollectionConfig = {
     delete: ({ req }) => req.user?.role === 'admin',
   },
   admin: {
-    defaultColumns: ['filename', 'purpose', 'mimeType', 'updatedAt'],
+    defaultColumns: ['filename', 'purpose', 'proposal', 'uploadedBy', 'mimeType', 'updatedAt'],
     group: '内容资产',
   },
   fields: [
@@ -62,17 +64,58 @@ export const Media: CollectionConfig = {
     },
     {
       name: 'proposal',
+      admin: {
+        description: '若该文档来自某条方案提交，这里会回指来源 proposal，便于二次复用。',
+      },
       type: 'relationship',
       relationTo: 'proposals',
     },
   ],
   upload: {
+    handlers: [
+      (_req, { doc, params }): void | Promise<Response> => {
+        const mediaDoc = doc as {
+          filename?: string | null
+          mimeType?: string | null
+          purpose?: string | null
+        }
+
+        if (mediaDoc.purpose !== 'document') {
+          return
+        }
+
+        const staticDir = path.resolve('./media')
+        const filePath = path.resolve(staticDir, params.filename)
+
+        if (!filePath.startsWith(`${staticDir}${path.sep}`)) {
+          return
+        }
+
+        return fsPromises.readFile(filePath).then((data) => {
+          const headers = new Headers()
+          const filename = mediaDoc.filename || params.filename
+
+          headers.set(
+            'Content-Disposition',
+            `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
+          )
+          headers.set('Content-Length', String(data.length))
+          headers.set('Content-Type', mediaDoc.mimeType || 'application/octet-stream')
+
+          return new Response(data, {
+            headers,
+            status: 200,
+          })
+        })
+      },
+    ],
     mimeTypes: [
       'application/pdf',
       'application/msword',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'application/vnd.ms-powerpoint',
       'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'text/plain',
       'image/*',
     ],
     staticDir: './media',

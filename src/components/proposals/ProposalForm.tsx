@@ -1,5 +1,7 @@
 'use client'
 
+import type { ChangeEvent, FormEvent } from 'react'
+
 import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 
@@ -7,6 +9,35 @@ type NeedOption = {
   id: number | string
   needId?: string | null
   title: string
+}
+
+type SelectedAttachment = {
+  file: File
+  id: string
+}
+
+function buildAttachmentSignature(file: File) {
+  return `${file.name}-${file.size}-${file.type}`
+}
+
+function formatFileSize(size: number) {
+  if (size < 1024) {
+    return `${size} B`
+  }
+
+  if (size < 1024 * 1024) {
+    return `${(size / 1024).toFixed(1)} KB`
+  }
+
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function buildAttachmentId(file: File, index: number) {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+
+  return `${file.name}-${file.size}-${file.lastModified}-${Date.now()}-${index}`
 }
 
 export function ProposalForm({
@@ -19,14 +50,46 @@ export function ProposalForm({
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [selectedAttachments, setSelectedAttachments] = useState<SelectedAttachment[]>([])
 
   const needsMap = useMemo(() => new Map(needs.map((need) => [String(need.id), need])), [needs])
 
-  async function onSubmit(formData: FormData) {
+  function onAttachmentChange(event: ChangeEvent<HTMLInputElement>) {
+    const nextFiles = Array.from(event.target.files || [])
+
+    if (!nextFiles.length) {
+      return
+    }
+
+    setSelectedAttachments((current) => {
+      const existingSignatures = new Set(current.map(({ file }) => buildAttachmentSignature(file)))
+
+      const appended = nextFiles
+        .filter((file) => !existingSignatures.has(buildAttachmentSignature(file)))
+        .map((file, index) => ({
+          file,
+          id: buildAttachmentId(file, index),
+        }))
+
+      return [...current, ...appended]
+    })
+
+    event.target.value = ''
+  }
+
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
     setIsSubmitting(true)
     setError(null)
 
     try {
+      const formData = new FormData(event.currentTarget)
+      formData.delete('attachments')
+
+      selectedAttachments.forEach(({ file }) => {
+        formData.append('attachments', file, file.name)
+      })
+
       const response = await fetch('/api/proposals', {
         body: formData,
         method: 'POST',
@@ -50,7 +113,7 @@ export function ProposalForm({
   }
 
   return (
-    <form action={onSubmit} className="theme-dashboard-panel space-y-8 rounded-[1rem] p-8">
+    <form className="theme-dashboard-panel space-y-8 rounded-[1rem] p-8" onSubmit={onSubmit}>
       <div className="grid gap-6 md:grid-cols-2">
         <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
           方案类型
@@ -111,15 +174,53 @@ export function ProposalForm({
       <div className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
         <label>附件上传</label>
         <input
-          accept=".pdf,.ppt,.pptx,.doc,.docx"
+          accept=".txt,.pdf,.ppt,.pptx,.doc,.docx,text/plain"
           className="block w-full rounded-[0.75rem] border border-dashed border-[color:var(--ht-input-border)] bg-[var(--ht-input-bg)] px-4 py-4 text-[var(--ht-text-secondary)]"
           multiple
           name="attachments"
+          onChange={onAttachmentChange}
           type="file"
         />
         <p className="text-xs text-[var(--ht-text-muted)]">
-          支持 PDF / PPT / Word，单文件建议不超过 20MB。
+          支持 TXT / PDF / PPT / Word，可一次选择多个文件；单文件建议不超过 20MB。
         </p>
+
+        {selectedAttachments.length ? (
+          <div className="overflow-hidden rounded-[0.75rem] border border-[color:var(--ht-border-soft)] bg-[var(--ht-card-soft)]">
+            <div className="grid grid-cols-[minmax(0,1fr)_88px_64px] gap-2 border-b border-[color:var(--ht-border-soft)] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--ht-text-muted)]">
+              <span>附件名称</span>
+              <span className="text-right">大小</span>
+              <span className="text-right">操作</span>
+            </div>
+
+            <div className="divide-y divide-[color:var(--ht-border-soft)]">
+              {selectedAttachments.map(({ file, id }) => (
+                <div
+                  key={id}
+                  className="grid grid-cols-[minmax(0,1fr)_88px_64px] items-center gap-2 px-3 py-2 text-sm text-[var(--ht-text-secondary)]"
+                >
+                  <span className="truncate font-medium text-[var(--ht-text-primary)]">
+                    {file.name}
+                  </span>
+                  <span className="text-right text-xs text-[var(--ht-text-muted)]">
+                    {formatFileSize(file.size)}
+                  </span>
+                  <button
+                    className="justify-self-end rounded-md border border-[color:var(--ht-border-soft)] px-2 py-1 text-[11px] font-semibold text-[var(--ht-text-secondary)] transition hover:border-rose-300 hover:text-rose-500"
+                    onClick={() => {
+                      setSelectedAttachments((current) =>
+                        current.filter((attachment) => attachment.id !== id),
+                      )
+                    }}
+                    type="button"
+                  >
+                    取消
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">

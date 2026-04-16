@@ -112,9 +112,8 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
                   <a
                     key={item.id}
                     className="theme-file-link rounded-md px-4 py-2 text-sm font-medium"
-                    href={item.url || '#'}
-                    rel="noreferrer"
-                    target="_blank"
+                    download={item.filename || true}
+                    href={`/api/attachments/${item.id}`}
                   >
                     {item.filename}
                   </a>

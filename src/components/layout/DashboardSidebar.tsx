@@ -27,7 +27,7 @@ export function DashboardSidebar({ role }: { role: User['role'] }) {
   const items = role === 'admin' ? [...baseItems, ...adminItems] : baseItems
 
   return (
-    <aside className="theme-dashboard-panel sticky top-4 overflow-hidden rounded-xl p-5">
+    <aside className="dashboard-sidebar theme-dashboard-panel relative overflow-hidden rounded-xl p-5 lg:flex lg:h-full lg:min-h-0 lg:flex-col">
       <div
         className="pointer-events-none absolute inset-x-0 top-0 h-24"
         style={{
@@ -36,7 +36,7 @@ export function DashboardSidebar({ role }: { role: User['role'] }) {
         }}
       />
 
-      <div className="theme-dashboard-highlight relative mb-8 rounded-lg p-4">
+      <div className="dashboard-sidebar-brand theme-dashboard-highlight relative mb-8 rounded-lg p-4">
         <Link aria-label="返回首页" className="block" href="/">
           <HetBrandLogo className="w-[152px] sm:w-[164px]" priority />
         </Link>
@@ -52,38 +52,41 @@ export function DashboardSidebar({ role }: { role: User['role'] }) {
         </div>
       </div>
 
-      <nav className="space-y-2">
-        {items.map((item) => {
-          const active =
-            pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
-          const Icon = item.icon
+      <div className="dashboard-sidebar-scroll min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1">
+        <nav className="space-y-2">
+          {items.map((item) => {
+            const active =
+              pathname === item.href ||
+              (item.href !== '/dashboard' && pathname.startsWith(item.href))
+            const Icon = item.icon
 
-          return (
-            <Link
-              key={item.href}
-              className={cn(
-                'theme-dashboard-nav-link group flex items-center gap-3 rounded-lg border border-transparent px-3 py-3 text-sm font-medium',
-                active && 'is-active',
-              )}
-              href={item.href}
-            >
-              <span className="theme-dashboard-nav-icon flex h-10 w-10 items-center justify-center rounded-lg">
-                <Icon size={18} />
-              </span>
-              <span className="flex-1">{item.label}</span>
-              {active ? <span className="h-2.5 w-2.5 rounded-sm bg-ht-light-blue" /> : null}
-            </Link>
-          )
-        })}
-      </nav>
+            return (
+              <Link
+                key={item.href}
+                className={cn(
+                  'theme-dashboard-nav-link group flex items-center gap-3 rounded-lg border border-transparent px-3 py-3 text-sm font-medium',
+                  active && 'is-active',
+                )}
+                href={item.href}
+              >
+                <span className="theme-dashboard-nav-icon flex h-10 w-10 items-center justify-center rounded-lg">
+                  <Icon size={18} />
+                </span>
+                <span className="flex-1">{item.label}</span>
+                {active ? <span className="h-2.5 w-2.5 rounded-sm bg-ht-light-blue" /> : null}
+              </Link>
+            )
+          })}
+        </nav>
 
-      <div className="theme-dashboard-info mt-8 rounded-lg p-4 text-sm text-[var(--ht-text-secondary)]">
-        <p className="text-xs uppercase tracking-[0.3em] text-ht-light-blue">Content Ops</p>
-        <p className="mt-2 font-semibold text-[var(--ht-text-primary)]">Payload Admin</p>
-        <p className="mt-2 leading-6 text-[var(--ht-text-secondary)]">
-          内容结构、媒体资产和权限策略仍可直接在{' '}
-          <span className="font-semibold text-ht-blue">/admin</span> 中维护。
-        </p>
+        <div className="theme-dashboard-info mt-8 rounded-lg p-4 text-sm text-[var(--ht-text-secondary)]">
+          <p className="text-xs uppercase tracking-[0.3em] text-ht-light-blue">Content Ops</p>
+          <p className="mt-2 font-semibold text-[var(--ht-text-primary)]">Payload Admin</p>
+          <p className="mt-2 leading-6 text-[var(--ht-text-secondary)]">
+            内容结构、媒体资产和权限策略仍可直接在{' '}
+            <span className="font-semibold text-ht-blue">/admin</span> 中维护。
+          </p>
+        </div>
       </div>
     </aside>
   )
