@@ -38,7 +38,7 @@ export function DashboardSidebar({ role }: { role: User['role'] }) {
 
       <div className="dashboard-sidebar-brand theme-dashboard-highlight relative mb-8 rounded-lg p-4">
         <Link aria-label="返回首页" className="block" href="/">
-          <HetBrandLogo className="w-[152px] sm:w-[164px]" priority />
+          <HetBrandLogo className="theme-logo-adaptive w-[152px] sm:w-[164px]" priority />
         </Link>
         <div className="mt-3 flex items-center gap-3">
           <span className="h-px flex-1 bg-[color:var(--ht-border-soft)]" />
@@ -47,7 +47,7 @@ export function DashboardSidebar({ role }: { role: User['role'] }) {
           </p>
         </div>
         <div className="mt-3 flex items-center justify-between gap-3">
-          <p className="text-sm text-[var(--ht-text-secondary)]">开放创新工作台</p>
+          <p className="text-[13px] leading-5 text-[var(--ht-text-secondary)]">开放创新工作台</p>
           <ThemeToggle className="shrink-0" />
         </div>
       </div>
@@ -89,7 +89,7 @@ export function DashboardSidebar({ role }: { role: User['role'] }) {
         </div>
       </div>
 
-      <div className="mt-6 border-t border-[color:var(--ht-border-soft)] pt-4 text-center text-[11px] leading-6 text-[var(--ht-text-muted)] lg:mt-4 lg:shrink-0">
+      <div className="theme-dashboard-legal mt-6 border-t border-[color:var(--ht-border-soft)] pt-4 text-center lg:mt-4 lg:shrink-0">
         <p>2026 HET. All rights reserved.</p>
         <p>HET Tech Research Inst. | LGQ</p>
       </div>

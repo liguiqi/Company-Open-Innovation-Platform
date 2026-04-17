@@ -89,6 +89,7 @@
   --ht-dashboard-icon-bg: rgba(241, 245, 249, 0.94);
   --ht-dashboard-icon-active: rgba(255, 255, 255, 0.98);
   --ht-dashboard-shell-glow: rgba(0, 160, 233, 0.14);
+  --ht-dashboard-legal-text: rgba(71, 85, 105, 0.66);
   --ht-warning-bg: rgba(255, 247, 237, 0.92);
   --ht-warning-border: rgba(251, 146, 60, 0.32);
   --ht-warning-text: #9a3412;
@@ -190,6 +191,7 @@ html[data-theme='dark'] {
   --ht-dashboard-icon-bg: rgba(15, 25, 40, 0.9);
   --ht-dashboard-icon-active: rgba(5, 18, 31, 0.98);
   --ht-dashboard-shell-glow: rgba(0, 160, 233, 0.18);
+  --ht-dashboard-legal-text: rgba(127, 145, 168, 0.52);
   --ht-warning-bg: rgba(71, 35, 10, 0.42);
   --ht-warning-border: rgba(251, 146, 60, 0.38);
   --ht-warning-text: #fdba74;
@@ -549,6 +551,12 @@ textarea {
   background: var(--ht-dashboard-icon-active);
   color: var(--ht-light-blue);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+.theme-dashboard-legal {
+  color: var(--ht-dashboard-legal-text);
+  font-size: 10px;
+  line-height: 1.7;
 }
 
 .auth-tabset {
