@@ -47,20 +47,21 @@
     border: 1px solid rgba(148, 163, 184, 0.22);
     border-radius: 18px;
     box-shadow: 0 20px 50px rgba(15, 23, 42, 0.16);
-    padding: 2rem;
+    padding: 2.9rem 2rem 2rem;
   }
 
   .login__brand {
     display: flex;
     justify-content: center;
-    margin-bottom: 1.4rem;
+    margin: 0 auto 2.2rem;
+    padding: 0.9rem 0 1.35rem;
   }
 
   .payload-brand-logo {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: min(100%, 24rem);
+    width: min(100%, 18rem);
   }
 
   .payload-brand-logo__image {
@@ -171,6 +172,7 @@
     border: 1px solid rgba(148, 163, 184, 0.18);
     box-shadow: 0 24px 56px rgba(0, 0, 0, 0.42);
   }
+
   .template-minimal label,
   .template-minimal .field-label,
   .template-minimal .login__forgotPassword,

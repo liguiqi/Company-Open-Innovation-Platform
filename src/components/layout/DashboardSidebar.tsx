@@ -88,6 +88,11 @@ export function DashboardSidebar({ role }: { role: User['role'] }) {
           </p>
         </div>
       </div>
+
+      <div className="mt-6 border-t border-[color:var(--ht-border-soft)] pt-4 text-center text-[11px] leading-6 text-[var(--ht-text-muted)] lg:mt-4 lg:shrink-0">
+        <p>2026 HET. All rights reserved.</p>
+        <p>HET Tech Research Inst. | LGQ</p>
+      </div>
     </aside>
   )
 }
