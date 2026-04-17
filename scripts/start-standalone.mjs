@@ -8,6 +8,8 @@ const rootDir = path.resolve(__dirname, '..')
 const buildDir = path.join(rootDir, '.next')
 const standaloneDir = path.join(buildDir, 'standalone')
 
+process.env.INNOVATION_MEDIA_DIR = path.join(rootDir, 'media')
+
 syncStandaloneAssets()
 
 if (existsSync(sourceMediaDir)) {

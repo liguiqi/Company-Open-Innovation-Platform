@@ -9,10 +9,12 @@ export default async function PublicLayout({ children }: { children: React.React
   const user = await getCurrentUser()
 
   return (
-    <RouteTransition>
+    <>
       <PublicHeader isLoggedIn={Boolean(user)} />
-      <main>{children}</main>
+      <main>
+        <RouteTransition>{children}</RouteTransition>
+      </main>
       <PublicFooter />
-    </RouteTransition>
+    </>
   )
 }

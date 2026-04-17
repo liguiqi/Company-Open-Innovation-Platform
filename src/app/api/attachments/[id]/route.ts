@@ -1,8 +1,8 @@
 import fsPromises from 'fs/promises'
-import path from 'path'
 import { NextResponse } from 'next/server'
 
 import { getRequestUser } from '@/lib/auth'
+import { getAttachmentContentDisposition, getRuntimeMediaDirs, resolveMediaPath } from '@/lib/media'
 import { getPayloadClient } from '@/lib/payload'
 
 function getRelationId(value: unknown) {
@@ -77,32 +77,32 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: '无权下载该附件' }, { status: 403 })
   }
 
-  const staticDir = path.resolve('./media')
-  const filePath = path.resolve(staticDir, media.filename)
+  for (const mediaDir of getRuntimeMediaDirs()) {
+    const filePath = resolveMediaPath(mediaDir, media.filename)
 
-  if (!filePath.startsWith(`${staticDir}${path.sep}`)) {
-    return NextResponse.json({ error: '附件路径无效' }, { status: 400 })
+    if (!filePath) {
+      return NextResponse.json({ error: '附件路径无效' }, { status: 400 })
+    }
+
+    const fileBuffer = await fsPromises.readFile(filePath).catch(() => null)
+
+    if (!fileBuffer) {
+      continue
+    }
+
+    const filename = media.filename
+    const headers = new Headers()
+
+    headers.set('Content-Disposition', getAttachmentContentDisposition(filename))
+    headers.set('Content-Length', String(fileBuffer.length))
+    headers.set('Content-Type', media.mimeType || 'application/octet-stream')
+    headers.set('Cache-Control', 'private, no-store')
+
+    return new Response(fileBuffer, {
+      headers,
+      status: 200,
+    })
   }
 
-  const fileBuffer = await fsPromises.readFile(filePath).catch(() => null)
-
-  if (!fileBuffer) {
-    return NextResponse.json({ error: '附件文件不存在' }, { status: 404 })
-  }
-
-  const filename = media.filename
-  const headers = new Headers()
-
-  headers.set(
-    'Content-Disposition',
-    `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
-  )
-  headers.set('Content-Length', String(fileBuffer.length))
-  headers.set('Content-Type', media.mimeType || 'application/octet-stream')
-  headers.set('Cache-Control', 'private, no-store')
-
-  return new Response(fileBuffer, {
-    headers,
-    status: 200,
-  })
+  return NextResponse.json({ error: '附件文件不存在' }, { status: 404 })
 }

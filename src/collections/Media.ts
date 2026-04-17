@@ -1,6 +1,12 @@
 import type { CollectionConfig } from 'payload'
 import fsPromises from 'fs/promises'
-import path from 'path'
+
+import {
+  getAttachmentContentDisposition,
+  getPersistentMediaDir,
+  getRuntimeMediaDirs,
+  resolveMediaPath,
+} from '@/lib/media'
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -80,33 +86,44 @@ export const Media: CollectionConfig = {
           purpose?: string | null
         }
 
+        if (!mediaDoc?.purpose || !params?.filename) {
+          return
+        }
+
         if (mediaDoc.purpose !== 'document') {
           return
         }
 
-        const staticDir = path.resolve('./media')
-        const filePath = path.resolve(staticDir, params.filename)
+        const filename = mediaDoc.filename || params.filename
 
-        if (!filePath.startsWith(`${staticDir}${path.sep}`)) {
-          return
-        }
+        return (async () => {
+          for (const mediaDir of getRuntimeMediaDirs()) {
+            const filePath = resolveMediaPath(mediaDir, params.filename)
 
-        return fsPromises.readFile(filePath).then((data) => {
-          const headers = new Headers()
-          const filename = mediaDoc.filename || params.filename
+            if (!filePath) {
+              return new Response(null, { status: 400 })
+            }
 
-          headers.set(
-            'Content-Disposition',
-            `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
-          )
-          headers.set('Content-Length', String(data.length))
-          headers.set('Content-Type', mediaDoc.mimeType || 'application/octet-stream')
+            const data = await fsPromises.readFile(filePath).catch(() => null)
 
-          return new Response(data, {
-            headers,
-            status: 200,
-          })
-        })
+            if (!data) {
+              continue
+            }
+
+            const headers = new Headers()
+
+            headers.set('Content-Disposition', getAttachmentContentDisposition(filename))
+            headers.set('Content-Length', String(data.length))
+            headers.set('Content-Type', mediaDoc.mimeType || 'application/octet-stream')
+
+            return new Response(data, {
+              headers,
+              status: 200,
+            })
+          }
+
+          return new Response(null, { status: 404 })
+        })()
       },
     ],
     mimeTypes: [
@@ -118,6 +135,6 @@ export const Media: CollectionConfig = {
       'text/plain',
       'image/*',
     ],
-    staticDir: './media',
+    staticDir: getPersistentMediaDir(),
   },
 }

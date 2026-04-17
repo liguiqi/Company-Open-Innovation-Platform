@@ -40,7 +40,13 @@ function isInternalNavigableLink(anchor: HTMLAnchorElement) {
   return true
 }
 
-export function RouteTransition({ children }: { children: ReactNode }) {
+export function RouteTransition({
+  children,
+  className,
+}: {
+  children: ReactNode
+  className?: string
+}) {
   const pathname = usePathname()
   const initialRenderRef = useRef(true)
   const resetTimerRef = useRef<number | null>(null)
@@ -137,7 +143,7 @@ export function RouteTransition({ children }: { children: ReactNode }) {
   }, [routeKey])
 
   return (
-    <>
+    <div className={cn('route-transition-shell', className)}>
       <div
         aria-hidden="true"
         className={cn('route-transition-overlay', isNavigating && 'is-active')}
@@ -145,6 +151,6 @@ export function RouteTransition({ children }: { children: ReactNode }) {
       <div className="route-transition-stage" key={routeKey}>
         {children}
       </div>
-    </>
+    </div>
   )
 }
