@@ -39,7 +39,7 @@ export default buildConfig({
   }),
   email: await nodemailerAdapter({
     defaultFromAddress: appEnv.SMTP_FROM_ADDRESS || appEnv.SMTP_USER || 'innovation@example.com',
-    defaultFromName: appEnv.SMTP_FROM_NAME || 'H&T Innovation Platform',
+    defaultFromName: appEnv.SMTP_FROM_NAME || 'HeT Innovation Platform',
     skipVerify: true,
     transportOptions: appEnv.smtpEnabled
       ? {
@@ -49,7 +49,10 @@ export default buildConfig({
           },
           host: appEnv.SMTP_HOST,
           port: appEnv.SMTP_PORT || 25,
-          secure: false,
+          secure: appEnv.smtpSecure,
+          tls: {
+            rejectUnauthorized: appEnv.smtpTlsRejectUnauthorized,
+          },
         }
       : undefined,
   }),

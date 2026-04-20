@@ -18,7 +18,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="theme-auth-shell__overlay absolute inset-0" />
 
       <div className="container-shell relative flex min-h-screen flex-col py-8 lg:py-12">
-        <div className="grid flex-1 w-full items-center gap-10 lg:grid-cols-[minmax(0,1fr)_460px] lg:gap-14">
+        <div className="grid flex-1 w-full items-center gap-10 lg:grid-cols-[minmax(0,1fr)_520px] lg:gap-14">
           <div className="space-y-10 text-[var(--ht-auth-text)]">
             <div className="space-y-4">
               <Link className="inline-flex" href="/">
@@ -35,13 +35,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             </div>
 
             <div className="max-w-2xl space-y-6">
-              <h1 className="font-display text-5xl font-semibold leading-none md:text-7xl">
+              <h1 className="font-display text-4xl font-semibold leading-none md:text-6xl xl:text-7xl">
                 开放协同，
                 <br />
-                快速导入。
+                高效导入。
               </h1>
               <p className="max-w-xl text-base leading-8 text-[var(--ht-auth-muted)] md:text-lg">
-                从公开需求发布、伙伴方案提交到内部评审流转，登录后即可进入Open Innovation开放创新工作台，与官网首页保持一致的创新协作入口。
+                从公开需求发布、合作伙伴方案提交到内部评审流转，登录后即可进入与官网视觉一致的创新协作入口。
               </p>
             </div>
 
@@ -59,7 +59,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </div>
 
           <div className="flex justify-center lg:justify-end">
-            <RouteTransition className="w-full max-w-[460px]">{children}</RouteTransition>
+            <RouteTransition className="w-full max-w-[520px]">{children}</RouteTransition>
           </div>
         </div>
 

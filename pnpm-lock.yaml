@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@alicloud/credentials':
+        specifier: ^2.4.4
+        version: 2.4.4
+      '@alicloud/dypnsapi20170525':
+        specifier: ^2.0.0
+        version: 2.0.0
       '@alicloud/dysmsapi20170525':
         specifier: 4.1.2
         version: 4.1.2
@@ -170,6 +176,9 @@ packages:
 
   '@alicloud/darabonba-string@1.0.3':
     resolution: {integrity: sha512-NyWwrU8cAIesWk3uHL1Q7pTDTqLkCI/0PmJXC4/4A0MFNAZ9Ouq0iFBsRqvfyUujSSM+WhYLuTfakQXiVLkTMA==}
+
+  '@alicloud/dypnsapi20170525@2.0.0':
+    resolution: {integrity: sha512-eVh1dJ2HA82bBHt+YZFIBzPEYW80FK+TSpcxSR9o0W+FgfTqBaj6eeIHnN7NFhyDAD/3+HtZ146Pmvr51JEEAg==}
 
   '@alicloud/dysmsapi20170525@4.1.2':
     resolution: {integrity: sha512-Wxg+wQjpBGmXCvmIf9QE0mBv9dcGI0q13NxzF48akLYjSf/Mpk7jbnYttqEzNZPpRMShi1wViANwo8q+WkvYfQ==}
@@ -4872,6 +4881,13 @@ snapshots:
   '@alicloud/darabonba-string@1.0.3':
     dependencies:
       '@alicloud/tea-typescript': 1.8.0
+    transitivePeerDependencies:
+      - supports-color
+
+  '@alicloud/dypnsapi20170525@2.0.0':
+    dependencies:
+      '@alicloud/openapi-core': 1.0.7
+      '@darabonba/typescript': 1.0.4
     transitivePeerDependencies:
       - supports-color
 

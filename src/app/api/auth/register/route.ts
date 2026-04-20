@@ -1,10 +1,13 @@
-import crypto from 'node:crypto'
-
 import { NextResponse } from 'next/server'
 
 import { getPayloadClient } from '@/lib/payload'
+import { buildSyntheticEmail } from '@/lib/utils'
 import { registerSchema } from '@/lib/validators'
-import { sendVerificationEmail } from '@/services/email'
+import { deleteCachedValue, getCachedValue } from '@/services/redis'
+
+function buildEmailCodeKey(email: string) {
+  return `email:otp:${email.trim().toLowerCase()}`
+}
 
 export async function POST(request: Request) {
   const body = await request.json()
@@ -18,7 +21,10 @@ export async function POST(request: Request) {
   }
 
   const payload = await getPayloadClient()
-  const { company, email, name, password, phone, username } = parsed.data
+  const { company, email, emailCode, name, password, phone, smsCode, username } = parsed.data
+  const normalizedEmail = email.trim().toLowerCase()
+  const normalizedPhone = phone.trim()
+  const effectiveEmail = normalizedEmail || buildSyntheticEmail(normalizedPhone)
 
   const [existingEmail, existingUsername, existingPhone] = await Promise.all([
     payload.find({
@@ -29,7 +35,7 @@ export async function POST(request: Request) {
       pagination: false,
       where: {
         email: {
-          equals: email,
+          equals: effectiveEmail,
         },
       },
     }),
@@ -54,7 +60,7 @@ export async function POST(request: Request) {
           pagination: false,
           where: {
             phone: {
-              equals: phone,
+              equals: normalizedPhone,
             },
           },
         })
@@ -73,29 +79,57 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: '该手机号已绑定其他账号' }, { status: 409 })
   }
 
-  const token = crypto.randomBytes(24).toString('hex')
-  const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24)
+  const now = new Date().toISOString()
+  const emailOTP = normalizedEmail ? await getCachedValue(buildEmailCodeKey(normalizedEmail)) : null
+  const phoneOTP = normalizedPhone ? await getCachedValue(`sms:otp:${normalizedPhone}`) : null
+  const emailVerified =
+    Boolean(normalizedEmail) && Boolean(emailCode) && Boolean(emailOTP) && emailOTP === emailCode
+  const phoneVerified =
+    Boolean(normalizedPhone) && Boolean(smsCode) && Boolean(phoneOTP) && phoneOTP === smsCode
+
+  if (normalizedEmail && emailCode && !emailVerified) {
+    return NextResponse.json({ error: '邮箱验证码错误或已过期' }, { status: 400 })
+  }
+
+  if (normalizedPhone && smsCode && !phoneVerified) {
+    return NextResponse.json({ error: '短信验证码错误或已过期' }, { status: 400 })
+  }
+
+  if (!emailVerified && !phoneVerified) {
+    return NextResponse.json({ error: '邮箱验证码或短信验证码至少完成一种' }, { status: 400 })
+  }
 
   const user = await payload.create({
     collection: 'users',
     data: {
       company,
-      email,
-      emailVerificationExpiresAt: expiresAt.toISOString(),
-      emailVerificationToken: token,
+      email: effectiveEmail,
+      emailVerificationExpiresAt: null,
+      emailVerificationToken: '',
+      emailVerifiedAt: emailVerified ? now : null,
       name,
       password,
-      phone: phone || undefined,
+      phone: normalizedPhone || undefined,
+      phoneVerifiedAt: phoneVerified ? now : null,
       role: 'partner',
       username,
     },
     overrideAccess: true,
   })
 
-  await sendVerificationEmail(user, token)
+  if (emailVerified && normalizedEmail) {
+    await deleteCachedValue(buildEmailCodeKey(normalizedEmail))
+  }
+
+  if (phoneVerified && normalizedPhone) {
+    await deleteCachedValue(`sms:otp:${normalizedPhone}`)
+  }
 
   return NextResponse.json({
-    message: '注册成功，请前往邮箱完成验证。',
+    message: `注册成功，已完成${[emailVerified ? '邮箱' : null, phoneVerified ? '手机' : null].filter(Boolean).join('和')}验证，可返回登录。`,
     ok: true,
+    user: {
+      id: user.id,
+    },
   })
 }

@@ -3,6 +3,18 @@ import { existsSync } from 'node:fs'
 import { config as loadEnv } from 'dotenv'
 import { z } from 'zod'
 
+function parseBoolean(value?: string | null) {
+  if (value == null || value === '') {
+    return undefined
+  }
+
+  return /^(1|true|yes|on)$/i.test(value)
+}
+
+function pickFirst(...values: Array<string | undefined>) {
+  return values.find((value) => value != null && value !== '')
+}
+
 if (existsSync('.env.local')) {
   loadEnv({ path: '.env.local', override: false })
 }
@@ -12,9 +24,16 @@ if (existsSync('.env')) {
 }
 
 const envSchema = z.object({
+  ALIYUN_ACCESS_KEY_ID: z.string().optional(),
+  ALIYUN_ACCESS_KEY_SECRET: z.string().optional(),
   ALIYUN_SMS_ACCESS_KEY_ID: z.string().optional(),
   ALIYUN_SMS_ACCESS_KEY_SECRET: z.string().optional(),
+  ALIYUN_SMS_COUNTRY_CODE: z.string().optional(),
+  ALIYUN_SMS_ENDPOINT: z.string().optional(),
+  ALIYUN_SMS_SCHEME_NAME: z.string().optional(),
+  ALIYUN_SMS_SIGN: z.string().optional(),
   ALIYUN_SMS_SIGN_NAME: z.string().optional(),
+  ALIYUN_SMS_TEMPLATE: z.string().optional(),
   ALIYUN_SMS_TEMPLATE_CODE: z.string().optional(),
   DATABASE_URI: z.string().optional(),
   DATABASE_URL: z.string().optional(),
@@ -31,18 +50,29 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PAYLOAD_SECRET: z.string().default('development-only-payload-secret-please-change'),
   REDIS_URL: z.string().optional(),
+  EMAIL_MOCK: z.string().optional(),
+  SMS_MOCK: z.string().optional(),
   SMTP_FROM_ADDRESS: z.string().optional(),
   SMTP_FROM_NAME: z.string().optional(),
   SMTP_HOST: z.string().optional(),
   SMTP_PASS: z.string().optional(),
   SMTP_PORT: z.coerce.number().optional(),
+  SMTP_SECURE: z.string().optional(),
+  SMTP_TLS_REJECT_UNAUTHORIZED: z.string().optional(),
   SMTP_USER: z.string().optional(),
 })
 
 export const env = envSchema.parse({
+  ALIYUN_ACCESS_KEY_ID: process.env.ALIYUN_ACCESS_KEY_ID,
+  ALIYUN_ACCESS_KEY_SECRET: process.env.ALIYUN_ACCESS_KEY_SECRET,
   ALIYUN_SMS_ACCESS_KEY_ID: process.env.ALIYUN_SMS_ACCESS_KEY_ID,
   ALIYUN_SMS_ACCESS_KEY_SECRET: process.env.ALIYUN_SMS_ACCESS_KEY_SECRET,
+  ALIYUN_SMS_COUNTRY_CODE: process.env.ALIYUN_SMS_COUNTRY_CODE,
+  ALIYUN_SMS_ENDPOINT: process.env.ALIYUN_SMS_ENDPOINT,
+  ALIYUN_SMS_SCHEME_NAME: process.env.ALIYUN_SMS_SCHEME_NAME,
+  ALIYUN_SMS_SIGN: process.env.ALIYUN_SMS_SIGN,
   ALIYUN_SMS_SIGN_NAME: process.env.ALIYUN_SMS_SIGN_NAME,
+  ALIYUN_SMS_TEMPLATE: process.env.ALIYUN_SMS_TEMPLATE,
   ALIYUN_SMS_TEMPLATE_CODE: process.env.ALIYUN_SMS_TEMPLATE_CODE,
   DATABASE_URI: process.env.DATABASE_URI,
   DATABASE_URL: process.env.DATABASE_URL,
@@ -59,23 +89,44 @@ export const env = envSchema.parse({
   NODE_ENV: process.env.NODE_ENV,
   PAYLOAD_SECRET: process.env.PAYLOAD_SECRET,
   REDIS_URL: process.env.REDIS_URL,
+  EMAIL_MOCK: process.env.EMAIL_MOCK,
+  SMS_MOCK: process.env.SMS_MOCK,
   SMTP_FROM_ADDRESS: process.env.SMTP_FROM_ADDRESS,
   SMTP_FROM_NAME: process.env.SMTP_FROM_NAME,
   SMTP_HOST: process.env.SMTP_HOST,
   SMTP_PASS: process.env.SMTP_PASS,
   SMTP_PORT: process.env.SMTP_PORT,
+  SMTP_SECURE: process.env.SMTP_SECURE,
+  SMTP_TLS_REJECT_UNAUTHORIZED: process.env.SMTP_TLS_REJECT_UNAUTHORIZED,
   SMTP_USER: process.env.SMTP_USER,
 })
 
 export const appEnv = {
   ...env,
+  emailMock: parseBoolean(env.EMAIL_MOCK) ?? false,
+  smsAccessKeyId: pickFirst(env.ALIYUN_ACCESS_KEY_ID, env.ALIYUN_SMS_ACCESS_KEY_ID) || '',
+  smsAccessKeySecret:
+    pickFirst(env.ALIYUN_ACCESS_KEY_SECRET, env.ALIYUN_SMS_ACCESS_KEY_SECRET) || '',
+  smsCountryCode: env.ALIYUN_SMS_COUNTRY_CODE || '86',
+  smsEndpoint: env.ALIYUN_SMS_ENDPOINT || 'dypnsapi.aliyuncs.com',
+  smsMock: parseBoolean(env.SMS_MOCK) ?? false,
+  smsSchemeName: env.ALIYUN_SMS_SCHEME_NAME || '平台验证码',
+  smsSignName: pickFirst(env.ALIYUN_SMS_SIGN, env.ALIYUN_SMS_SIGN_NAME) || '',
+  smsTemplateCode: pickFirst(env.ALIYUN_SMS_TEMPLATE, env.ALIYUN_SMS_TEMPLATE_CODE) || '',
+  smtpSecure: parseBoolean(env.SMTP_SECURE) ?? [465, 994].includes(env.SMTP_PORT || 0),
+  smtpTlsRejectUnauthorized: parseBoolean(env.SMTP_TLS_REJECT_UNAUTHORIZED) ?? true,
   databaseURL: env.DATABASE_URI || env.DATABASE_URL || '',
   isDevelopment: env.NODE_ENV === 'development',
   isProduction: env.NODE_ENV === 'production',
   smsEnabled:
-    Boolean(env.ALIYUN_SMS_ACCESS_KEY_ID) &&
-    Boolean(env.ALIYUN_SMS_ACCESS_KEY_SECRET) &&
-    Boolean(env.ALIYUN_SMS_SIGN_NAME) &&
-    Boolean(env.ALIYUN_SMS_TEMPLATE_CODE),
-  smtpEnabled: Boolean(env.SMTP_HOST) && Boolean(env.SMTP_USER) && Boolean(env.SMTP_PASS),
+    !(parseBoolean(env.SMS_MOCK) ?? false) &&
+    Boolean(pickFirst(env.ALIYUN_ACCESS_KEY_ID, env.ALIYUN_SMS_ACCESS_KEY_ID)) &&
+    Boolean(pickFirst(env.ALIYUN_ACCESS_KEY_SECRET, env.ALIYUN_SMS_ACCESS_KEY_SECRET)) &&
+    Boolean(pickFirst(env.ALIYUN_SMS_SIGN, env.ALIYUN_SMS_SIGN_NAME)) &&
+    Boolean(pickFirst(env.ALIYUN_SMS_TEMPLATE, env.ALIYUN_SMS_TEMPLATE_CODE)),
+  smtpEnabled:
+    !(parseBoolean(env.EMAIL_MOCK) ?? false) &&
+    Boolean(env.SMTP_HOST) &&
+    Boolean(env.SMTP_USER) &&
+    Boolean(env.SMTP_PASS),
 }
