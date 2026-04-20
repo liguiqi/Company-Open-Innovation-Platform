@@ -12,8 +12,4 @@ process.env.INNOVATION_MEDIA_DIR = path.join(rootDir, 'media')
 
 syncStandaloneAssets()
 
-if (existsSync(sourceMediaDir)) {
-  cpSync(sourceMediaDir, targetMediaDir, { recursive: true, force: true })
-}
-
 await import(path.join(standaloneDir, 'server.js'))
