@@ -175,7 +175,7 @@ pnpm test:e2e
 
 - 文档总索引：[docs/README.md](docs/README.md)
 - 架构文档：[docs/architecture/README.md](docs/architecture/README.md)
-- 部署说明：[docs/deployment.md](docs/deployment.md)
+- 部署说明：[docs/deployment/deployment.md](docs/deployment/deployment.md)
 - 测试与验收：[docs/testing.md](docs/testing.md)
 - 运维手册：[docs/Ops/README.md](docs/Ops/README.md)
 - 开发进度：[docs/progress/2026-04-20.md](docs/progress/2026-04-20.md)
