@@ -275,9 +275,6 @@ export function LoginPanel({
                   <KeyRound size={17} />
                   <span>验证码验证</span>
                 </div>
-                <p className="auth-section-text">
-                  输入已注册邮箱或手机号，系统会按邮箱或短信通道发送对应验证码。若验证码正确但账号未注册，页面会提示你前往注册。
-                </p>
                 <label className="auth-field">
                   邮箱或手机号
                   <input
@@ -310,9 +307,7 @@ export function LoginPanel({
                     {codeSending ? '发送中' : '发送验证码'}
                   </button>
                 </div>
-                <p className="auth-field-hint">
-                  验证码 5 分钟内有效。输入邮箱时发送邮箱验证码，输入手机号时发送短信验证码。
-                </p>
+                <p className="auth-field-hint">邮箱/短信验证码 5 分钟内有效。</p>
               </div>
 
               <button

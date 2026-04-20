@@ -1,5 +1,7 @@
 # 测试与验收说明
 
+更新日期：`2026-04-20`
+
 ## 1. 常用命令
 
 ```bash
@@ -9,7 +11,7 @@ pnpm test:int
 pnpm test:e2e
 ```
 
-如果是第一次在当前机器运行 Playwright，或升级过 Playwright 版本，需要先安装浏览器二进制：
+若首次运行 Playwright：
 
 ```bash
 pnpm exec playwright install chromium
@@ -17,20 +19,20 @@ pnpm exec playwright install chromium
 
 ## 2. 自动化测试现状
 
-| 层级     | 文件                             | 当前覆盖内容                                                       |
-| -------- | -------------------------------- | ------------------------------------------------------------------ |
-| Lint     | `pnpm lint`                      | ESLint + oxlint                                                    |
-| 类型检查 | `pnpm typecheck`                 | TypeScript 无输出校验                                              |
-| 集成测试 | `tests/int/api.int.spec.ts`      | 初始化 Payload 并验证 `users` 集合可查询                           |
-| E2E      | `tests/e2e/frontend.e2e.spec.ts` | 首页可访问、标题和主标题文案正确                                   |
-| E2E      | `tests/e2e/admin.e2e.spec.ts`    | 创建测试管理员、登录 `/admin`、校验 Dashboard / List / Create 流程 |
+| 层级     | 文件 / 命令                      | 当前覆盖内容                             |
+| -------- | -------------------------------- | ---------------------------------------- |
+| Lint     | `pnpm lint`                      | ESLint + oxlint                          |
+| 类型检查 | `pnpm typecheck`                 | TypeScript 无输出校验                    |
+| 集成测试 | `tests/int/api.int.spec.ts`      | 初始化 Payload 并校验 `users` 集合可查询 |
+| E2E      | `tests/e2e/frontend.e2e.spec.ts` | 首页可访问、标题与主标题文案正确         |
+| E2E      | `tests/e2e/admin.e2e.spec.ts`    | 登录 `/admin`、进入列表与创建页          |
 
 ### E2E 运行前提
 
-- 本地开发服务器默认跑在 `http://localhost:3000`
+- 本地开发服务器跑在 `http://localhost:3000`
 - Playwright 配置会自动执行 `pnpm dev`
-- PostgreSQL 需可连接，否则 Payload 初始化和种子账号创建会失败
-- 当前 E2E 依赖本机已安装 Chromium 浏览器二进制
+- PostgreSQL 必须可连接
+- 当前机器需已安装 Chromium 二进制
 
 ## 3. 建议的人工验收路径
 
@@ -39,45 +41,66 @@ pnpm exec playwright install chromium
 1. 打开首页 `/`
 2. 打开 `/needs`、`/ecosystem`、`/cases`、`/process`
 3. 打开 `/login`、`/register`
-4. 确认 `/dashboard` 未登录时会跳转到 `/login`
+4. 确认 `/dashboard` 未登录时跳转 `/login`
 5. 确认 `/admin` 可打开 Payload Admin 登录页
 
 ### 3.2 认证链路
 
-1. 合作伙伴通过邮箱注册
-2. 收到验证邮件并点击验证链接
-3. 验证完成后自动写入 Dashboard 登录态
-4. 使用邮箱/手机号 + 密码登录成功进入 `/dashboard`
-5. 使用短信验证码登录；如果短信环境未配齐，开发环境应返回 `debugCode`
+1. 使用邮箱或手机号 + 密码登录
+2. 使用邮箱验证码登录已有账号
+3. 使用短信验证码登录已有账号
+4. 使用邮箱注册新合作伙伴账号
+5. 使用手机号注册新合作伙伴账号
+6. 注册成功后自动跳回登录页
+7. 对未注册邮箱 / 手机号走验证码登录，应被提示前往注册，不自动建号
 
 ### 3.3 业务链路
 
 1. 合作伙伴提交新方案
-2. 上传一个或多个附件（支持 `txt/pdf/ppt/pptx/doc/docx`，单文件不超过 20MB）
+2. 上传一个或多个附件（支持 `txt/pdf/ppt/pptx/doc/docx`）
 3. 管理员 / 评审员在 `/dashboard/proposals` 查看方案
 4. 管理员 / 评审员更新状态并填写评审意见
-5. 合作伙伴重新进入详情页，确认状态、评审意见和附件下载都正常
+5. 合作伙伴重新进入详情页，确认状态与评审意见同步更新
+
+### 3.4 个人设置链路
+
+1. 登录后进入 `/dashboard/settings`
+2. 修改姓名、用户名、公司、邮箱或手机
+3. 点击“保存更新”
+4. 刷新页面，确认表单值与顶部用户信息一致
+5. 如变更邮箱或手机，确认对应验证状态按规则更新
+
+### 3.5 短信链路验收
+
+1. 注册页切到“手机验证”
+2. 输入手机号并发送短信验证码
+3. 确认接口返回“验证码已发送，请在 5 分钟内完成验证”
+4. 收到真实短信，短信签名应为 `【平台验证码】`
+5. 注意同一手机号 60 秒冷却，5 分钟有效
 
 ## 4. 演示账号来源
 
-- 管理员：`.env.local` 中的 `DEFAULT_ADMIN_*`
-- 评审员：`.env.local` 中的 `DEFAULT_REVIEWER_*`
-- 合作伙伴：`.env.local` 中的 `DEFAULT_PARTNER_*`
+默认演示账号来自 `.env.local` / `.env` 中的 `DEFAULT_*` 变量：
+
+- 管理员：`DEFAULT_ADMIN_*`
+- 评审员：`DEFAULT_REVIEWER_*`
+- 合作伙伴：`DEFAULT_PARTNER_*`
 
 ## 5. 当前自动化覆盖缺口
 
-当前自动化测试仍然偏轻量，尚未完整覆盖以下链路：
+仍未完整覆盖以下链路：
 
-- 邮箱注册与邮箱验证成功/失败分支
-- 短信发送、验证码校验与限流
-- 方案提交接口的附件上传与失败回滚
-- `partner` 只能查看自己的提案这一访问控制
-- 附件下载权限校验
-- `needId` 自动生成与邮件通知 Hook
+- 邮箱注册与邮箱验证成功 / 失败分支
+- 短信发送、短信限流与阿里云错误码分支
+- 登录验证码“未注册引导去注册”完整前端交互
+- 方案附件上传、权限下载与失败回滚
+- 评审状态流转、通知邮件与权限组合分支
+- 设置页个人资料更新与验证状态重置分支
 
-## 6. 已知限制
+## 6. 当前已知限制
 
-- `settings` 页面当前仅提供只读展示
-- 阿里云短信变量未配齐时，系统自动回退到 mock 短信模式
+- 自动化测试仍偏轻量，正式验收仍需人工走主链路
+- 阿里云短信签名必须使用审核通过的 `平台验证码`
 - SMTP 发送失败不会阻断注册、提案和状态流转主链路
-- 直接数据库查询不会体现 Payload 的访问控制；如需按业务权限看数据，请优先用 `/admin`、REST 或 GraphQL
+- Redis 缺失时 OTP 会退回进程内存，应用重启后验证码丢失
+- 直接数据库查询不会体现 Payload 访问控制

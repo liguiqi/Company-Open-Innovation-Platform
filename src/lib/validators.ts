@@ -107,6 +107,27 @@ export const registerSchema = z
     }
   })
 
+export const profileUpdateSchema = z.object({
+  company: z
+    .string()
+    .trim()
+    .optional()
+    .transform((value) => value ?? '')
+    .refine((value) => !value || value.length >= 2, '请输入至少 2 个字符的公司名称'),
+  email: z
+    .string()
+    .trim()
+    .min(1, '请输入邮箱地址')
+    .refine((value) => emailRegex.test(value), '请输入正确的邮箱地址'),
+  name: z.string().trim().min(2, '请输入联系人姓名'),
+  phone: optionalPhoneSchema,
+  username: z
+    .string()
+    .trim()
+    .min(2, '请输入用户名')
+    .regex(USERNAME_REGEX, '用户名仅支持字母、数字、下划线和短横线'),
+})
+
 export const emailCodeSendSchema = z.object({
   email: z
     .string()
