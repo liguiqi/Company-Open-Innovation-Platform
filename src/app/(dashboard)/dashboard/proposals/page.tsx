@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import { EmptyState } from '@/components/shared/EmptyState'
-import { ProposalStatusBadge } from '@/components/shared/StatusBadge'
+import { NeedStatusBadge, ProposalStatusBadge } from '@/components/shared/StatusBadge'
 import { requireUser } from '@/lib/auth'
 import { proposalTypeMap } from '@/lib/constants'
 import { getPayloadClient } from '@/lib/payload'
@@ -68,7 +68,10 @@ export default async function ProposalsPage() {
                 <span>联系人：{proposal.contactName}</span>
                 <span>邮箱：{proposal.contactEmail}</span>
                 {proposal.relatedNeed && typeof proposal.relatedNeed !== 'number' ? (
-                  <span>关联需求：{proposal.relatedNeed.title}</span>
+                  <span className="flex flex-wrap items-center gap-2">
+                    <span>关联需求：{proposal.relatedNeed.title}</span>
+                    <NeedStatusBadge status={proposal.relatedNeed.status} />
+                  </span>
                 ) : null}
               </div>
 

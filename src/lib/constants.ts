@@ -11,6 +11,12 @@ export const needDomainMap: Record<string, string> = {
   sensor: '传感器技术',
 }
 
+export const needStatusMap: Record<string, string> = {
+  closed: '已关闭',
+  'in-progress': '推进中',
+  open: '开放中',
+}
+
 export const proposalTypeMap: Record<string, string> = {
   investment: '寻求战略投资',
   'open-proposal': '开放式技术自荐',

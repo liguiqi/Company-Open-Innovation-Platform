@@ -61,6 +61,7 @@ pnpm exec playwright install chromium
 3. 管理员 / 评审员在 `/dashboard/proposals` 查看方案
 4. 管理员 / 评审员更新状态并填写评审意见
 5. 合作伙伴重新进入详情页，确认状态与评审意见同步更新
+6. 管理员在 Payload Admin 修改需求 `Status` 后，确认 `/needs`、需求详情页与 `/dashboard/proposals` 中关联需求状态同步更新
 
 ### 3.4 个人设置链路
 

@@ -1,4 +1,4 @@
-import { needPriorityMap, proposalStatusMap } from '@/lib/constants'
+import { needPriorityMap, needStatusMap, proposalStatusMap } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 
 export function NeedPriorityBadge({ priority }: { priority?: string | null }) {
@@ -21,6 +21,18 @@ export function ProposalStatusBadge({ status }: { status?: string | null }) {
         : status === 'reviewing'
           ? 'bg-blue-50 text-blue-700'
           : 'bg-amber-50 text-amber-700'
+
+  return <span className={cn('rounded-full px-3 py-1 text-xs font-semibold', tone)}>{label}</span>
+}
+
+export function NeedStatusBadge({ status }: { status?: string | null }) {
+  const label = needStatusMap[status || 'open'] || needStatusMap.open
+  const tone =
+    status === 'closed'
+      ? 'bg-slate-200 text-slate-700'
+      : status === 'in-progress'
+        ? 'bg-blue-50 text-blue-700'
+        : 'bg-emerald-50 text-emerald-700'
 
   return <span className={cn('rounded-full px-3 py-1 text-xs font-semibold', tone)}>{label}</span>
 }

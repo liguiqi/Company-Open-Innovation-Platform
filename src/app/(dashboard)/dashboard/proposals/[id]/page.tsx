@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { ProposalReviewForm } from '@/components/proposals/ProposalReviewForm'
-import { ProposalStatusBadge } from '@/components/shared/StatusBadge'
+import { NeedStatusBadge, ProposalStatusBadge } from '@/components/shared/StatusBadge'
 import { requireUser } from '@/lib/auth'
 import { proposalTypeMap } from '@/lib/constants'
 import { getPayloadClient } from '@/lib/payload'
@@ -92,9 +92,10 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
           {proposal.relatedNeed && typeof proposal.relatedNeed !== 'number' ? (
             <section>
               <h3 className="text-xl font-semibold text-[var(--ht-text-primary)]">关联需求</h3>
-              <p className="mt-3 text-sm text-[var(--ht-text-secondary)]">
-                {proposal.relatedNeed.title}
-              </p>
+              <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-[var(--ht-text-secondary)]">
+                <p>{proposal.relatedNeed.title}</p>
+                <NeedStatusBadge status={proposal.relatedNeed.status} />
+              </div>
               <Link
                 className="mt-2 inline-flex text-sm font-semibold text-ht-light-blue"
                 href={`/needs/${proposal.relatedNeed.needId}`}

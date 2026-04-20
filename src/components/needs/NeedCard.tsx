@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 import type { TechNeed } from '@/payload-types'
 
-import { NeedPriorityBadge } from '@/components/shared/StatusBadge'
+import { NeedPriorityBadge, NeedStatusBadge } from '@/components/shared/StatusBadge'
 import { getNeedDomainLabel } from '@/lib/utils'
 import { lexicalToPlainText } from '@/lib/richtext'
 
@@ -11,6 +11,7 @@ export function NeedCard({ need }: { need: TechNeed }) {
     <article className="theme-card group rounded-[1rem] p-6 transition hover:border-[color:var(--ht-border-strong)]">
       <div className="flex flex-wrap items-center gap-3">
         <NeedPriorityBadge priority={need.priority} />
+        <NeedStatusBadge status={need.status} />
         <span className="text-xs font-mono text-[var(--ht-text-muted)]">{need.needId}</span>
         {need.productLine ? (
           <span className="text-xs text-[var(--ht-text-muted)]">| {need.productLine}</span>
