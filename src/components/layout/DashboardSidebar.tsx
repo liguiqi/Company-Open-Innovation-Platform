@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Blocks, BriefcaseBusiness, LayoutDashboard, Settings, Users } from 'lucide-react'
 
-import { HetWordmark } from '@/components/shared/HetWordmark'
 import type { User } from '@/payload-types'
 
 import { HetBrandLogo } from '@/components/shared/HetBrandLogo'

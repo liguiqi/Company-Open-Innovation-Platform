@@ -1,5 +1,7 @@
 import Link from 'next/link'
 
+import { HetBrandLogo } from '@/components/shared/HetBrandLogo'
+
 export function PublicFooter() {
   return (
     <footer className="theme-footer mt-20">
