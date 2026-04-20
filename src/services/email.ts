@@ -107,6 +107,23 @@ export async function sendRegistrationCodeEmail(email: string, code: string) {
   })
 }
 
+export async function sendLoginCodeEmail(email: string, code: string) {
+  return sendEmail({
+    html: `
+      <div style="font-family:Arial,'Microsoft YaHei',sans-serif;line-height:1.7;color:#1f2937">
+        <h2 style="color:#004098">登录验证码</h2>
+        <p>您正在通过邮箱验证码登录Open Innovation Platform。</p>
+        <p>本次登录验证码为：</p>
+        <p style="margin:16px 0;font-size:28px;font-weight:700;letter-spacing:6px;color:#00A0E9">${code}</p>
+        <p>验证码 5 分钟内有效。如非本人操作，请忽略此邮件。</p>
+      </div>
+    `,
+    subject: 'Open Innovation Platform登录验证码',
+    text: `您正在通过邮箱验证码登录Open Innovation Platform，本次登录验证码为：${code}。验证码 5 分钟内有效。`,
+    to: email,
+  })
+}
+
 export async function sendProposalCreatedNotification(
   proposal: Proposal,
   reviewerEmails: string[],

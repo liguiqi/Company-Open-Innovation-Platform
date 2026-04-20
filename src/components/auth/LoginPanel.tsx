@@ -3,30 +3,70 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Mail, ShieldCheck, Smartphone } from 'lucide-react'
+import { KeyRound, Mail, ShieldCheck } from 'lucide-react'
 
 import { emitRouteTransitionStart } from '@/lib/navigation'
 
-type Mode = 'password' | 'sms'
+type Mode = 'password' | 'code'
+type IdentifierType = 'email' | 'phone'
 
-export function LoginPanel({ redirectTo }: { redirectTo?: string }) {
+type RegisterPrompt = {
+  identifier: string
+  identifierType: IdentifierType
+  redirectTo: string
+} | null
+
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const phonePattern = /^1\d{10}$/
+
+function getIdentifierType(identifier: string) {
+  const normalizedIdentifier = identifier.trim()
+
+  if (emailPattern.test(normalizedIdentifier)) {
+    return 'email' as const
+  }
+
+  if (phonePattern.test(normalizedIdentifier)) {
+    return 'phone' as const
+  }
+
+  return null
+}
+
+export function LoginPanel({
+  redirectTo,
+  initialIdentifier,
+  initialSuccessMessage,
+}: {
+  redirectTo?: string
+  initialIdentifier?: string
+  initialSuccessMessage?: string
+}) {
   const router = useRouter()
   const [mode, setMode] = useState<Mode>('password')
+  const [identifier, setIdentifier] = useState(initialIdentifier || '')
+  const [password, setPassword] = useState('')
+  const [code, setCode] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(initialSuccessMessage || null)
   const [debugCode, setDebugCode] = useState<string | null>(null)
-  const [phone, setPhone] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [passwordLoading, setPasswordLoading] = useState(false)
+  const [codeSending, setCodeSending] = useState(false)
+  const [codeVerifying, setCodeVerifying] = useState(false)
+  const [registerPrompt, setRegisterPrompt] = useState<RegisterPrompt>(null)
 
-  async function onPasswordLogin(formData: FormData) {
-    setLoading(true)
+  const identifierType = getIdentifierType(identifier)
+
+  async function onPasswordLogin() {
+    setPasswordLoading(true)
     setError(null)
     setSuccess(null)
+    setRegisterPrompt(null)
 
     const response = await fetch('/api/auth/login', {
       body: JSON.stringify({
-        identifier: formData.get('identifier'),
-        password: formData.get('password'),
+        identifier,
+        password,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -35,7 +75,7 @@ export function LoginPanel({ redirectTo }: { redirectTo?: string }) {
     })
 
     const data = await response.json()
-    setLoading(false)
+    setPasswordLoading(false)
 
     if (!response.ok) {
       setError(data.error || '登录失败')
@@ -48,13 +88,19 @@ export function LoginPanel({ redirectTo }: { redirectTo?: string }) {
   }
 
   async function sendCode() {
-    setLoading(true)
+    if (!identifierType) {
+      setError('请输入正确的邮箱或手机号')
+      return
+    }
+
+    setCodeSending(true)
     setError(null)
     setSuccess(null)
     setDebugCode(null)
+    setRegisterPrompt(null)
 
-    const response = await fetch('/api/sms/send', {
-      body: JSON.stringify({ phone }),
+    const response = await fetch('/api/auth/login-code/send', {
+      body: JSON.stringify({ identifier }),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -62,7 +108,7 @@ export function LoginPanel({ redirectTo }: { redirectTo?: string }) {
     })
 
     const data = await response.json()
-    setLoading(false)
+    setCodeSending(false)
 
     if (!response.ok) {
       setError(data.error || '验证码发送失败')
@@ -70,20 +116,27 @@ export function LoginPanel({ redirectTo }: { redirectTo?: string }) {
     }
 
     setSuccess(data.message)
+
     if (data.debugCode) {
       setDebugCode(data.debugCode)
     }
   }
 
-  async function onSMSLogin(formData: FormData) {
-    setLoading(true)
+  async function onCodeLogin() {
+    if (!identifierType) {
+      setError('请输入正确的邮箱或手机号')
+      return
+    }
+
+    setCodeVerifying(true)
     setError(null)
     setSuccess(null)
+    setRegisterPrompt(null)
 
-    const response = await fetch('/api/sms/verify', {
+    const response = await fetch('/api/auth/login-code/verify', {
       body: JSON.stringify({
-        code: formData.get('code'),
-        phone: formData.get('phone'),
+        code,
+        identifier,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -92,9 +145,19 @@ export function LoginPanel({ redirectTo }: { redirectTo?: string }) {
     })
 
     const data = await response.json()
-    setLoading(false)
+    setCodeVerifying(false)
 
     if (!response.ok) {
+      if (response.status === 404 && data.action === 'register') {
+        setRegisterPrompt({
+          identifier: data.identifier,
+          identifierType: data.identifierType,
+          redirectTo: data.redirectTo,
+        })
+        setError(data.error || '当前账号未注册')
+        return
+      }
+
       setError(data.error || '验证码登录失败')
       return
     }
@@ -104,147 +167,214 @@ export function LoginPanel({ redirectTo }: { redirectTo?: string }) {
     router.refresh()
   }
 
+  function handleRegisterRedirect() {
+    if (!registerPrompt) {
+      return
+    }
+
+    emitRouteTransitionStart()
+    router.push(registerPrompt.redirectTo)
+  }
+
   return (
-    <div className="auth-panel w-full max-w-[500px] rounded-[1rem] p-6 md:p-8">
-      <div className="auth-form-shell">
-        <div className="auth-form-header">
-          <p className="auth-form-kicker">Open Innovation Access</p>
-          <h2 className="auth-form-title">登录开放创新工作台</h2>
-          <p className="auth-form-description">
-            使用邮箱或手机号登录，进入需求跟进、方案提交、评审协同与状态流转的统一工作区。
-          </p>
-        </div>
+    <>
+      <div className="auth-panel w-full max-w-[500px] rounded-[1rem] p-6 md:p-8">
+        <div className="auth-form-shell">
+          <div className="auth-form-header">
+            <p className="auth-form-kicker">Open Innovation Access</p>
+            <h2 className="auth-form-title">欢迎使用开放创新工作台</h2>
+            <p className="auth-form-description">
+              使用邮箱或手机号登录，进入需求跟进、方案提交、评审协同与状态流转的统一工作区。
+            </p>
+          </div>
 
-        <div className="auth-callout">
-          当前登录页仅支持邮箱 / 手机号两种账号口径，不再开放用户名登录。
-        </div>
-
-        <div className="auth-tabset grid w-full grid-cols-2 rounded-lg p-1">
-          <button
-            className={`auth-tab rounded-md px-4 py-2.5 text-sm font-semibold ${mode === 'password' ? 'is-active' : ''}`}
-            onClick={() => setMode('password')}
-            type="button"
-          >
-            邮箱 / 手机密码
-          </button>
-          <button
-            className={`auth-tab rounded-md px-4 py-2.5 text-sm font-semibold ${mode === 'sms' ? 'is-active' : ''}`}
-            onClick={() => setMode('sms')}
-            type="button"
-          >
-            短信验证码
-          </button>
-        </div>
-
-        {mode === 'password' ? (
-          <form action={onPasswordLogin} className="auth-form-shell">
-            <div className="auth-section-card">
-              <div className="auth-section-heading">
-                <Mail size={17} />
-                <span>账号验证</span>
-              </div>
-              <p className="auth-section-text">
-                输入已注册邮箱或手机号，以及对应密码。手机号注册用户也可以直接使用手机号密码登录。
-              </p>
-              <label className="auth-field">
-                邮箱或手机号
-                <input
-                  className="theme-input w-full rounded-lg px-4 py-3"
-                  name="identifier"
-                  placeholder="请输入邮箱或手机号"
-                  required
-                />
-              </label>
-              <label className="auth-field">
-                登录密码
-                <input
-                  className="theme-input w-full rounded-lg px-4 py-3"
-                  name="password"
-                  placeholder="请输入密码"
-                  required
-                  type="password"
-                />
-              </label>
-            </div>
-
+          <div className="auth-tabset grid w-full grid-cols-2 rounded-lg p-1">
             <button
-              className="theme-primary-button w-full rounded-md px-5 py-3 font-semibold disabled:opacity-60"
-              disabled={loading}
-              type="submit"
+              className={`auth-tab rounded-md px-4 py-2.5 text-sm font-semibold ${mode === 'password' ? 'is-active' : ''}`}
+              onClick={() => {
+                setMode('password')
+                setError(null)
+                setRegisterPrompt(null)
+              }}
+              type="button"
             >
-              {loading ? '登录中...' : '登录工作台'}
+              邮箱/手机密码登录
             </button>
-          </form>
-        ) : (
-          <form action={onSMSLogin} className="auth-form-shell">
-            <div className="auth-section-card">
-              <div className="auth-section-heading">
-                <Smartphone size={17} />
-                <span>短信验证</span>
-              </div>
-              <p className="auth-section-text">
-                输入手机号并发送验证码。当前短信链路已经切换为阿里云 Dypnsapi，验证码 5 分钟内有效。
-              </p>
-              <label className="auth-field">
-                手机号码
-                <input
-                  className="theme-input w-full rounded-lg px-4 py-3"
-                  name="phone"
-                  onChange={(event) => setPhone(event.target.value)}
-                  placeholder="请输入 11 位手机号"
-                  required
-                  value={phone}
-                />
-              </label>
-              <div className="auth-code-row">
-                <input
-                  className="theme-input min-w-0 rounded-lg px-4 py-3 text-sm"
-                  name="code"
-                  placeholder="请输入短信验证码"
-                  required
-                />
-                <button
-                  className="theme-outline-button auth-send-button rounded-md px-3 py-2.5 text-sm font-semibold disabled:opacity-60"
-                  disabled={loading || phone.length !== 11}
-                  onClick={sendCode}
-                  type="button"
-                >
-                  发送验证码
-                </button>
-              </div>
-              <p className="auth-field-hint">
-                验证通过后将直接进入工作台；如该手机号未注册，系统会自动建立一个待补全资料的合作伙伴账号。
-              </p>
-            </div>
-
             <button
-              className="theme-primary-button w-full rounded-md px-5 py-3 font-semibold disabled:opacity-60"
-              disabled={loading}
-              type="submit"
+              className={`auth-tab rounded-md px-4 py-2.5 text-sm font-semibold ${mode === 'code' ? 'is-active' : ''}`}
+              onClick={() => {
+                setMode('code')
+                setError(null)
+                setRegisterPrompt(null)
+              }}
+              type="button"
             >
-              {loading ? '验证中...' : '验证码登录'}
+              邮箱/短信验证码登录
             </button>
-          </form>
-        )}
+          </div>
 
-        {error ? <p className="auth-feedback auth-feedback--error">{error}</p> : null}
-        {success ? <p className="auth-feedback auth-feedback--success">{success}</p> : null}
-        {debugCode ? (
-          <p className="auth-feedback auth-feedback--info">
-            当前为开发联调模式，验证码：<strong>{debugCode}</strong>
-          </p>
-        ) : null}
+          {mode === 'password' ? (
+            <form
+              className="auth-form-shell"
+              onSubmit={(event) => {
+                event.preventDefault()
+                void onPasswordLogin()
+              }}
+            >
+              <div className="auth-section-card">
+                <div className="auth-section-heading">
+                  <Mail size={17} />
+                  <span>账号验证</span>
+                </div>
+                <label className="auth-field">
+                  邮箱或手机号
+                  <input
+                    className="theme-input w-full rounded-lg px-4 py-3"
+                    name="identifier"
+                    onChange={(event) => {
+                      setIdentifier(event.target.value)
+                      setRegisterPrompt(null)
+                    }}
+                    placeholder="请输入邮箱或手机号"
+                    required
+                    value={identifier}
+                  />
+                </label>
+                <label className="auth-field">
+                  登录密码
+                  <input
+                    className="theme-input w-full rounded-lg px-4 py-3"
+                    name="password"
+                    onChange={(event) => setPassword(event.target.value)}
+                    placeholder="请输入密码"
+                    required
+                    type="password"
+                    value={password}
+                  />
+                </label>
+              </div>
 
-        <div className="auth-link-row">
-          <span className="inline-flex items-center gap-2">
-            <ShieldCheck size={15} />
-            登录后可直接进入协同工作台
-          </span>
-          <Link className="font-semibold text-ht-blue" href="/register">
-            立即注册
-          </Link>
+              <button
+                className="theme-primary-button w-full rounded-md px-5 py-3 font-semibold disabled:opacity-60"
+                disabled={passwordLoading}
+                type="submit"
+              >
+                {passwordLoading ? '登录中...' : '登录工作台'}
+              </button>
+            </form>
+          ) : (
+            <form
+              className="auth-form-shell"
+              onSubmit={(event) => {
+                event.preventDefault()
+                void onCodeLogin()
+              }}
+            >
+              <div className="auth-section-card">
+                <div className="auth-section-heading">
+                  <KeyRound size={17} />
+                  <span>验证码验证</span>
+                </div>
+                <p className="auth-section-text">
+                  输入已注册邮箱或手机号，系统会按邮箱或短信通道发送对应验证码。若验证码正确但账号未注册，页面会提示你前往注册。
+                </p>
+                <label className="auth-field">
+                  邮箱或手机号
+                  <input
+                    className="theme-input w-full rounded-lg px-4 py-3"
+                    name="identifier"
+                    onChange={(event) => {
+                      setIdentifier(event.target.value)
+                      setRegisterPrompt(null)
+                    }}
+                    placeholder="请输入邮箱或手机号"
+                    required
+                    value={identifier}
+                  />
+                </label>
+                <div className="auth-code-row">
+                  <input
+                    className="theme-input min-w-0 rounded-lg px-4 py-3 text-sm"
+                    name="code"
+                    onChange={(event) => setCode(event.target.value)}
+                    placeholder="请输入邮箱或短信验证码"
+                    required
+                    value={code}
+                  />
+                  <button
+                    className="theme-outline-button auth-send-button rounded-md px-3 py-2.5 text-sm font-semibold disabled:opacity-60"
+                    disabled={codeSending || codeVerifying || !identifierType}
+                    onClick={() => void sendCode()}
+                    type="button"
+                  >
+                    {codeSending ? '发送中' : '发送验证码'}
+                  </button>
+                </div>
+                <p className="auth-field-hint">
+                  验证码 5 分钟内有效。输入邮箱时发送邮箱验证码，输入手机号时发送短信验证码。
+                </p>
+              </div>
+
+              <button
+                className="theme-primary-button w-full rounded-md px-5 py-3 font-semibold disabled:opacity-60"
+                disabled={codeVerifying}
+                type="submit"
+              >
+                {codeVerifying ? '验证中...' : '验证码登录'}
+              </button>
+            </form>
+          )}
+
+          {error ? <p className="auth-feedback auth-feedback--error">{error}</p> : null}
+          {success ? <p className="auth-feedback auth-feedback--success">{success}</p> : null}
+          {debugCode ? (
+            <p className="auth-feedback auth-feedback--info">
+              当前为开发联调模式，验证码：<strong>{debugCode}</strong>
+            </p>
+          ) : null}
+
+          <div className="auth-link-row">
+            <span className="inline-flex items-center gap-2">
+              <ShieldCheck size={15} />
+              登录后可直接进入协同工作台
+            </span>
+            <Link className="font-semibold text-ht-blue" href="/register">
+              立即注册
+            </Link>
+          </div>
         </div>
       </div>
-    </div>
+
+      {registerPrompt ? (
+        <div className="auth-dialog-backdrop">
+          <div className="auth-dialog">
+            <div className="auth-dialog__header">
+              <h3 className="auth-dialog__title">当前账号未注册</h3>
+              <p className="auth-dialog__description">
+                {registerPrompt.identifierType === 'email'
+                  ? `邮箱 ${registerPrompt.identifier} 还没有创建合作伙伴账号。`
+                  : `手机号 ${registerPrompt.identifier} 还没有创建合作伙伴账号。`}
+              </p>
+            </div>
+            <div className="auth-dialog__actions">
+              <button
+                className="theme-outline-button rounded-md px-4 py-2.5 text-sm font-semibold"
+                onClick={() => setRegisterPrompt(null)}
+                type="button"
+              >
+                取消
+              </button>
+              <button
+                className="theme-primary-button rounded-md px-4 py-2.5 text-sm font-semibold"
+                onClick={handleRegisterRedirect}
+                type="button"
+              >
+                去注册
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
   )
 }

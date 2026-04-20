@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
 
+import type { User } from '@/payload-types'
+
 import { createAuthCookie } from '@/lib/auth'
 import { getPayloadClient } from '@/lib/payload'
 import { smsVerifySchema } from '@/lib/validators'
-import { buildPhoneOnlyName, buildSyntheticEmail } from '@/lib/utils'
 import { deleteCachedValue, getCachedValue } from '@/services/redis'
 
 export async function POST(request: Request) {
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
     )
   }
 
-  const { code, name, phone } = parsed.data
+  const { code, phone } = parsed.data
   const cachedCode = await getCachedValue(`sms:otp:${phone}`)
 
   if (!cachedCode || cachedCode !== code) {
@@ -40,44 +41,42 @@ export async function POST(request: Request) {
     },
   })
 
-  const user =
-    matched.docs[0] ||
-    (await payload.create({
-      collection: 'users',
-      data: {
-        company: '待完善',
-        email: buildSyntheticEmail(phone),
-        name: name || buildPhoneOnlyName(phone),
-        password: `${phone}-${Date.now()}-SmsOnly!`,
-        phone,
-        phoneVerifiedAt: new Date().toISOString(),
-        role: 'partner',
-        username: `u${phone.slice(-6)}`,
-      },
-      overrideAccess: true,
-    }))
+  const user = matched.docs[0] as User | undefined
 
-  if (!user.phoneVerifiedAt) {
-    await payload.update({
-      id: user.id,
-      collection: 'users',
-      data: {
-        phoneVerifiedAt: new Date().toISOString(),
+  if (!user) {
+    return NextResponse.json(
+      {
+        action: 'register',
+        error: '该手机账号未注册，请先创建合作伙伴账号',
+        identifier: phone,
+        identifierType: 'phone',
+        redirectTo: `/register?phone=${encodeURIComponent(phone)}`,
       },
-      overrideAccess: true,
-    })
+      { status: 404 },
+    )
   }
+
+  const authenticatedUser = user.phoneVerifiedAt
+    ? user
+    : ((await payload.update({
+        id: user.id,
+        collection: 'users',
+        data: {
+          phoneVerifiedAt: new Date().toISOString(),
+        },
+        overrideAccess: true,
+      })) as User)
 
   const response = NextResponse.json({
     ok: true,
     redirectTo: '/dashboard',
     user: {
-      name: user.name,
-      phone: user.phone,
-      role: user.role,
+      name: authenticatedUser.name,
+      phone: authenticatedUser.phone,
+      role: authenticatedUser.role,
     },
   })
 
-  response.headers.append('Set-Cookie', await createAuthCookie(user))
+  response.headers.append('Set-Cookie', await createAuthCookie(authenticatedUser))
   return response
 }

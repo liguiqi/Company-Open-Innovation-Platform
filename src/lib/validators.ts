@@ -1,8 +1,30 @@
 import { z } from 'zod'
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const phoneRegex = /^1\d{10}$/
-const verificationCodeRegex = /^\d{6}$/
+export const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+export const phoneRegex = /^1\d{10}$/
+export const verificationCodeRegex = /^\d{6}$/
+export const USER_PASSWORD_MIN_LENGTH = 6
+export const USERNAME_REGEX = /^[a-zA-Z0-9_-]+$/
+
+export function getLoginIdentifierType(identifier: string) {
+  const normalizedIdentifier = identifier.trim()
+
+  if (emailRegex.test(normalizedIdentifier)) {
+    return 'email' as const
+  }
+
+  if (phoneRegex.test(normalizedIdentifier)) {
+    return 'phone' as const
+  }
+
+  return null
+}
+
+const loginIdentifierSchema = z
+  .string()
+  .trim()
+  .min(1, '请输入邮箱或手机号')
+  .refine((value) => getLoginIdentifierType(value) !== null, '请输入邮箱或手机号')
 
 const optionalEmailSchema = z
   .string()
@@ -26,12 +48,8 @@ const optionalVerificationCodeSchema = z
   .refine((value) => !value || verificationCodeRegex.test(value), '请输入 6 位验证码')
 
 export const loginSchema = z.object({
-  identifier: z
-    .string()
-    .trim()
-    .min(1, '请输入邮箱或手机号')
-    .refine((value) => emailRegex.test(value) || phoneRegex.test(value), '请输入邮箱或手机号'),
-  password: z.string().min(6, '密码至少 6 位'),
+  identifier: loginIdentifierSchema,
+  password: z.string().min(USER_PASSWORD_MIN_LENGTH, `密码至少 ${USER_PASSWORD_MIN_LENGTH} 位`),
 })
 
 export const registerSchema = z
@@ -40,15 +58,17 @@ export const registerSchema = z
     email: optionalEmailSchema,
     emailCode: optionalVerificationCodeSchema,
     name: z.string().trim().min(2, '请输入联系人姓名'),
-    password: z.string().min(6, '密码至少 6 位'),
-    passwordConfirm: z.string().min(6, '请再次输入密码'),
+    password: z.string().min(USER_PASSWORD_MIN_LENGTH, `密码至少 ${USER_PASSWORD_MIN_LENGTH} 位`),
+    passwordConfirm: z
+      .string()
+      .min(USER_PASSWORD_MIN_LENGTH, `请再次输入至少 ${USER_PASSWORD_MIN_LENGTH} 位密码`),
     phone: optionalPhoneSchema,
     smsCode: optionalVerificationCodeSchema,
     username: z
       .string()
       .trim()
       .min(2, '请输入用户名')
-      .regex(/^[a-zA-Z0-9_-]+$/, '用户名仅支持字母、数字、下划线和短横线'),
+      .regex(USERNAME_REGEX, '用户名仅支持字母、数字、下划线和短横线'),
   })
   .refine((value) => Boolean(value.email) || Boolean(value.phone), {
     message: '请至少填写邮箱或手机号',
@@ -93,6 +113,15 @@ export const emailCodeSendSchema = z.object({
     .trim()
     .min(1, '请输入邮箱地址')
     .refine((value) => emailRegex.test(value), '请输入正确的邮箱地址'),
+})
+
+export const loginCodeSendSchema = z.object({
+  identifier: loginIdentifierSchema,
+})
+
+export const loginCodeVerifySchema = z.object({
+  code: z.string().trim().regex(verificationCodeRegex, '请输入 6 位验证码'),
+  identifier: loginIdentifierSchema,
 })
 
 export const smsSendSchema = z.object({
