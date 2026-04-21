@@ -7,7 +7,7 @@ export function AdminIcon() {
         alt=""
         aria-hidden="true"
         className="payload-brand-icon__image"
-        src="/branding/het-logo.png"
+        src="/branding/het-admin-icon.png"
       />
     </div>
   )
