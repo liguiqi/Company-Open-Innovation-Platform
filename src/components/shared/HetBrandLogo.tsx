@@ -21,7 +21,7 @@ export function HetBrandLogo({
       )}
       height={460}
       priority={priority}
-      src="/branding/het-full.png"
+      src="/branding/het-logo.png"
       unoptimized
       width={3180}
     />
