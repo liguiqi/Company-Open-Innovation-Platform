@@ -22,6 +22,7 @@ export default buildConfig({
   admin: {
     components: {
       graphics: {
+        Icon: '@/components/payload/AdminIcon#AdminIcon',
         Logo: '@/components/payload/AdminLoginLogo#AdminLoginLogo',
       },
     },

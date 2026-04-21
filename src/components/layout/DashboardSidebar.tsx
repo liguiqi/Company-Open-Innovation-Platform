@@ -79,10 +79,10 @@ export function DashboardSidebar({ role }: { role: User['role'] }) {
         </nav>
 
         <div className="theme-dashboard-info mt-8 rounded-lg p-4 text-sm text-[var(--ht-text-secondary)]">
-          <p className="text-xs uppercase tracking-[0.3em] text-ht-light-blue">Content Ops</p>
-          <p className="mt-2 font-semibold text-[var(--ht-text-primary)]">Payload Admin</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-ht-light-blue">Platform Ops</p>
+          <p className="mt-2 font-semibold text-[var(--ht-text-primary)]">内容与权限维护</p>
           <p className="mt-2 leading-6 text-[var(--ht-text-secondary)]">
-            内容结构、媒体资产和权限策略仍可直接在{' '}
+            站点内容、附件资产和账号权限仍可直接在{' '}
             <span className="font-semibold text-ht-blue">/admin</span> 中维护。
           </p>
         </div>

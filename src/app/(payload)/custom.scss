@@ -70,6 +70,22 @@
     height: auto;
   }
 
+  .payload-brand-icon {
+    align-items: center;
+    display: inline-flex;
+    height: 2.7rem;
+    justify-content: flex-start;
+    overflow: hidden;
+    width: 2.7rem;
+  }
+
+  .payload-brand-icon__image {
+    display: block;
+    height: 100%;
+    max-width: none;
+    width: auto;
+  }
+
   .payload-brand-logo__image--inverted {
     filter: brightness(0) invert(1);
   }
@@ -188,6 +204,10 @@
     background: rgba(15, 25, 40, 0.88);
     border-color: rgba(148, 163, 184, 0.24);
     color: #f8fafc;
+  }
+
+  .payload-brand-icon__image {
+    filter: brightness(0) invert(1);
   }
 
   .template-minimal input:focus {
