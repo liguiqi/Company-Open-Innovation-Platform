@@ -1,0 +1,111 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam dpi 180
+skinparam defaultFontName DejaVu Sans
+skinparam packageStyle rectangle
+skinparam componentStyle rectangle
+skinparam roundCorner 8
+skinparam ArrowColor #0B5CAD
+skinparam PackageBorderColor #0B5CAD
+skinparam PackageBackgroundColor #F8FBFF
+skinparam ComponentBorderColor #0B5CAD
+skinparam ComponentBackgroundColor #EFF6FF
+skinparam DatabaseBorderColor #0B5CAD
+skinparam DatabaseBackgroundColor #F2F8FF
+skinparam FolderBorderColor #0B5CAD
+skinparam FolderBackgroundColor #F8FBFF
+skinparam CloudBorderColor #0B5CAD
+skinparam CloudBackgroundColor #F8FBFF
+skinparam NodeBorderColor #0B5CAD
+skinparam NodeBackgroundColor #F8FBFF
+skinparam NoteBackgroundColor #FFFBEA
+skinparam NoteBorderColor #D4A72C
+footer HeT Open Innovation Platform | Generated at 20260422-164252
+title HeT 开放创新平台 - 应用分层图
+top to bottom direction
+
+package "表示层 / Route Groups" as Presentation {
+  [公开门户\nsrc/app/(public)] as PublicRoutes
+  [认证注册\nsrc/app/(auth)] as AuthRoutes
+  [工作台\nsrc/app/(dashboard)] as DashboardRoutes
+  [Payload Admin\nsrc/app/(payload)] as PayloadRoutes
+}
+
+package "接口层 / Route Handlers" as ApiLayer {
+  component "认证接口\n/api/auth/*" as AuthAPI
+  component "短信接口\n/api/sms/*" as SmsAPI
+  component "提案接口\n/api/proposals*" as ProposalAPI
+  component "附件接口\n/api/attachments/[id]" as AttachmentAPI
+  component "账号资料接口\n/api/account/profile" as ProfileAPI
+}
+
+package "领域层 / Payload Domain" as DomainLayer {
+  [Collections\nusers / tech-needs / proposals / media / partners / case-studies / user-groups] as Collections
+  [Access Control\nsrc/access/*] as AccessLayer
+  [Hooks\ngenerateNeedId / sendProposalNotification / onProposalStatusChange] as Hooks
+}
+
+package "应用服务层" as ServiceLayer {
+  [Email Service\nsrc/services/email.ts] as EmailSvc
+  [Aliyun SMS Service\nsrc/services/aliyun-sms.ts] as SmsSvc
+  [Redis Cache\nsrc/services/redis.ts] as RedisSvc
+  [Rate Limit\nsrc/services/rate-limit.ts] as RateLimitSvc
+}
+
+package "共享基础设施代码" as SharedLibs {
+  [auth.ts / payload.ts] as AuthLib
+  [env.ts / validators.ts] as ValidationLib
+  [media.ts / lexical.ts / data.ts] as SupportLib
+}
+
+database "PostgreSQL" as Postgres
+database "Redis" as Redis
+folder "media/ 文件目录" as MediaFS
+cloud "SMTP / 阿里云短信" as ExternalVendors
+
+PublicRoutes --> Collections : Server Component 查询
+DashboardRoutes --> Collections : Server Component 查询
+AuthRoutes --> AuthAPI
+DashboardRoutes --> ProposalAPI
+DashboardRoutes --> AttachmentAPI
+DashboardRoutes --> ProfileAPI
+PayloadRoutes --> Collections : Admin / REST / GraphQL
+
+AuthAPI --> AuthLib
+AuthAPI --> ValidationLib
+AuthAPI --> Collections
+AuthAPI --> EmailSvc
+AuthAPI --> SmsSvc
+AuthAPI --> RedisSvc
+AuthAPI --> RateLimitSvc
+
+SmsAPI --> ValidationLib
+SmsAPI --> SmsSvc
+SmsAPI --> RedisSvc
+SmsAPI --> RateLimitSvc
+
+ProposalAPI --> AuthLib
+ProposalAPI --> ValidationLib
+ProposalAPI --> SupportLib
+ProposalAPI --> Collections
+ProposalAPI --> Hooks
+
+AttachmentAPI --> AuthLib
+AttachmentAPI --> SupportLib
+AttachmentAPI --> Collections
+AttachmentAPI --> MediaFS
+
+ProfileAPI --> AuthLib
+ProfileAPI --> ValidationLib
+ProfileAPI --> Collections
+
+Collections --> AccessLayer
+Collections --> Hooks
+Collections --> Postgres
+Collections --> MediaFS
+RedisSvc --> Redis
+EmailSvc --> ExternalVendors
+SmsSvc --> ExternalVendors
+
+@enduml

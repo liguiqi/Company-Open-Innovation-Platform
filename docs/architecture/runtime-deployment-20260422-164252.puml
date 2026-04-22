@@ -1,0 +1,72 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam dpi 180
+skinparam defaultFontName DejaVu Sans
+skinparam packageStyle rectangle
+skinparam componentStyle rectangle
+skinparam roundCorner 8
+skinparam ArrowColor #0B5CAD
+skinparam PackageBorderColor #0B5CAD
+skinparam PackageBackgroundColor #F8FBFF
+skinparam ComponentBorderColor #0B5CAD
+skinparam ComponentBackgroundColor #EFF6FF
+skinparam DatabaseBorderColor #0B5CAD
+skinparam DatabaseBackgroundColor #F2F8FF
+skinparam FolderBorderColor #0B5CAD
+skinparam FolderBackgroundColor #F8FBFF
+skinparam CloudBorderColor #0B5CAD
+skinparam CloudBackgroundColor #F8FBFF
+skinparam NodeBorderColor #0B5CAD
+skinparam NodeBackgroundColor #F8FBFF
+skinparam NoteBackgroundColor #FFFBEA
+skinparam NoteBorderColor #D4A72C
+footer HeT Open Innovation Platform | Generated at 20260422-164252
+title HeT 开放创新平台 - 运行部署拓扑图
+top to bottom direction
+
+cloud "Browser / 内网终端" as Browser
+cloud "域名入口\ninnovation.example.com" as Domain
+
+node "宿主机 10.0.0.2" as Host {
+  node "Nginx\n80 / 443" as Nginx
+
+  node "systemd" as Systemd {
+    artifact "innovation-platform.service" as Service
+    artifact "pnpm start" as StartCmd
+    artifact "scripts/start-standalone.mjs" as StartScript
+    artifact ".next/standalone/server.js" as Standalone
+    component "Next.js App Router\n+ Payload CMS 3\n+ Local API" as App
+  }
+
+  frame "Docker Compose" as DockerStack {
+    database "PostgreSQL\n5433 -> 5432" as Pg
+    database "Redis\n6380 -> 6379" as Redis
+  }
+
+  folder "media/" as Media
+  folder "public/" as PublicAssets
+  folder "example.com_nginx/\nSSL 证书目录" as Certs
+}
+
+Browser --> Domain : HTTPS 请求
+Domain --> Nginx : 443 / 证书终止
+Nginx --> Service : proxy_pass 127.0.0.1:3005
+Service --> StartCmd
+StartCmd --> StartScript
+StartScript --> Standalone
+Standalone --> App
+App --> Pg : 业务数据 / Payload Collections
+App --> Redis : OTP / 限流缓存
+App --> Media : 上传附件 / 图片
+Nginx --> PublicAssets : /_next/static / public 缓存
+Nginx --> Certs : TLS 证书与密钥
+
+note right of Service
+正式环境关键链路：
+pnpm build -> .next/standalone
+然后由 systemd 托管 pnpm start。
+环境变量变更后必须 rebuild + restart。
+end note
+
+@enduml

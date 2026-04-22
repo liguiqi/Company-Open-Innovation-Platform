@@ -1,0 +1,107 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam dpi 180
+skinparam defaultFontName DejaVu Sans
+skinparam roundCorner 6
+skinparam ArrowColor #0B5CAD
+skinparam EntityBorderColor #0B5CAD
+skinparam EntityBackgroundColor #F8FBFF
+hide methods
+hide stereotypes
+footer HeT Open Innovation Platform | Generated at 20260422-164252
+
+title HeT 开放创新平台 - 主要实体关系图
+
+entity "users" as users {
+  * id : number
+  --
+  username : text <<unique>>
+  email : email
+  phone : text
+  name : text
+  company : text
+  role : admin|reviewer|partner|viewer
+  emailVerifiedAt : date
+  phoneVerifiedAt : date
+  userGroup : FK -> user-groups
+  avatar : FK -> media
+}
+
+entity "user-groups" as user_groups {
+  * id : number
+  --
+  name : text
+  description : textarea
+  permissions : json
+}
+
+entity "tech-needs" as tech_needs {
+  * id : number
+  --
+  needId : text <<unique>>
+  title : text
+  priority : urgent|open|joint-research
+  domain : enum
+  status : open|in-progress|closed
+  publishedAt : date
+}
+
+entity "proposals" as proposals {
+  * id : number
+  --
+  title : text
+  type : specific-need|open-proposal|investment|partnership
+  relatedNeed : FK -> tech-needs
+  submittedBy : FK -> users
+  status : pending|reviewing|approved|rejected
+  reviewNotes : richText
+  reviewedBy : FK -> users
+  attachments : hasMany -> media
+}
+
+entity "media" as media {
+  * id : number
+  --
+  filename : upload
+  purpose : image|document
+  uploadedBy : FK -> users
+  proposal : FK -> proposals
+  mimeType : text
+}
+
+entity "partners" as partners {
+  * id : number
+  --
+  name : text
+  category : chip|power|connectivity|academia
+  tier : strategic|certified|general
+  logo : FK -> media
+}
+
+entity "case-studies" as case_studies {
+  * id : number
+  --
+  title : text
+  slug : text <<unique>>
+  partnerName : text
+  coverImage : FK -> media
+  domain : home-appliance|power-tool|automotive
+  publishedAt : date
+}
+
+user_groups ||--o{ users : grants
+users ||--o{ proposals : submittedBy
+users ||--o{ media : uploadedBy
+users }o--o| media : avatar
+tech_needs ||--o{ proposals : relatedNeed
+proposals ||--o{ media : source / attachments
+partners }o--o| media : logo
+case_studies }o--|| media : coverImage
+
+note bottom of proposals
+proposal 是平台核心流转实体，
+连接需求、附件、提交人、评审人和状态流转。
+end note
+
+@enduml

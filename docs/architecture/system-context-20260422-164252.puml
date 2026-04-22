@@ -1,0 +1,75 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam dpi 180
+skinparam defaultFontName DejaVu Sans
+skinparam packageStyle rectangle
+skinparam componentStyle rectangle
+skinparam roundCorner 8
+skinparam ArrowColor #0B5CAD
+skinparam PackageBorderColor #0B5CAD
+skinparam PackageBackgroundColor #F8FBFF
+skinparam ComponentBorderColor #0B5CAD
+skinparam ComponentBackgroundColor #EFF6FF
+skinparam DatabaseBorderColor #0B5CAD
+skinparam DatabaseBackgroundColor #F2F8FF
+skinparam FolderBorderColor #0B5CAD
+skinparam FolderBackgroundColor #F8FBFF
+skinparam CloudBorderColor #0B5CAD
+skinparam CloudBackgroundColor #F8FBFF
+skinparam NodeBorderColor #0B5CAD
+skinparam NodeBackgroundColor #F8FBFF
+skinparam NoteBackgroundColor #FFFBEA
+skinparam NoteBorderColor #D4A72C
+footer HeT Open Innovation Platform | Generated at 20260422-164252
+title HeT 开放创新平台 - 系统全景图
+left to right direction
+
+actor "公开访客" as Public
+actor "合作伙伴" as Partner
+actor "评审员" as Reviewer
+actor "管理员" as Admin
+
+cloud "阿里云短信\nDypnsapi SendSmsVerifyCode" as AliyunSMS
+cloud "企业邮箱服务\nSMTP / IMAP" as MailService
+
+database "PostgreSQL\n业务数据与内容资产" as Postgres
+database "Redis\nOTP 与限流缓存" as Redis
+folder "media/\n上传附件与展示图片" as MediaDir
+
+package "HeT 开放创新平台\n单仓全栈 Node 进程" as Platform {
+  rectangle "公开站点\nsrc/app/(public)" as PublicSite
+  rectangle "登录注册页\nsrc/app/(auth)" as AuthPages
+  rectangle "工作台\nsrc/app/(dashboard)" as Dashboard
+  rectangle "管理后台\n/admin" as AdminPanel
+  rectangle "业务 API\nsrc/app/api/*" as BizAPI
+  rectangle "Payload Local API\nCollections / Hooks / Access" as LocalAPI
+  rectangle "集成服务\nEmail / SMS / Rate Limit" as IntegrationSvc
+}
+
+Public --> PublicSite : 浏览需求 / 案例 / 生态页面
+Partner --> AuthPages : 登录 / 注册 / 验证
+Partner --> Dashboard : 提交方案 / 查看状态
+Reviewer --> Dashboard : 评审方案 / 下载附件
+Admin --> Dashboard : 运营看板 / 用户管理
+Admin --> AdminPanel : 内容维护 / 权限维护
+
+PublicSite --> LocalAPI : Server Component 查询
+AuthPages --> BizAPI : 登录 / 注册 / 验证码请求
+Dashboard --> BizAPI : 方案 / 个人资料 / 附件下载
+AdminPanel --> LocalAPI : Admin / REST / GraphQL
+BizAPI --> LocalAPI : 直接读写 Payload
+BizAPI --> IntegrationSvc : 调用验证码 / 邮件通知
+IntegrationSvc --> AliyunSMS : 短信验证码
+IntegrationSvc --> MailService : 注册 / 登录 / 状态邮件
+IntegrationSvc --> Redis : OTP / 限流缓存
+LocalAPI --> Postgres : Collection 数据
+LocalAPI --> MediaDir : 附件与图片文件
+
+note bottom of Platform
+当前项目不是前后端分离多仓架构。
+公开站、登录注册、工作台、Payload Admin 与业务 API
+全部运行在同一个 Next.js + Payload 进程内。
+end note
+
+@enduml
