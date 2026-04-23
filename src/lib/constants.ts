@@ -33,14 +33,20 @@ export const proposalStatusMap: Record<string, string> = {
 
 export const partnerCategoryMap: Record<string, string> = {
   academia: '产学研机构',
+  'automotive-brand': '汽车客户',
   chip: '核心计算芯片',
   connectivity: '连接与传感',
+  'home-appliance-brand': '家电品牌客户',
   power: '功率与电源',
+  'smart-product-brand': '智能产品客户',
+  'tool-industrial-brand': '工具 / 工业客户',
 }
 
 export const partnerTierMap: Record<string, string> = {
   certified: '认证伙伴',
-  general: '一般伙伴',
+  ecosystem: '生态伙伴',
+  general: '生态伙伴',
+  other: '其他伙伴',
   strategic: '金牌战略伙伴',
 }
 

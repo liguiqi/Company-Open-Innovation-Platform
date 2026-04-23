@@ -16,7 +16,7 @@ export async function getHomepageData() {
     payload.find({
       collection: 'partners',
       depth: 1,
-      limit: 4,
+      limit: 10,
       overrideAccess: true,
       sort: 'sortOrder',
     }),
@@ -32,6 +32,7 @@ export async function getHomepageData() {
   return {
     cases: cases.docs,
     needs: needs.docs,
+    partnerCount: partners.totalDocs,
     partners: partners.docs,
   }
 }

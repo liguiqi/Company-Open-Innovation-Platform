@@ -1,15 +1,18 @@
 import Link from 'next/link'
 
 import { NeedCard } from '@/components/needs/NeedCard'
+import { PartnerLogoCard, type DisplayPartnerRecord } from '@/components/partners/PartnerLogoWall'
 import { SectionHeading } from '@/components/shared/SectionHeading'
 import { getHomepageData } from '@/lib/data'
 import { heroDomains, publicStats } from '@/lib/constants'
 import { getCaseDomainLabel } from '@/lib/utils'
+import { getDisplayPartners, partnerDirectoryRoute } from '@/lib/partner-branding'
 
 export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
   const { cases, needs, partners } = await getHomepageData()
+  const featuredPartners = getDisplayPartners(partners as DisplayPartnerRecord[], 10)
 
   return (
     <div>
@@ -114,24 +117,33 @@ export default async function HomePage() {
           <div className="theme-card-contrast rounded-[1rem] p-8 shadow-sm shadow-slate-300/40">
             <p className="text-xs uppercase tracking-[0.35em] text-sky-200">Ecosystem</p>
             <h2 className="mt-4 font-display text-4xl font-semibold">HeT 全球合作伙伴联盟</h2>
-            <p className="mt-5 max-w-2xl text-sm leading-8 text-[var(--ht-contrast-muted)]">
+            <p className="mt-4 max-w-2xl text-sm leading-8 text-[var(--ht-contrast-muted)]">
               平台目前覆盖芯片、功率、电源、连接与传感、产学研合作机构等多类生态角色，可在供应链导入和联合研发之间实现快速闭环。
             </p>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2">
-              {partners.map((partner) => (
-                <div
-                  key={partner.id}
-                  className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5"
-                >
-                  <p className="text-sm font-semibold text-white">{partner.name}</p>
-                  <p className="mt-2 text-xs uppercase tracking-[0.3em] text-sky-200">
-                    {partner.category}
-                  </p>
-                  <p className="mt-3 text-sm leading-7 text-[var(--ht-contrast-muted)]">
-                    {partner.products || partner.description}
-                  </p>
-                </div>
+
+            <div className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3">
+              {featuredPartners.map((partner) => (
+                <PartnerLogoCard
+                  key={`home-partner-${partner.id}`}
+                  compact
+                  partner={partner}
+                  tone="contrast"
+                />
               ))}
+            </div>
+
+            <div className="mt-7 border-t border-white/10 pt-5">
+              <div className="flex justify-center">
+                <Link
+                  className="inline-flex items-center gap-2 whitespace-nowrap text-base font-semibold text-sky-200 transition hover:text-white"
+                  href={partnerDirectoryRoute}
+                >
+                  查看全部认证合作伙伴
+                  <span aria-hidden="true" className="text-xl leading-none">
+                    ›
+                  </span>
+                </Link>
+              </div>
             </div>
           </div>
 

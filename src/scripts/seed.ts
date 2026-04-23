@@ -313,7 +313,7 @@ async function main() {
       name: 'Partner C',
       products: 'Thread, WiFi, BLE, Sensors',
       sortOrder: 3,
-      tier: 'general',
+      tier: 'ecosystem',
       website: 'https://example.com/partner-c',
     },
     field: 'name',
