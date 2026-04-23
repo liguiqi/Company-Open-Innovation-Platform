@@ -64,11 +64,13 @@ export function PartnerBrandMark({
 }
 
 export function PartnerLogoCard({
+  allowWebsiteLink = false,
   className,
   compact = false,
   partner,
   tone = 'default',
 }: {
+  allowWebsiteLink?: boolean
   className?: string
   compact?: boolean
   partner: DisplayPartnerRecord
@@ -109,7 +111,7 @@ export function PartnerLogoCard({
     </>
   )
 
-  if (partner.website) {
+  if (allowWebsiteLink && partner.website) {
     return (
       <a
         className={cardClassName}
