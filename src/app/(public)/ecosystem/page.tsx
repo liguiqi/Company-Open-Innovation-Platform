@@ -30,9 +30,10 @@ export default async function EcosystemPage() {
     <div className="container-shell py-16">
       <SectionHeading
         align="center"
-        description="加入Open Innovation供应链生态，您的技术将进入从需求澄清、联合评估到 PoC 验证和导入量产的完整通道。"
+        description="加入Open Innovation全球创新生态，与产业领袖们协同进化，您的卓越技术将获得从概念验证到规模商用的完整价值通路。"
+        descriptionClassName="lg:max-w-none lg:whitespace-nowrap"
         eyebrow="Ecosystem"
-        title="HeT 全球合作伙伴联盟"
+        title="Open Innovation全球合作伙伴联盟"
       />
 
       {strategicGroup?.partners.length ? (

@@ -35,7 +35,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             </div>
 
             <div className="max-w-2xl space-y-6">
-              <h1 className="font-display text-4xl font-semibold leading-none md:text-6xl xl:text-7xl">
+              <h1 className="font-display text-4xl font-semibold leading-[1.14] md:text-6xl md:leading-[1.08] xl:text-7xl">
                 开放协同，
                 <br />
                 高效导入。

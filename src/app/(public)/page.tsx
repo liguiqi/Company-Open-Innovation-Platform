@@ -6,13 +6,17 @@ import { SectionHeading } from '@/components/shared/SectionHeading'
 import { getHomepageData } from '@/lib/data'
 import { heroDomains, publicStats } from '@/lib/constants'
 import { getCaseDomainLabel } from '@/lib/utils'
-import { getDisplayPartners, partnerDirectoryRoute } from '@/lib/partner-branding'
+import { getDisplayPartnersByTier, partnerDirectoryRoute } from '@/lib/partner-branding'
 
 export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
   const { cases, needs, partners } = await getHomepageData()
-  const featuredPartners = getDisplayPartners(partners as DisplayPartnerRecord[], 10)
+  const featuredPartners = getDisplayPartnersByTier(
+    partners as DisplayPartnerRecord[],
+    'strategic',
+    9,
+  )
 
   return (
     <div>
@@ -31,13 +35,13 @@ export default async function HomePage() {
             <p className="text-xs uppercase tracking-[0.4em] text-sky-200">
               HeT Open Innovation Platform
             </p>
-            <h1 className="mt-6 font-display text-5xl font-semibold leading-none md:text-7xl">
+            <h1 className="mt-6 font-display text-5xl font-semibold leading-[1.14] md:text-7xl md:leading-[1.08]">
               连接全球智慧，
               <br />
               共创智能控制未来
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-blue-100">
-              依托Open Innovation在全球家电、汽车与电动工具领域的深厚积累，我们向全球电子产业链伙伴开放需求、开放评审与开放协同。
+            <p className="mt-6 text-lg leading-8 text-blue-100 lg:max-w-none lg:whitespace-nowrap">
+              依托Open Innovation在智能控制领域的全球产业积累，我们向全球伙伴开放前沿需求，汇聚生态智慧，共创未来。
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
               <Link
@@ -117,23 +121,11 @@ export default async function HomePage() {
           <div className="theme-card-contrast rounded-[1rem] p-8 shadow-sm shadow-slate-300/40">
             <p className="text-xs uppercase tracking-[0.35em] text-sky-200">Ecosystem</p>
             <h2 className="mt-4 font-display text-4xl font-semibold">HeT 全球合作伙伴联盟</h2>
-            <p className="mt-4 max-w-2xl text-sm leading-8 text-[var(--ht-contrast-muted)]">
-              平台目前覆盖芯片、功率、电源、连接与传感、产学研合作机构等多类生态角色，可在供应链导入和联合研发之间实现快速闭环。
-            </p>
-
-            <div className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3">
-              {featuredPartners.map((partner) => (
-                <PartnerLogoCard
-                  key={`home-partner-${partner.id}`}
-                  compact
-                  partner={partner}
-                  tone="contrast"
-                />
-              ))}
-            </div>
-
-            <div className="mt-7 border-t border-white/10 pt-5">
-              <div className="flex justify-center">
+            <div className="mt-4 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+              <p className="max-w-2xl text-sm leading-8 text-[var(--ht-contrast-muted)]">
+                平台目前覆盖芯片、功率、电源、连接与传感、产学研合作机构等多类生态角色，可在供应链导入和联合研发之间实现快速闭环。
+              </p>
+              <div className="flex justify-end xl:shrink-0">
                 <Link
                   className="inline-flex items-center gap-2 whitespace-nowrap text-base font-semibold text-sky-200 transition hover:text-white"
                   href={partnerDirectoryRoute}
@@ -144,6 +136,17 @@ export default async function HomePage() {
                   </span>
                 </Link>
               </div>
+            </div>
+
+            <div className="mt-8 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+              {featuredPartners.map((partner) => (
+                <PartnerLogoCard
+                  key={`home-partner-${partner.id}`}
+                  compact
+                  partner={partner}
+                  tone="contrast"
+                />
+              ))}
             </div>
           </div>
 

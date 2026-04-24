@@ -34,7 +34,7 @@ export default async function NeedsPage({
     <div className="container-shell py-16">
       <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
         <SectionHeading
-          description="这里展示HeT当前面临的关键技术挑战。针对任一需求，都可以在登录后直接提交方案，进入内部评审流程。"
+          description="链接全球智慧，共策技术未来。我们期待您的加入，以创新方案开启共创，并肩探索无限可能。"
           eyebrow="Current Needs"
           title="技术需求大厅"
         />

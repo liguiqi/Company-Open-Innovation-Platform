@@ -23,7 +23,7 @@ export default async function PartnerDirectoryPage() {
     <div className="container-shell py-16">
       <SectionHeading
         align="center"
-        description="当前目录实时读取后台 partners 数据，按金牌战略伙伴、认证合作伙伴、生态合作伙伴和其他合作伙伴四个层级统一展示。"
+        description="加入Open Innovation供应链生态，您的技术将进入从需求澄清、联合评估到 PoC 验证和导入量产的完整通道。平台围绕战略协同、认证合作、生态共建与专项合作持续扩展联合创新网络。"
         eyebrow="Directory"
         title="全部合作伙伴目录"
       />

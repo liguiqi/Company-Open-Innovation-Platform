@@ -30,7 +30,7 @@ export default function ProcessPage() {
     <div className="container-shell py-16">
       <SectionHeading
         align="center"
-        description="从创意进入量产，需要经过公开征集、技术评估、PoC 验证和供应链导入四个阶段。平台将全过程沉淀为可追踪流程。"
+        description="从创意到量产只需四步：公开征集、技术评估、PoC验证与供应链导入。平台全程护航、开放透明。"
         eyebrow="Workflow"
         title="从创意到量产的合作路径"
       />

@@ -40,6 +40,8 @@ type TierSectionMeta = {
   title: string
 }
 
+export const partnerTierOrder: PartnerTier[] = ['strategic', 'certified', 'ecosystem', 'other']
+
 const partnerTierWeight: Record<string, number> = {
   strategic: 0,
   certified: 1,
@@ -669,10 +671,26 @@ export function getDisplayPartners(partners: DisplayPartnerRecord[], limit?: num
   return source
 }
 
+export function getDisplayPartnersByTier(
+  partners: DisplayPartnerRecord[],
+  tier: PartnerTier,
+  limit?: number,
+) {
+  const source = getDisplayPartners(partners).filter(
+    (partner) => normalizePartnerTier(partner.tier) === tier,
+  )
+
+  if (typeof limit === 'number') {
+    return source.slice(0, limit)
+  }
+
+  return source
+}
+
 export function groupPartnersByTier(partners: DisplayPartnerRecord[]) {
   const source = sortPartnersForDisplay(partners)
 
-  return (Object.keys(partnerTierSections) as PartnerTier[]).map((tier) => ({
+  return partnerTierOrder.map((tier) => ({
     meta: partnerTierSections[tier],
     partners: source.filter((partner) => normalizePartnerTier(partner.tier) === tier),
     tier,
