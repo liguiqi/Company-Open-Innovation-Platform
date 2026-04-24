@@ -23,8 +23,8 @@ export default async function NewProposalPage({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-semibold text-slate-950">提交新方案</h2>
-        <p className="mt-2 text-sm text-slate-500">
+        <h2 className="theme-page-title text-3xl font-semibold">提交新方案</h2>
+        <p className="theme-page-description mt-2 text-sm">
           填写方案摘要、联系人信息并上传附件，提交后会自动进入评审流程。
         </p>
       </div>

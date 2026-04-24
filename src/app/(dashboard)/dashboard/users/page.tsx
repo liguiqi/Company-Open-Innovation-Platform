@@ -19,29 +19,28 @@ export default async function UsersAdminPage() {
   return users.docs.length ? (
     <div className="space-y-5">
       <div>
-        <h2 className="text-3xl font-semibold text-slate-950">用户管理</h2>
-        <p className="mt-2 text-sm text-slate-500">
+        <h2 className="theme-page-title text-3xl font-semibold">用户管理</h2>
+        <p className="theme-page-description mt-2 text-sm">
           展示当前平台账号视图，完整编辑仍建议在 Payload Admin 中进行。
         </p>
       </div>
       <div className="space-y-4">
         {users.docs.map((user) => (
-          <article
-            key={user.id}
-            className="rounded-[2rem] border border-white/70 bg-white p-6 shadow-lg shadow-slate-200/60"
-          >
+          <article key={user.id} className="theme-dashboard-panel rounded-[1rem] p-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <h3 className="text-xl font-semibold text-slate-950">
+                <h3 className="text-xl font-semibold text-[var(--ht-text-primary)]">
                   {user.name}{' '}
-                  <span className="text-sm font-normal text-slate-400">(@{user.username})</span>
+                  <span className="text-sm font-normal text-[var(--ht-text-muted)]">
+                    (@{user.username})
+                  </span>
                 </h3>
-                <p className="mt-2 text-sm text-slate-500">
+                <p className="mt-2 text-sm text-[var(--ht-text-muted)]">
                   {user.email} · {user.phone || '未绑定手机'} · {roleLabelMap[user.role]}
                 </p>
               </div>
               <a
-                className="text-sm font-semibold text-ht-blue"
+                className="text-sm font-semibold text-ht-light-blue"
                 href={`/admin/collections/users/${user.id}`}
               >
                 在 Admin 中编辑

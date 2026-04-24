@@ -1,0 +1,80 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam dpi 180
+skinparam defaultFontName DejaVu Sans
+skinparam roundCorner 8
+skinparam sequenceArrowColor #0B5CAD
+skinparam sequenceLifeLineBorderColor #0B5CAD
+skinparam sequenceLifeLineBackgroundColor #F8FBFF
+skinparam participantBorderColor #0B5CAD
+skinparam participantBackgroundColor #EFF6FF
+skinparam actorBorderColor #0B5CAD
+skinparam actorBackgroundColor #EFF6FF
+skinparam databaseBorderColor #0B5CAD
+skinparam databaseBackgroundColor #F2F8FF
+skinparam noteBackgroundColor #FFFBEA
+skinparam noteBorderColor #D4A72C
+footer HeT Open Innovation Platform | Generated at 20260422-164252
+
+title HeT 开放创新平台 - 方案提交流转图
+
+autonumber
+actor "合作伙伴" as Partner
+actor "评审员 / 管理员" as Reviewer
+participant "提交方案页\n/dashboard/proposals/new" as ProposalPage
+participant "方案创建 API\n/api/proposals" as ProposalAPI
+participant "状态更新 API\n/api/proposals/[id]/status" as StatusAPI
+participant "附件下载 API\n/api/attachments/[id]" as AttachmentAPI
+participant "认证与会话\ninnovation-session" as Session
+participant "Payload Local API" as Payload
+participant "提案通知 Hook\nsendProposalNotification" as CreateHook
+participant "状态通知 Hook\nonProposalStatusChange" as StatusHook
+participant "邮件服务" as EmailSvc
+participant "PostgreSQL" as Postgres
+participant "media/ 文件目录" as MediaFS
+
+== 提交阶段 ==
+Partner -> ProposalPage : 填写方案 / 关联需求 / 选择多附件
+ProposalPage -> ProposalAPI : POST FormData
+ProposalAPI -> Session : getRequestUser()
+ProposalAPI -> Payload : create proposal
+Payload -> Postgres : 写入 proposals
+loop 每个附件
+  ProposalAPI -> Payload : create media(document)
+  Payload -> MediaFS : 落盘文件
+  Payload -> Postgres : 写入 media
+end
+ProposalAPI -> Payload : update proposal.attachments
+Payload -> CreateHook : afterChange
+CreateHook -> EmailSvc : sendProposalCreatedNotification()
+EmailSvc --> Reviewer : 邮件通知评审待处理
+ProposalAPI --> ProposalPage : 返回 proposal id / success
+
+== 评审阶段 ==
+Reviewer -> StatusAPI : 更新状态 + 评审意见
+StatusAPI -> Session : 校验 reviewer/admin
+StatusAPI -> Payload : update proposal.status / reviewNotes / reviewedBy
+Payload -> Postgres : 更新 proposals
+Payload -> StatusHook : afterChange
+StatusHook -> EmailSvc : sendProposalStatusNotification()
+EmailSvc --> Partner : 状态更新邮件
+StatusAPI --> Reviewer : 保存成功
+
+== 下载附件阶段 ==
+Partner -> AttachmentAPI : GET /api/attachments/[id]
+AttachmentAPI -> Session : 识别登录用户
+AttachmentAPI -> Payload : find media / proposal
+AttachmentAPI -> MediaFS : 读取附件文件
+AttachmentAPI --> Partner : Content-Disposition: attachment
+
+note right of AttachmentAPI
+附件下载权限：
+- admin
+- reviewer
+- 上传者
+- 方案所有者
+其他账号不可下载。
+end note
+
+@enduml

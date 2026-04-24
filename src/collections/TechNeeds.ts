@@ -20,8 +20,12 @@ export const TechNeeds: CollectionConfig = {
     {
       name: 'needId',
       type: 'text',
+      admin: {
+        description: '系统按 RD-年份-流水号 自动生成，创建后不可修改。',
+        placeholder: '保存后自动生成，例如 RD-2026-001',
+        readOnly: true,
+      },
       index: true,
-      required: true,
       unique: true,
     },
     {

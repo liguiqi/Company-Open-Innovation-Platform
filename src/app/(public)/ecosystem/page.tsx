@@ -1,7 +1,13 @@
+import Link from 'next/link'
+
+import { PartnerLogoCard, type DisplayPartnerRecord } from '@/components/partners/PartnerLogoWall'
 import { SectionHeading } from '@/components/shared/SectionHeading'
+import {
+  getDisplayPartners,
+  groupPartnersByTier,
+  partnerDirectoryRoute,
+} from '@/lib/partner-branding'
 import { getPayloadClient } from '@/lib/payload'
-import { getPartnerCategoryLabel } from '@/lib/utils'
-import { partnerCategoryMap, partnerTierMap } from '@/lib/constants'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,60 +16,56 @@ export default async function EcosystemPage() {
   const partners = await payload.find({
     collection: 'partners',
     depth: 1,
-    limit: 100,
+    limit: 200,
     overrideAccess: true,
     sort: 'sortOrder',
   })
+
+  const groupedPartners = groupPartnersByTier(
+    getDisplayPartners(partners.docs as DisplayPartnerRecord[]),
+  )
+  const strategicGroup = groupedPartners.find((group) => group.tier === 'strategic')
 
   return (
     <div className="container-shell py-16">
       <SectionHeading
         align="center"
-        description="加入Open Innovation供应链生态，您的技术将进入从需求澄清、联合评估到 PoC 验证和导入量产的完整通道。"
+        description="加入Open Innovation全球创新生态，与产业领袖们协同进化，您的卓越技术将获得从概念验证到规模商用的完整价值通路。"
+        descriptionClassName="lg:max-w-none lg:whitespace-nowrap"
         eyebrow="Ecosystem"
-        title="HET 全球合作伙伴联盟"
+        title="Open Innovation全球合作伙伴联盟"
       />
 
-      <div className="mt-10 grid gap-4 md:grid-cols-4">
-        {Object.entries(partnerCategoryMap).map(([value, label]) => (
-          <div
-            key={value}
-            className="rounded-[2rem] border border-white/70 bg-white p-6 text-center shadow-lg shadow-slate-200/60"
-          >
-            <p className="text-xs uppercase tracking-[0.35em] text-ht-light-blue">Category</p>
-            <h3 className="mt-4 text-lg font-semibold text-slate-950">{label}</h3>
+      {strategicGroup?.partners.length ? (
+        <section className="mt-12 space-y-5" id="strategic-partners">
+          <div className="flex items-center gap-3">
+            <span className="h-6 w-1 rounded-full bg-ht-blue" />
+            <h3 className="text-2xl font-semibold text-[var(--ht-text-primary)]">
+              {strategicGroup.meta.title}
+              <span className="ml-2 text-lg font-medium text-[var(--ht-text-muted)]">
+                ({strategicGroup.meta.subtitle})
+              </span>
+            </h3>
           </div>
-        ))}
-      </div>
 
-      <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {partners.docs.map((partner) => (
-          <article
-            key={partner.id}
-            className="rounded-[2rem] border border-white/70 bg-white p-6 shadow-lg shadow-slate-200/60"
-          >
-            <p className="text-xs uppercase tracking-[0.35em] text-ht-light-blue">
-              {getPartnerCategoryLabel(partner.category)}
-            </p>
-            <h3 className="mt-4 text-2xl font-semibold text-slate-950">{partner.name}</h3>
-            <p className="mt-2 text-sm font-medium text-slate-500">
-              {partnerTierMap[partner.tier]}
-            </p>
-            <p className="mt-4 text-sm leading-7 text-slate-600">
-              {partner.description || partner.products}
-            </p>
-            {partner.website ? (
-              <a
-                className="mt-5 inline-flex text-sm font-semibold text-ht-blue"
-                href={partner.website}
-                rel="noreferrer"
-                target="_blank"
-              >
-                访问官网
-              </a>
-            ) : null}
-          </article>
-        ))}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            {strategicGroup.partners.map((partner) => (
+              <PartnerLogoCard key={`${strategicGroup.tier}-${partner.id}`} partner={partner} />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <div className="mt-10 flex justify-center">
+        <Link
+          className="inline-flex items-center gap-2 whitespace-nowrap text-base font-semibold text-ht-blue transition hover:text-ht-light-blue"
+          href={partnerDirectoryRoute}
+        >
+          查看全部合作伙伴
+          <span aria-hidden="true" className="text-xl leading-none">
+            ›
+          </span>
+        </Link>
       </div>
     </div>
   )

@@ -20,22 +20,19 @@ export default async function PartnersAdminPage() {
   return partners.docs.length ? (
     <div className="space-y-5">
       <div>
-        <h2 className="text-3xl font-semibold text-slate-950">伙伴管理</h2>
-        <p className="mt-2 text-sm text-slate-500">
+        <h2 className="theme-page-title text-3xl font-semibold">伙伴管理</h2>
+        <p className="theme-page-description mt-2 text-sm">
           这里提供运营视图，详细字段维护可进入 `/admin/collections/partners`。
         </p>
       </div>
       <div className="grid gap-5 md:grid-cols-2">
         {partners.docs.map((partner) => (
-          <article
-            key={partner.id}
-            className="rounded-[2rem] border border-white/70 bg-white p-6 shadow-lg shadow-slate-200/60"
-          >
-            <h3 className="text-2xl font-semibold text-slate-950">{partner.name}</h3>
-            <p className="mt-3 text-sm text-slate-500">
+          <article key={partner.id} className="theme-dashboard-panel rounded-[1rem] p-6">
+            <h3 className="text-2xl font-semibold text-[var(--ht-text-primary)]">{partner.name}</h3>
+            <p className="mt-3 text-sm text-[var(--ht-text-muted)]">
               {getPartnerCategoryLabel(partner.category)} · {partnerTierMap[partner.tier]}
             </p>
-            <p className="mt-4 text-sm leading-7 text-slate-600">
+            <p className="mt-4 text-sm leading-7 text-[var(--ht-text-secondary)]">
               {partner.description || partner.products}
             </p>
           </article>

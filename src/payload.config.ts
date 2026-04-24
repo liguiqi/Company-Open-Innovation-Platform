@@ -20,6 +20,36 @@ const dirname = path.dirname(filename)
 
 export default buildConfig({
   admin: {
+    meta: {
+      icons: [
+        {
+          media: '(prefers-color-scheme: light)',
+          rel: 'icon',
+          sizes: '32x32',
+          type: 'image/png',
+          url: '/branding/het-favicon-32.png',
+        },
+        {
+          media: '(prefers-color-scheme: dark)',
+          rel: 'icon',
+          sizes: '32x32',
+          type: 'image/png',
+          url: '/branding/het-favicon-32-white.png',
+        },
+        {
+          rel: 'apple-touch-icon',
+          sizes: '180x180',
+          type: 'image/png',
+          url: '/branding/het-apple-touch-180.png',
+        },
+      ],
+    },
+    components: {
+      graphics: {
+        Icon: '@/components/payload/AdminIcon#AdminIcon',
+        Logo: '@/components/payload/AdminLoginLogo#AdminLoginLogo',
+      },
+    },
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
@@ -34,7 +64,7 @@ export default buildConfig({
   }),
   email: await nodemailerAdapter({
     defaultFromAddress: appEnv.SMTP_FROM_ADDRESS || appEnv.SMTP_USER || 'innovation@example.com',
-    defaultFromName: appEnv.SMTP_FROM_NAME || 'H&T Innovation Platform',
+    defaultFromName: appEnv.SMTP_FROM_NAME || 'HeT Innovation Platform',
     skipVerify: true,
     transportOptions: appEnv.smtpEnabled
       ? {
@@ -44,7 +74,10 @@ export default buildConfig({
           },
           host: appEnv.SMTP_HOST,
           port: appEnv.SMTP_PORT || 25,
-          secure: false,
+          secure: appEnv.smtpSecure,
+          tls: {
+            rejectUnauthorized: appEnv.smtpTlsRejectUnauthorized,
+          },
         }
       : undefined,
   }),

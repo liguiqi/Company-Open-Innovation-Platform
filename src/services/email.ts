@@ -6,8 +6,14 @@ import { appEnv } from '@/lib/env'
 
 let transporterPromise: Promise<nodemailer.Transporter | null> | null = null
 
+type SendEmailResult =
+  | {
+      skipped: true
+    }
+  | nodemailer.SentMessageInfo
+
 async function getTransporter() {
-  if (!appEnv.smtpEnabled) {
+  if (!appEnv.smtpEnabled || appEnv.emailMock) {
     return null
   }
 
@@ -18,9 +24,15 @@ async function getTransporter() {
           pass: appEnv.SMTP_PASS,
           user: appEnv.SMTP_USER,
         },
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
         host: appEnv.SMTP_HOST,
         port: appEnv.SMTP_PORT || 25,
-        secure: false,
+        secure: appEnv.smtpSecure,
+        socketTimeout: 10000,
+        tls: {
+          rejectUnauthorized: appEnv.smtpTlsRejectUnauthorized,
+        },
       }),
     )
   }
@@ -38,7 +50,7 @@ export async function sendEmail({
   subject: string
   text: string
   to: string | string[]
-}) {
+}): Promise<SendEmailResult> {
   const transporter = await getTransporter()
 
   if (!transporter) {
@@ -75,6 +87,40 @@ export async function sendVerificationEmail(user: Pick<User, 'email' | 'name'>, 
     subject: '请验证您的Open Innovation Platform邮箱',
     text: `请访问以下链接完成邮箱验证：${verifyURL}`,
     to: user.email,
+  })
+}
+
+export async function sendRegistrationCodeEmail(email: string, code: string) {
+  return sendEmail({
+    html: `
+      <div style="font-family:Arial,'Microsoft YaHei',sans-serif;line-height:1.7;color:#1f2937">
+        <h2 style="color:#004098">注册验证码</h2>
+        <p>您正在注册Open Innovation Platform账号。</p>
+        <p>本次邮箱验证码为：</p>
+        <p style="margin:16px 0;font-size:28px;font-weight:700;letter-spacing:6px;color:#00A0E9">${code}</p>
+        <p>验证码 5 分钟内有效。如非本人操作，请忽略此邮件。</p>
+      </div>
+    `,
+    subject: 'Open Innovation Platform注册验证码',
+    text: `您正在注册Open Innovation Platform账号，本次邮箱验证码为：${code}。验证码 5 分钟内有效。`,
+    to: email,
+  })
+}
+
+export async function sendLoginCodeEmail(email: string, code: string) {
+  return sendEmail({
+    html: `
+      <div style="font-family:Arial,'Microsoft YaHei',sans-serif;line-height:1.7;color:#1f2937">
+        <h2 style="color:#004098">登录验证码</h2>
+        <p>您正在通过邮箱验证码登录Open Innovation Platform。</p>
+        <p>本次登录验证码为：</p>
+        <p style="margin:16px 0;font-size:28px;font-weight:700;letter-spacing:6px;color:#00A0E9">${code}</p>
+        <p>验证码 5 分钟内有效。如非本人操作，请忽略此邮件。</p>
+      </div>
+    `,
+    subject: 'Open Innovation Platform登录验证码',
+    text: `您正在通过邮箱验证码登录Open Innovation Platform，本次登录验证码为：${code}。验证码 5 分钟内有效。`,
+    to: email,
   })
 }
 

@@ -1,0 +1,88 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam dpi 180
+skinparam defaultFontName DejaVu Sans
+skinparam roundCorner 8
+skinparam sequenceArrowColor #0B5CAD
+skinparam sequenceLifeLineBorderColor #0B5CAD
+skinparam sequenceLifeLineBackgroundColor #F8FBFF
+skinparam participantBorderColor #0B5CAD
+skinparam participantBackgroundColor #EFF6FF
+skinparam actorBorderColor #0B5CAD
+skinparam actorBackgroundColor #EFF6FF
+skinparam databaseBorderColor #0B5CAD
+skinparam databaseBackgroundColor #F2F8FF
+skinparam noteBackgroundColor #FFFBEA
+skinparam noteBorderColor #D4A72C
+footer HeT Open Innovation Platform | Generated at 20260422-164252
+
+title HeT 开放创新平台 - 认证与验证码业务流
+
+autonumber
+actor "用户" as User
+participant "登录页 / 注册页" as UI
+participant "邮箱验证码 API\n/api/auth/email-code" as EmailAPI
+participant "短信验证码 API\n/api/sms/send" as SmsAPI
+participant "注册 API\n/api/auth/register" as RegisterAPI
+participant "登录验证码发送 API\n/api/auth/login-code/send" as LoginSendAPI
+participant "登录验证码校验 API\n/api/auth/login-code/verify" as LoginVerifyAPI
+participant "限流服务\nRateLimiterMemory" as RateLimit
+participant "SMTP 邮件服务" as SMTP
+participant "阿里云短信" as AliyunSMS
+database "Redis OTP Cache" as Redis
+participant "Payload Local API" as Payload
+participant "innovation-session Cookie" as Cookie
+
+group 注册阶段
+  User -> UI : 填写基础信息 / 邮箱 / 手机
+  UI -> EmailAPI : 请求邮箱验证码
+  EmailAPI -> RateLimit : consume(email, ip)
+  EmailAPI -> SMTP : sendRegistrationCodeEmail()
+  EmailAPI -> Redis : set email:otp (TTL 300s)
+
+  UI -> SmsAPI : 请求短信验证码
+  SmsAPI -> RateLimit : consume(phone, ip)
+  SmsAPI -> AliyunSMS : sendSMSCode()
+  SmsAPI -> Redis : set sms:otp (TTL 300s)
+
+  User -> UI : 提交注册表单
+  UI -> RegisterAPI : name / username / password / emailCode / smsCode
+  RegisterAPI -> Payload : 唯一性检查(users)
+  RegisterAPI -> Redis : get email:otp / sms:otp
+  RegisterAPI -> Payload : create partner user
+  RegisterAPI --> UI : 注册成功，跳转登录页
+end
+
+group 已有账号验证码登录
+  User -> UI : 输入邮箱或手机号
+  UI -> LoginSendAPI : 请求登录验证码
+  LoginSendAPI -> RateLimit : consume(identifier, ip)
+  alt 邮箱登录验证码
+    LoginSendAPI -> SMTP : sendLoginCodeEmail()
+  else 手机登录验证码
+    LoginSendAPI -> AliyunSMS : sendSMSCode()
+  end
+  LoginSendAPI -> Redis : set login:otp (TTL 300s)
+
+  User -> UI : 输入收到的验证码
+  UI -> LoginVerifyAPI : identifier + code
+  LoginVerifyAPI -> Redis : get login otp
+  LoginVerifyAPI -> Payload : find users by email / phone
+
+  alt 已存在账号
+    LoginVerifyAPI -> Payload : 补写验证时间戳（如需要）
+    LoginVerifyAPI -> Cookie : createAuthCookie()
+    LoginVerifyAPI --> UI : 登录成功 -> /dashboard
+  else 未注册账号
+    LoginVerifyAPI --> UI : 返回 register action / redirectTo
+  end
+end
+
+note right of LoginVerifyAPI
+当前验证码登录逻辑只允许“已有账号”直接登录。
+验证码正确但账号不存在时，引导跳转注册页，
+不会自动注册新用户。
+end note
+
+@enduml

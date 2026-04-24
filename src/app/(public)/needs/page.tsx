@@ -34,7 +34,7 @@ export default async function NeedsPage({
     <div className="container-shell py-16">
       <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
         <SectionHeading
-          description="这里展示Open Innovation当前面临的关键技术挑战。针对任一需求，都可以在登录后直接提交方案，进入内部评审流程。"
+          description="链接全球智慧，共策技术未来。我们期待您的加入，以创新方案开启共创，并肩探索无限可能。"
           eyebrow="Current Needs"
           title="技术需求大厅"
         />
@@ -45,7 +45,7 @@ export default async function NeedsPage({
 
       <div className="mt-8 flex flex-wrap gap-3">
         <Link
-          className={`rounded-full border px-4 py-2 text-sm font-medium ${!domain ? 'border-ht-blue bg-ht-blue text-white' : 'border-slate-200 bg-white text-slate-600'}`}
+          className={`theme-filter-chip rounded-md px-4 py-2 text-sm font-medium ${!domain ? 'is-active' : ''}`}
           href="/needs"
         >
           全部需求
@@ -53,7 +53,7 @@ export default async function NeedsPage({
         {Object.entries(needDomainMap).map(([value, label]) => (
           <Link
             key={value}
-            className={`rounded-full border px-4 py-2 text-sm font-medium ${domain === value ? 'border-ht-blue bg-ht-blue text-white' : 'border-slate-200 bg-white text-slate-600'}`}
+            className={`theme-filter-chip rounded-md px-4 py-2 text-sm font-medium ${domain === value ? 'is-active' : ''}`}
             href={`/needs?domain=${value}`}
           >
             {label}

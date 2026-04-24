@@ -16,7 +16,7 @@ export async function getHomepageData() {
     payload.find({
       collection: 'partners',
       depth: 1,
-      limit: 4,
+      limit: 10,
       overrideAccess: true,
       sort: 'sortOrder',
     }),
@@ -32,6 +32,7 @@ export async function getHomepageData() {
   return {
     cases: cases.docs,
     needs: needs.docs,
+    partnerCount: partners.totalDocs,
     partners: partners.docs,
   }
 }
@@ -68,9 +69,14 @@ export async function getDashboardMetrics(user: User) {
 
 export async function resolveLoginEmail(identifier: string) {
   const payload = await getPayloadClient()
+  const normalizedIdentifier = identifier.trim()
 
-  if (identifier.includes('@')) {
-    return identifier
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedIdentifier)) {
+    return normalizedIdentifier.toLowerCase()
+  }
+
+  if (!/^1\d{10}$/.test(normalizedIdentifier)) {
+    return null
   }
 
   const user = await payload.find({
@@ -80,18 +86,9 @@ export async function resolveLoginEmail(identifier: string) {
     overrideAccess: true,
     pagination: false,
     where: {
-      or: [
-        {
-          username: {
-            equals: identifier,
-          },
-        },
-        {
-          email: {
-            equals: identifier,
-          },
-        },
-      ],
+      phone: {
+        equals: normalizedIdentifier,
+      },
     },
   })
 

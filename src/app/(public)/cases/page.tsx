@@ -19,7 +19,8 @@ export default async function CasesPage() {
   return (
     <div className="container-shell py-16">
       <SectionHeading
-        description="平台沉淀了Open Innovation与芯片厂商、算法公司和实验室合作完成的典型联合创新案例，用于展示协同研发和量产导入能力。"
+        description="在此，见证生态合力如何成就卓越。我们精选与各领域伙伴的联合创新实践，分享给每一位同行者。"
+        descriptionClassName="lg:max-w-none lg:whitespace-nowrap"
         eyebrow="Success Stories"
         title="联合创新案例"
       />
@@ -31,7 +32,7 @@ export default async function CasesPage() {
           return (
             <Link
               key={item.id}
-              className="overflow-hidden rounded-[2rem] border border-white/70 bg-white shadow-2xl shadow-slate-200/60 transition hover:-translate-y-1"
+              className="theme-card overflow-hidden rounded-[1rem] transition hover:border-[color:var(--ht-border-strong)]"
               href={`/cases/${item.slug}`}
             >
               <div
@@ -46,11 +47,15 @@ export default async function CasesPage() {
                 <p className="text-xs uppercase tracking-[0.35em] text-ht-light-blue">
                   {item.partnerName}
                 </p>
-                <h2 className="mt-4 text-3xl font-semibold text-slate-950">{item.title}</h2>
-                <p className="mt-3 text-sm text-slate-500">
+                <h2 className="mt-4 text-3xl font-semibold text-[var(--ht-text-primary)]">
+                  {item.title}
+                </h2>
+                <p className="mt-3 text-sm text-[var(--ht-text-muted)]">
                   {getCaseDomainLabel(item.domain)} · {formatDate(item.publishedAt)}
                 </p>
-                <p className="mt-4 text-sm leading-7 text-slate-600">{item.summary}</p>
+                <p className="mt-4 text-sm leading-7 text-[var(--ht-text-secondary)]">
+                  {item.summary}
+                </p>
               </div>
             </Link>
           )

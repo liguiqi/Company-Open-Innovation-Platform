@@ -567,19 +567,19 @@ SMTP_FROM_ADDRESS=innovation@example.com
 
 【短信认证】使用部署环境中的以下环境变量注入，真实值不写入仓库：
 
-ALIYUN_SMS_ACCESS_KEY_ID=**_REDACTED_**
+ALIYUN*SMS_ACCESS_KEY_ID=\*\*\_REDACTED*\*\*
 
-ALIYUN_SMS_ACCESS_KEY_SECRET=**_REDACTED_**
+ALIYUN*SMS_ACCESS_KEY_SECRET=\*\*\_REDACTED*\*\*
 
 【邮箱认证】同样通过环境变量注入，真实值不写入仓库：
 
-SMTP_USER=**_REDACTED_**
+SMTP*USER=\*\*\_REDACTED*\*\*
 
-SMTP_PASS=**_REDACTED_**
+SMTP*PASS=\*\*\_REDACTED*\*\*
 
-IMAP_HOST=**_REDACTED_**
+IMAP*HOST=\*\*\_REDACTED*\*\*
 
-SMTP_HOST=**_REDACTED_**
+SMTP*HOST=\*\*\_REDACTED*\*\*
 
 SMTP_PORT=\*\*\*
 

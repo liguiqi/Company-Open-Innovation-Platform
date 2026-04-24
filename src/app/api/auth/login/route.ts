@@ -36,8 +36,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: '登录失败' }, { status: 401 })
     }
 
-    if (!result.user.emailVerifiedAt && result.user.role !== 'admin') {
-      return NextResponse.json({ error: '请先完成邮箱验证后再登录' }, { status: 403 })
+    const hasVerifiedChannel =
+      result.user.role === 'admin' ||
+      Boolean(result.user.emailVerifiedAt) ||
+      Boolean(result.user.phoneVerifiedAt)
+
+    if (!hasVerifiedChannel) {
+      return NextResponse.json({ error: '请先完成邮箱或手机验证后再登录' }, { status: 403 })
     }
 
     const response = NextResponse.json({
@@ -53,6 +58,6 @@ export async function POST(request: Request) {
     response.headers.append('Set-Cookie', await createAuthCookie(result.user))
     return response
   } catch {
-    return NextResponse.json({ error: '邮箱或密码错误' }, { status: 401 })
+    return NextResponse.json({ error: '邮箱/手机号或密码错误' }, { status: 401 })
   }
 }

@@ -187,6 +187,9 @@ export interface Media {
   alt: string
   purpose: 'image' | 'document'
   uploadedBy?: (number | null) | User
+  /**
+   * 若该文档来自某条方案提交，这里会回指来源 proposal，便于二次复用。
+   */
   proposal?: (number | null) | Proposal
   updatedAt: string
   createdAt: string
@@ -224,6 +227,9 @@ export interface Proposal {
     }
     [k: string]: unknown
   }
+  /**
+   * 附件文件统一保存在 media 集合中，可直接复用已上传的文档媒体记录。
+   */
   attachments?: (number | Media)[] | null
   submittedBy: number | User
   contactName: string
@@ -255,7 +261,10 @@ export interface Proposal {
  */
 export interface TechNeed {
   id: number
-  needId: string
+  /**
+   * 系统按 RD-年份-流水号 自动生成，创建后不可修改。
+   */
+  needId?: string | null
   title: string
   priority: 'urgent' | 'open' | 'joint-research'
   domain: 'motor-control' | 'sensor' | 'materials' | 'ai'
@@ -286,13 +295,72 @@ export interface TechNeed {
  */
 export interface Partner {
   id: number
+  /**
+   * 公开站与工作台的展示名称；未选择品牌预设时，也会用于自动生成文本 SVG 标识。
+   */
   name: string
+  /**
+   * 优先用于前台统一 Logo 卡片展示。选择后将直接使用预设 SVG；若留空，则优先读取上传 Logo，其次根据名称自动生成字标。
+   */
+  brandPreset?:
+    | (
+        | 'infineon'
+        | 'st'
+        | 'renesas'
+        | 'nxp'
+        | 'ti'
+        | 'nordic'
+        | 'sensirion'
+        | 'realtek'
+        | 'melexis'
+        | 'uni-joint-lab'
+        | 'electrolux'
+        | 'whirlpool'
+        | 'bosch'
+        | 'siemens'
+        | 'bsh'
+        | 'tti'
+        | 'arcelik'
+        | 'haier'
+        | 'hisense'
+        | 'philips'
+        | 'robam'
+        | 'supor'
+        | 'xiaomi'
+        | 'borgwarner'
+        | 'nidec'
+        | 'byd'
+        | 'nio'
+        | 'xpeng'
+        | 'volvo'
+        | 'delonghi'
+        | 'panasonic'
+        | 'toshiba'
+      )
+    | null
+  /**
+   * 用于非预设品牌或自定义 SVG / PNG。若同时设置品牌预设，前台优先使用品牌预设。
+   */
   logo?: (number | null) | Media
   website?: string | null
-  category: 'chip' | 'power' | 'connectivity' | 'academia'
-  tier: 'strategic' | 'certified' | 'general'
+  category:
+    | 'academia'
+    | 'automotive-brand'
+    | 'chip'
+    | 'connectivity'
+    | 'home-appliance-brand'
+    | 'power'
+    | 'smart-product-brand'
+    | 'tool-industrial-brand'
+  tier: 'strategic' | 'certified' | 'ecosystem' | 'other'
+  /**
+   * 用于 /ecosystem 页面和工作台伙伴管理页的说明文字。
+   */
   description?: string | null
   products?: string | null
+  /**
+   * 数值越小越靠前；公开页会先按展示层级，再按排序权重展示。
+   */
   sortOrder?: number | null
   updatedAt: string
   createdAt: string
@@ -502,6 +570,7 @@ export interface ProposalsSelect<T extends boolean = true> {
  */
 export interface PartnersSelect<T extends boolean = true> {
   name?: T
+  brandPreset?: T
   logo?: T
   website?: T
   category?: T
