@@ -11,6 +11,29 @@ function parseBoolean(value?: string | null) {
   return /^(1|true|yes|on)$/i.test(value)
 }
 
+function parseCSV(value?: string | null) {
+  if (value == null || value === '') {
+    return []
+  }
+
+  return value
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
+function normalizeOrigin(value?: string | null) {
+  if (value == null || value === '') {
+    return undefined
+  }
+
+  try {
+    return new URL(value).origin
+  } catch {
+    return value.replace(/\/+$/, '')
+  }
+}
+
 function pickFirst(...values: Array<string | undefined>) {
   return values.find((value) => value != null && value !== '')
 }
@@ -49,6 +72,7 @@ const envSchema = z.object({
   NEXT_PUBLIC_SERVER_URL: z.string().default('http://localhost:3000'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PAYLOAD_SECRET: z.string().default('development-only-payload-secret-please-change'),
+  PAYLOAD_ALLOWED_ORIGINS: z.string().optional(),
   REDIS_URL: z.string().optional(),
   EMAIL_MOCK: z.string().optional(),
   SMS_MOCK: z.string().optional(),
@@ -88,6 +112,7 @@ export const env = envSchema.parse({
   NEXT_PUBLIC_SERVER_URL: process.env.NEXT_PUBLIC_SERVER_URL,
   NODE_ENV: process.env.NODE_ENV,
   PAYLOAD_SECRET: process.env.PAYLOAD_SECRET,
+  PAYLOAD_ALLOWED_ORIGINS: process.env.PAYLOAD_ALLOWED_ORIGINS,
   REDIS_URL: process.env.REDIS_URL,
   EMAIL_MOCK: process.env.EMAIL_MOCK,
   SMS_MOCK: process.env.SMS_MOCK,
@@ -118,6 +143,13 @@ export const appEnv = {
   databaseURL: env.DATABASE_URI || env.DATABASE_URL || '',
   isDevelopment: env.NODE_ENV === 'development',
   isProduction: env.NODE_ENV === 'production',
+  payloadAllowedOrigins: Array.from(
+    new Set(
+      [env.NEXT_PUBLIC_SERVER_URL, ...parseCSV(env.PAYLOAD_ALLOWED_ORIGINS)]
+        .map((value) => normalizeOrigin(value))
+        .filter((value): value is string => Boolean(value)),
+    ),
+  ),
   smsEnabled:
     !(parseBoolean(env.SMS_MOCK) ?? false) &&
     Boolean(pickFirst(env.ALIYUN_ACCESS_KEY_ID, env.ALIYUN_SMS_ACCESS_KEY_ID)) &&

@@ -17,6 +17,7 @@ import { appEnv } from './lib/env'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+const allowedOrigins = appEnv.payloadAllowedOrigins
 
 export default buildConfig({
   admin: {
@@ -56,7 +57,8 @@ export default buildConfig({
     },
   },
   collections: [Users, UserGroups, TechNeeds, Proposals, Partners, CaseStudies, Media],
-  csrf: [appEnv.NEXT_PUBLIC_SERVER_URL],
+  cors: allowedOrigins,
+  csrf: allowedOrigins,
   db: postgresAdapter({
     pool: {
       connectionString: appEnv.databaseURL,

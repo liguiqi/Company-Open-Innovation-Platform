@@ -173,27 +173,34 @@ export function RegisterForm({ initialEmail = '', initialPhone = '' }: RegisterF
     setDebugCode(null)
     setSending(true)
 
-    const response = await fetch(endpoint, {
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      method: 'POST',
-    })
+    try {
+      const response = await fetch(endpoint, {
+        body: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      })
+      const data = await response.json().catch(() => ({}))
 
-    const data = await response.json()
-    setSending(false)
+      if (!response.ok) {
+        setError(
+          (typeof data.error === 'string' && data.error) ||
+            `${isEmail ? '邮箱' : '短信'}验证码发送失败`,
+        )
+        return
+      }
 
-    if (!response.ok) {
-      setError(data.error || `${isEmail ? '邮箱' : '短信'}验证码发送失败`)
-      return
-    }
+      setStatus((typeof data.message === 'string' && data.message) || '验证码已发送')
+      setCooldown(SEND_CODE_COOLDOWN)
 
-    setStatus(data.message || '验证码已发送')
-    setCooldown(SEND_CODE_COOLDOWN)
-
-    if (data.debugCode) {
-      setDebugCode(data.debugCode)
+      if (typeof data.debugCode === 'string' && data.debugCode) {
+        setDebugCode(data.debugCode)
+      }
+    } catch {
+      setError(`${isEmail ? '邮箱' : '短信'}验证码发送失败，请检查网络后重试`)
+    } finally {
+      setSending(false)
     }
   }
 
@@ -218,39 +225,44 @@ export function RegisterForm({ initialEmail = '', initialPhone = '' }: RegisterF
       return
     }
 
-    const response = await fetch('/api/auth/register', {
-      body: JSON.stringify({
-        company: trimmedCompany,
-        email: trimmedEmail,
-        emailCode: emailCode.trim(),
-        name: trimmedName,
-        password,
-        passwordConfirm,
-        phone: trimmedPhone,
-        smsCode: smsCode.trim(),
-        username: trimmedUsername,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      method: 'POST',
-    })
+    try {
+      const response = await fetch('/api/auth/register', {
+        body: JSON.stringify({
+          company: trimmedCompany,
+          email: trimmedEmail,
+          emailCode: emailCode.trim(),
+          name: trimmedName,
+          password,
+          passwordConfirm,
+          phone: trimmedPhone,
+          smsCode: smsCode.trim(),
+          username: trimmedUsername,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      })
 
-    const data = await response.json()
-    setLoading(false)
+      const data = await response.json().catch(() => ({}))
 
-    if (!response.ok) {
-      setError(data.error || '注册失败')
-      return
+      if (!response.ok) {
+        setError((typeof data.error === 'string' && data.error) || '注册失败')
+        return
+      }
+
+      const loginIdentifier = trimmedEmail || trimmedPhone
+      setSuccess('注册成功，正在跳转登录页面...')
+
+      window.setTimeout(() => {
+        emitRouteTransitionStart()
+        router.push(`/login?registered=1&identifier=${encodeURIComponent(loginIdentifier)}`)
+      }, 700)
+    } catch {
+      setError('注册请求失败，请检查网络后重试')
+    } finally {
+      setLoading(false)
     }
-
-    const loginIdentifier = trimmedEmail || trimmedPhone
-    setSuccess('注册成功，正在跳转登录页面...')
-
-    window.setTimeout(() => {
-      emitRouteTransitionStart()
-      router.push(`/login?registered=1&identifier=${encodeURIComponent(loginIdentifier)}`)
-    }, 700)
   }
 
   return (

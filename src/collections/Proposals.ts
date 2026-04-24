@@ -96,7 +96,6 @@ export const Proposals: CollectionConfig = {
         readOnly: true,
       },
       relationTo: 'users',
-      required: true,
     },
     {
       name: 'contactName',

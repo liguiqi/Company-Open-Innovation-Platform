@@ -231,7 +231,7 @@ export interface Proposal {
    * 附件文件统一保存在 media 集合中，可直接复用已上传的文档媒体记录。
    */
   attachments?: (number | Media)[] | null
-  submittedBy: number | User
+  submittedBy?: (number | null) | User
   contactName: string
   contactEmail: string
   contactCompany: string

@@ -63,28 +63,33 @@ export function LoginPanel({
     setSuccess(null)
     setRegisterPrompt(null)
 
-    const response = await fetch('/api/auth/login', {
-      body: JSON.stringify({
-        identifier,
-        password,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      method: 'POST',
-    })
+    try {
+      const response = await fetch('/api/auth/login', {
+        body: JSON.stringify({
+          identifier,
+          password,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      })
 
-    const data = await response.json()
-    setPasswordLoading(false)
+      const data = await response.json().catch(() => ({}))
 
-    if (!response.ok) {
-      setError(data.error || '登录失败')
-      return
+      if (!response.ok) {
+        setError((typeof data.error === 'string' && data.error) || '登录失败')
+        return
+      }
+
+      emitRouteTransitionStart()
+      router.push(redirectTo || data.redirectTo || '/dashboard')
+      router.refresh()
+    } catch {
+      setError('登录请求失败，请检查网络后重试')
+    } finally {
+      setPasswordLoading(false)
     }
-
-    emitRouteTransitionStart()
-    router.push(redirectTo || data.redirectTo || '/dashboard')
-    router.refresh()
   }
 
   async function sendCode() {
@@ -99,26 +104,31 @@ export function LoginPanel({
     setDebugCode(null)
     setRegisterPrompt(null)
 
-    const response = await fetch('/api/auth/login-code/send', {
-      body: JSON.stringify({ identifier }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      method: 'POST',
-    })
+    try {
+      const response = await fetch('/api/auth/login-code/send', {
+        body: JSON.stringify({ identifier }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      })
 
-    const data = await response.json()
-    setCodeSending(false)
+      const data = await response.json().catch(() => ({}))
 
-    if (!response.ok) {
-      setError(data.error || '验证码发送失败')
-      return
-    }
+      if (!response.ok) {
+        setError((typeof data.error === 'string' && data.error) || '验证码发送失败')
+        return
+      }
 
-    setSuccess(data.message)
+      setSuccess(typeof data.message === 'string' ? data.message : '验证码已发送')
 
-    if (data.debugCode) {
-      setDebugCode(data.debugCode)
+      if (typeof data.debugCode === 'string' && data.debugCode) {
+        setDebugCode(data.debugCode)
+      }
+    } catch {
+      setError('验证码发送失败，请检查网络后重试')
+    } finally {
+      setCodeSending(false)
     }
   }
 
@@ -133,38 +143,49 @@ export function LoginPanel({
     setSuccess(null)
     setRegisterPrompt(null)
 
-    const response = await fetch('/api/auth/login-code/verify', {
-      body: JSON.stringify({
-        code,
-        identifier,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      method: 'POST',
-    })
+    try {
+      const response = await fetch('/api/auth/login-code/verify', {
+        body: JSON.stringify({
+          code,
+          identifier,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      })
 
-    const data = await response.json()
-    setCodeVerifying(false)
+      const data = await response.json().catch(() => ({}))
 
-    if (!response.ok) {
-      if (response.status === 404 && data.action === 'register') {
-        setRegisterPrompt({
-          identifier: data.identifier,
-          identifierType: data.identifierType,
-          redirectTo: data.redirectTo,
-        })
-        setError(data.error || '当前账号未注册')
+      if (!response.ok) {
+        if (
+          response.status === 404 &&
+          data &&
+          typeof data === 'object' &&
+          'action' in data &&
+          data.action === 'register'
+        ) {
+          setRegisterPrompt({
+            identifier: typeof data.identifier === 'string' ? data.identifier : identifier.trim(),
+            identifierType: data.identifierType === 'email' ? 'email' : 'phone',
+            redirectTo: typeof data.redirectTo === 'string' ? data.redirectTo : '/register',
+          })
+          setError((typeof data.error === 'string' && data.error) || '当前账号未注册')
+          return
+        }
+
+        setError((typeof data.error === 'string' && data.error) || '验证码登录失败')
         return
       }
 
-      setError(data.error || '验证码登录失败')
-      return
+      emitRouteTransitionStart()
+      router.push(redirectTo || data.redirectTo || '/dashboard')
+      router.refresh()
+    } catch {
+      setError('验证码登录请求失败，请检查网络后重试')
+    } finally {
+      setCodeVerifying(false)
     }
-
-    emitRouteTransitionStart()
-    router.push(redirectTo || data.redirectTo || '/dashboard')
-    router.refresh()
   }
 
   function handleRegisterRedirect() {
