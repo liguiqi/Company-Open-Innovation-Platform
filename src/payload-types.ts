@@ -75,11 +75,16 @@ export interface Config {
     'case-studies': CaseStudy
     media: Media
     'payload-kv': PayloadKv
+    'payload-folders': FolderInterface
     'payload-locked-documents': PayloadLockedDocument
     'payload-preferences': PayloadPreference
     'payload-migrations': PayloadMigration
   }
-  collectionsJoins: {}
+  collectionsJoins: {
+    'payload-folders': {
+      documentsAndFolders: 'payload-folders' | 'media'
+    }
+  }
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>
     'user-groups': UserGroupsSelect<false> | UserGroupsSelect<true>
@@ -89,6 +94,7 @@ export interface Config {
     'case-studies': CaseStudiesSelect<false> | CaseStudiesSelect<true>
     media: MediaSelect<false> | MediaSelect<true>
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>
+    'payload-folders': PayloadFoldersSelect<false> | PayloadFoldersSelect<true>
     'payload-locked-documents':
       | PayloadLockedDocumentsSelect<false>
       | PayloadLockedDocumentsSelect<true>
@@ -212,6 +218,7 @@ export interface Media {
    * 若该文档来自某条方案提交，这里会回指来源 proposal，便于二次复用。
    */
   proposal?: (number | null) | Proposal
+  folder?: (number | null) | FolderInterface
   updatedAt: string
   createdAt: string
   url?: string | null
@@ -307,6 +314,32 @@ export interface TechNeed {
   }
   status: 'open' | 'in-progress' | 'closed'
   publishedAt?: string | null
+  updatedAt: string
+  createdAt: string
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-folders".
+ */
+export interface FolderInterface {
+  id: number
+  name: string
+  folder?: (number | null) | FolderInterface
+  documentsAndFolders?: {
+    docs?: (
+      | {
+          relationTo?: 'payload-folders'
+          value: number | FolderInterface
+        }
+      | {
+          relationTo?: 'media'
+          value: number | Media
+        }
+    )[]
+    hasNextPage?: boolean
+    totalDocs?: number
+  }
+  folderType?: 'media'[] | null
   updatedAt: string
   createdAt: string
 }
@@ -470,6 +503,10 @@ export interface PayloadLockedDocument {
         relationTo: 'media'
         value: number | Media
       } | null)
+    | ({
+        relationTo: 'payload-folders'
+        value: number | FolderInterface
+      } | null)
   globalSlug?: string | null
   user: {
     relationTo: 'users'
@@ -631,6 +668,7 @@ export interface MediaSelect<T extends boolean = true> {
   storageKey?: T
   uploadedBy?: T
   proposal?: T
+  folder?: T
   updatedAt?: T
   createdAt?: T
   url?: T
@@ -650,6 +688,18 @@ export interface MediaSelect<T extends boolean = true> {
 export interface PayloadKvSelect<T extends boolean = true> {
   key?: T
   data?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-folders_select".
+ */
+export interface PayloadFoldersSelect<T extends boolean = true> {
+  name?: T
+  folder?: T
+  documentsAndFolders?: T
+  folderType?: T
+  updatedAt?: T
+  createdAt?: T
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

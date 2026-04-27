@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import { SectionHeading } from '@/components/shared/SectionHeading'
+import { getMediaImageURL } from '@/lib/media'
 import { getPayloadClient } from '@/lib/payload'
 import { formatDate, getCaseDomainLabel } from '@/lib/utils'
 
@@ -28,6 +29,7 @@ export default async function CasesPage() {
       <div className="mt-10 grid gap-8 lg:grid-cols-2">
         {caseStudies.docs.map((item) => {
           const coverImage = typeof item.coverImage === 'number' ? null : item.coverImage
+          const coverImageURL = getMediaImageURL(coverImage)
 
           return (
             <Link
@@ -38,8 +40,8 @@ export default async function CasesPage() {
               <div
                 className="h-56 bg-cover bg-center"
                 style={{
-                  backgroundImage: coverImage?.url
-                    ? `linear-gradient(rgba(2,6,23,0.35), rgba(2,6,23,0.35)), url('${coverImage.url}')`
+                  backgroundImage: coverImageURL
+                    ? `linear-gradient(rgba(2,6,23,0.35), rgba(2,6,23,0.35)), url('${coverImageURL}')`
                     : 'linear-gradient(135deg, #004098 0%, #00A0E9 100%)',
                 }}
               />

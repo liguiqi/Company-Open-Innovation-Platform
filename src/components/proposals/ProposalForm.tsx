@@ -92,7 +92,7 @@ export function ProposalForm({
         formData.append('attachments', file, file.name)
       })
 
-      const response = await fetch('/api/proposals', {
+      const response = await fetch('/api/partner/proposals', {
         body: formData,
         method: 'POST',
       })

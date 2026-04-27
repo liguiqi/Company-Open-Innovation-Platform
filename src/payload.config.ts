@@ -14,6 +14,7 @@ import { Proposals } from './collections/Proposals'
 import { TechNeeds } from './collections/TechNeeds'
 import { UserGroups } from './collections/UserGroups'
 import { appEnv } from './lib/env'
+import { backfillMediaFolders } from './lib/media-folders'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -84,10 +85,17 @@ export default buildConfig({
       : undefined,
   }),
   editor: lexicalEditor(),
+  folders: {
+    browseByFolder: true,
+    collectionSpecific: true,
+  },
   graphQL: {
     disablePlaygroundInProduction: true,
   },
   onInit: async (payload) => {
+    await backfillMediaFolders({
+      payload,
+    })
     payload.logger.info('H&T Open Innovation Platform initialized')
   },
   routes: {

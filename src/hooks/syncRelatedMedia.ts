@@ -23,6 +23,7 @@ async function syncSingleMedia({
   mediaId,
   module,
   payload,
+  req,
   proposalId,
   purpose,
   uploadedBy,
@@ -34,6 +35,7 @@ async function syncSingleMedia({
     findByID: (...args: any[]) => Promise<any>
     update: (...args: any[]) => Promise<any>
   }
+  req: unknown
   proposalId?: number | string | null
   purpose: 'document' | 'image'
   uploadedBy?: number | string | null
@@ -44,6 +46,7 @@ async function syncSingleMedia({
       collection: 'media',
       depth: 0,
       overrideAccess: true,
+      req,
     })
     .catch(() => null)
 
@@ -89,6 +92,7 @@ async function syncSingleMedia({
     collection: 'media',
     data: nextData,
     overrideAccess: true,
+    req,
   })
 }
 
@@ -104,6 +108,7 @@ export const syncPartnerLogoMedia: CollectionAfterChangeHook = async ({ doc, req
     module: 'partners',
     payload: req.payload as any,
     purpose: 'image',
+    req,
   })
 
   return doc
@@ -122,6 +127,7 @@ export const syncCaseStudyCoverMedia: CollectionAfterChangeHook = async ({ doc, 
     module: 'case-studies',
     payload: req.payload as any,
     purpose: 'image',
+    req,
   })
 
   return doc
@@ -140,6 +146,7 @@ export const syncUserAvatarMedia: CollectionAfterChangeHook = async ({ doc, req 
     module: 'users',
     payload: req.payload as any,
     purpose: 'image',
+    req,
   })
 
   return doc
@@ -162,6 +169,7 @@ export const syncProposalAttachmentMedia: CollectionAfterChangeHook = async ({ d
         mediaId,
         module: 'proposals',
         payload: req.payload as any,
+        req,
         proposalId: doc.id,
         purpose: 'document',
         uploadedBy,

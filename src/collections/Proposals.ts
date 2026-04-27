@@ -1,5 +1,13 @@
 import type { CollectionConfig } from 'payload'
 
+import {
+  deleteProposalRelatedMedia,
+  deleteProposalRelatedMediaAfterDelete,
+} from '@/hooks/deleteProposalRelatedMedia'
+import {
+  duplicateProposalAttachments,
+  duplicateProposalTitle,
+} from '@/hooks/duplicateProposalAttachments'
 import { sendProposalNotification } from '@/hooks/sendProposalNotification'
 import { onProposalStatusChange } from '@/hooks/onProposalStatusChange'
 import { syncProposalAttachmentMedia } from '@/hooks/syncRelatedMedia'
@@ -58,6 +66,9 @@ export const Proposals: CollectionConfig = {
     {
       name: 'title',
       type: 'text',
+      hooks: {
+        beforeDuplicate: [duplicateProposalTitle],
+      },
       required: true,
     },
     {
@@ -83,8 +94,23 @@ export const Proposals: CollectionConfig = {
     },
     {
       name: 'attachments',
+      filterOptions: {
+        assetCategory: {
+          equals: 'proposal-attachment',
+        },
+        module: {
+          equals: 'proposals',
+        },
+        purpose: {
+          equals: 'document',
+        },
+      },
       admin: {
         description: '附件文件统一保存在 media 集合中，可直接复用已上传的文档媒体记录。',
+        sortOptions: '-updatedAt',
+      },
+      hooks: {
+        beforeDuplicate: [duplicateProposalAttachments],
       },
       type: 'relationship',
       hasMany: true,
@@ -147,6 +173,8 @@ export const Proposals: CollectionConfig = {
     },
   ],
   hooks: {
+    afterDelete: [deleteProposalRelatedMediaAfterDelete],
+    beforeDelete: [deleteProposalRelatedMedia],
     afterChange: [sendProposalNotification, onProposalStatusChange, syncProposalAttachmentMedia],
     beforeChange: [
       ({ data, operation, req }) => {

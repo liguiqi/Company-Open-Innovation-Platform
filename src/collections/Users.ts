@@ -93,8 +93,22 @@ export const Users: CollectionConfig = {
     },
     {
       name: 'avatar',
+      filterOptions: {
+        assetCategory: {
+          equals: 'user-avatar',
+        },
+        module: {
+          equals: 'users',
+        },
+        purpose: {
+          equals: 'image',
+        },
+      },
       type: 'relationship',
       relationTo: 'media',
+      admin: {
+        sortOptions: '-updatedAt',
+      },
     },
     {
       name: 'emailVerifiedAt',

@@ -40,10 +40,22 @@ export const Partners: CollectionConfig = {
     {
       name: 'logo',
       label: 'Logo 文件（可选）',
+      filterOptions: {
+        assetCategory: {
+          in: ['partner-logo', 'partner-svg'],
+        },
+        module: {
+          equals: 'partners',
+        },
+        purpose: {
+          equals: 'image',
+        },
+      },
       type: 'relationship',
       relationTo: 'media',
       admin: {
         description: '用于非预设品牌或自定义 SVG / PNG。若同时设置品牌预设，前台优先使用品牌预设。',
+        sortOptions: '-updatedAt',
       },
     },
     {

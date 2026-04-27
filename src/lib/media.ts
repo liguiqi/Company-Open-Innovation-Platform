@@ -29,6 +29,12 @@ export type MediaModule = (typeof mediaModuleOptions)[number]['value']
 export type MediaAssetCategory = (typeof mediaAssetCategoryOptions)[number]['value']
 export type MediaPurpose = 'document' | 'image'
 
+type MediaResourceRef = {
+  id?: number | string | null
+  purpose?: MediaPurpose | null | string
+  url?: string | null
+}
+
 const mediaModuleValueSet = new Set<MediaModule>(mediaModuleOptions.map((option) => option.value))
 const mediaAssetCategoryValueSet = new Set<MediaAssetCategory>(
   mediaAssetCategoryOptions.map((option) => option.value),
@@ -209,6 +215,33 @@ export function buildMediaStorageKey({
   }
 
   return path.posix.join(mediaStorageDirectoryMap[assetCategory], safeFilename)
+}
+
+export function getMediaResourceURL(media?: MediaResourceRef | null) {
+  if (!media || typeof media !== 'object') {
+    return null
+  }
+
+  if (media.id != null) {
+    const encodedId = encodeURIComponent(String(media.id))
+    return media.purpose === 'document'
+      ? `/api/attachments/${encodedId}`
+      : `/api/public-media/${encodedId}`
+  }
+
+  return media.url || null
+}
+
+export function getMediaImageURL(media?: MediaResourceRef | null) {
+  if (!media || typeof media !== 'object') {
+    return null
+  }
+
+  if (media.id != null) {
+    return `/api/public-media/${encodeURIComponent(String(media.id))}`
+  }
+
+  return media.url || null
 }
 
 async function fileExists(filePath: string) {

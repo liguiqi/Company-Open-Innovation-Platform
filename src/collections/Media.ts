@@ -5,16 +5,22 @@ import {
   deleteMediaFiles,
   ensureMediaFileOrganization,
   getAttachmentContentDisposition,
+  getMediaImageURL,
   getPersistentMediaDir,
+  type MediaAssetCategory,
   mediaAssetCategoryOptions,
   mediaModuleOptions,
   normalizeMediaAssetCategory,
   normalizeMediaModule,
   readMediaFile,
 } from '@/lib/media'
+import { getMediaFolderId } from '@/lib/media-folders'
 
 export const Media: CollectionConfig = {
   slug: 'media',
+  folders: {
+    browseByFolder: true,
+  },
   access: {
     create: ({ req }) => Boolean(req.user),
     read: ({ req }) => {
@@ -51,6 +57,7 @@ export const Media: CollectionConfig = {
   admin: {
     defaultColumns: [
       'filename',
+      'folder',
       'module',
       'assetCategory',
       'purpose',
@@ -184,7 +191,7 @@ export const Media: CollectionConfig = {
   },
   hooks: {
     beforeChange: [
-      ({ data, originalDoc }) => {
+      async ({ data, originalDoc, req }) => {
         const purpose = data?.purpose || originalDoc?.purpose || 'image'
         const mediaModule = normalizeMediaModule({
           module: data?.module || originalDoc?.module,
@@ -197,12 +204,44 @@ export const Media: CollectionConfig = {
           module: mediaModule,
           purpose,
         })
+        const storageKey = buildMediaStorageKey({
+          assetCategory,
+          filename: data?.filename || originalDoc?.filename,
+        })
+        const folderId = await getMediaFolderId({
+          assetCategory: assetCategory as MediaAssetCategory,
+          payload: req.payload,
+          req,
+        })
 
         return {
           ...data,
           assetCategory,
+          folder: folderId,
           module: mediaModule,
           purpose,
+          storageKey,
+        }
+      },
+    ],
+    afterRead: [
+      ({ doc }) => {
+        if (doc?.purpose !== 'image') {
+          return doc
+        }
+
+        const imageURL = getMediaImageURL(
+          doc as { id?: number | string | null; url?: string | null },
+        )
+
+        if (!imageURL) {
+          return doc
+        }
+
+        return {
+          ...doc,
+          thumbnailURL: imageURL,
+          url: imageURL,
         }
       },
     ],

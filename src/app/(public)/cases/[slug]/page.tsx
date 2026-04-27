@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { SectionHeading } from '@/components/shared/SectionHeading'
+import { getMediaImageURL } from '@/lib/media'
 import { getPayloadClient } from '@/lib/payload'
 import { lexicalToPlainText } from '@/lib/richtext'
 import { formatDate, getCaseDomainLabel } from '@/lib/utils'
@@ -31,6 +32,7 @@ export default async function CaseDetailPage({ params }: { params: Promise<{ slu
   }
 
   const coverImage = typeof caseStudy.coverImage === 'number' ? null : caseStudy.coverImage
+  const coverImageURL = getMediaImageURL(coverImage)
 
   return (
     <div className="container-shell py-16">
@@ -38,8 +40,8 @@ export default async function CaseDetailPage({ params }: { params: Promise<{ slu
         <div
           className="h-72 bg-cover bg-center"
           style={{
-            backgroundImage: coverImage?.url
-              ? `linear-gradient(rgba(2,6,23,0.35), rgba(2,6,23,0.35)), url('${coverImage.url}')`
+            backgroundImage: coverImageURL
+              ? `linear-gradient(rgba(2,6,23,0.35), rgba(2,6,23,0.35)), url('${coverImageURL}')`
               : 'linear-gradient(135deg, #004098 0%, #00A0E9 100%)',
           }}
         />

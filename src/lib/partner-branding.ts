@@ -1,6 +1,7 @@
 import type { Media } from '@/payload-types'
 
 import { partnerCategoryMap } from './constants'
+import { getMediaImageURL } from './media'
 
 export type PartnerTier = 'strategic' | 'certified' | 'ecosystem' | 'other'
 
@@ -10,7 +11,7 @@ export type DisplayPartnerRecord = {
   brandPreset?: string | null
   category: string
   description?: string | null
-  logo?: Pick<Media, 'alt' | 'url'> | number | null
+  logo?: Pick<Media, 'alt' | 'id' | 'url'> | number | null
   products?: string | null
   sortOrder?: number | null
   tier: PartnerTier | string
@@ -633,8 +634,15 @@ export function resolvePartnerBrandProfile({
 }
 
 export function getPartnerLogoMedia(logo?: DisplayPartnerRecord['logo']) {
-  if (logo && typeof logo === 'object' && 'url' in logo && logo.url) {
-    return logo
+  if (logo && typeof logo === 'object') {
+    const url = getMediaImageURL(logo)
+
+    if (url) {
+      return {
+        ...logo,
+        url,
+      }
+    }
   }
 
   return null

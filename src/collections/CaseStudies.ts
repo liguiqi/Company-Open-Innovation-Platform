@@ -35,8 +35,22 @@ export const CaseStudies: CollectionConfig = {
     },
     {
       name: 'coverImage',
+      filterOptions: {
+        assetCategory: {
+          equals: 'case-cover',
+        },
+        module: {
+          equals: 'case-studies',
+        },
+        purpose: {
+          equals: 'image',
+        },
+      },
       type: 'relationship',
       relationTo: 'media',
+      admin: {
+        sortOptions: '-updatedAt',
+      },
       required: true,
     },
     {
