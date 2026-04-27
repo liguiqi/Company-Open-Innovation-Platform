@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Blocks, BriefcaseBusiness, LayoutDashboard, Settings, Users } from 'lucide-react'
+import { Blocks, BriefcaseBusiness, FileText, LayoutDashboard, Settings, Users } from 'lucide-react'
 
 import type { User } from '@/payload-types'
 
@@ -16,6 +16,8 @@ const baseItems = [
   { href: '/dashboard/settings', icon: Settings, label: '个人设置' },
 ]
 
+const operatorItems = [{ href: '/dashboard/needs', icon: FileText, label: '需求发布' }]
+
 const adminItems = [
   { href: '/dashboard/partners', icon: BriefcaseBusiness, label: '伙伴管理' },
   { href: '/dashboard/users', icon: Users, label: '用户管理' },
@@ -23,7 +25,12 @@ const adminItems = [
 
 export function DashboardSidebar({ role }: { role: User['role'] }) {
   const pathname = usePathname()
-  const items = role === 'admin' ? [...baseItems, ...adminItems] : baseItems
+  const items =
+    role === 'admin'
+      ? [...baseItems, ...operatorItems, ...adminItems]
+      : role === 'reviewer'
+        ? [...baseItems, ...operatorItems]
+        : baseItems
 
   return (
     <aside className="dashboard-sidebar theme-dashboard-panel relative overflow-hidden rounded-xl p-5 lg:flex lg:h-full lg:min-h-0 lg:flex-col">

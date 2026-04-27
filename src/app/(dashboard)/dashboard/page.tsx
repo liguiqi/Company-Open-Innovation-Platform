@@ -1,11 +1,17 @@
 import Link from 'next/link'
+import { Blocks, BriefcaseBusiness, FileText, FolderKanban, type LucideIcon } from 'lucide-react'
 
 import { EmptyState } from '@/components/shared/EmptyState'
-import { ProposalStatusBadge } from '@/components/shared/StatusBadge'
+import {
+  NeedPriorityBadge,
+  NeedStatusBadge,
+  ProposalStatusBadge,
+} from '@/components/shared/StatusBadge'
 import { requireUser } from '@/lib/auth'
 import { getDashboardMetrics } from '@/lib/data'
 import { getPayloadClient } from '@/lib/payload'
-import { formatDate } from '@/lib/utils'
+import { lexicalToPlainText } from '@/lib/richtext'
+import { formatDate, getNeedDomainLabel } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,20 +36,40 @@ export default async function DashboardPage() {
           },
   })
 
+  const needs =
+    user.role === 'admin' || user.role === 'reviewer'
+      ? await payload.find({
+          collection: 'tech-needs',
+          depth: 0,
+          limit: 3,
+          overrideAccess: true,
+          sort: '-publishedAt',
+        })
+      : null
+
   const cards = [
-    { label: '方案总数', value: metrics.proposalCount },
-    { label: '公开需求', value: metrics.needCount },
-    { label: '生态伙伴', value: metrics.partnerCount },
-    { label: '联合案例', value: metrics.caseCount },
-  ]
+    { label: '方案总数', value: metrics.proposalCount, icon: Blocks },
+    { label: '公开需求', value: metrics.needCount, icon: FileText },
+    { label: '生态伙伴', value: metrics.partnerCount, icon: BriefcaseBusiness },
+    { label: '联合案例', value: metrics.caseCount, icon: FolderKanban },
+  ] satisfies Array<{
+    icon: LucideIcon
+    label: string
+    value: number
+  }>
 
   return (
     <div className="space-y-8">
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         {cards.map((card) => (
           <div key={card.label} className="theme-dashboard-panel rounded-xl p-6">
-            <p className="text-sm text-[var(--ht-text-muted)]">{card.label}</p>
-            <p className="mt-4 font-display text-5xl font-semibold text-[var(--ht-text-primary)]">
+            <div className="flex items-start justify-between gap-4">
+              <p className="text-sm text-[var(--ht-text-muted)]">{card.label}</p>
+              <span className="theme-dashboard-nav-icon flex h-11 w-11 items-center justify-center rounded-lg">
+                <card.icon size={18} />
+              </span>
+            </div>
+            <p className="mt-6 font-display text-5xl font-semibold text-[var(--ht-text-primary)]">
               {card.value}
             </p>
           </div>
@@ -97,6 +123,53 @@ export default async function DashboardPage() {
           )}
         </div>
       </div>
+
+      {needs ? (
+        <div className="theme-dashboard-panel rounded-xl p-6">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-semibold text-[var(--ht-text-primary)]">最新技术需求</h2>
+              <p className="mt-2 text-sm text-[var(--ht-text-muted)]">
+                供管理员与评审员快速查看当前公开需求状态，并进入需求发布台维护。
+              </p>
+            </div>
+            <Link className="text-sm font-semibold text-ht-light-blue" href="/dashboard/needs">
+              进入需求发布
+            </Link>
+          </div>
+
+          <div className="mt-6 grid gap-4 lg:grid-cols-2">
+            {needs.docs.length ? (
+              needs.docs.map((need) => (
+                <div key={need.id} className="theme-dashboard-panel-soft rounded-lg p-5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <NeedPriorityBadge priority={need.priority} />
+                    <NeedStatusBadge status={need.status} />
+                  </div>
+                  <h3 className="mt-4 text-xl font-semibold text-[var(--ht-text-primary)]">
+                    {need.title}
+                  </h3>
+                  <p className="mt-2 text-sm text-[var(--ht-text-muted)]">
+                    {need.needId} · {getNeedDomainLabel(need.domain)} ·{' '}
+                    {formatDate(need.publishedAt)}
+                  </p>
+                  <p className="mt-4 text-sm leading-7 text-[var(--ht-text-secondary)]">
+                    {lexicalToPlainText(need.description).slice(0, 96) || '暂无需求描述'}
+                    {lexicalToPlainText(need.description).length > 96 ? '...' : ''}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <div className="lg:col-span-2">
+                <EmptyState
+                  description="当前尚未发布技术需求，可在需求发布台创建首条记录。"
+                  title="暂无技术需求"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

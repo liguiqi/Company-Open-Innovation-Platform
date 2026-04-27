@@ -169,3 +169,22 @@ export const proposalReviewSchema = z.object({
   reviewNotes: z.string().trim().min(6, '请填写评审意见'),
   status: z.enum(['pending', 'reviewing', 'approved', 'rejected']),
 })
+
+export const techNeedUpsertSchema = z.object({
+  description: z.string().trim().min(20, '请至少填写 20 个字符的需求描述'),
+  domain: z.enum(['motor-control', 'sensor', 'materials', 'ai']),
+  priority: z.enum(['urgent', 'open', 'joint-research']),
+  productLine: z
+    .string()
+    .trim()
+    .optional()
+    .transform((value) => value ?? '')
+    .refine((value) => !value || value.length >= 2, '产品线名称至少 2 个字符'),
+  publishedAt: z
+    .string()
+    .trim()
+    .min(1, '请选择发布日期')
+    .refine((value) => !Number.isNaN(Date.parse(value)), '发布日期格式无效'),
+  status: z.enum(['open', 'in-progress', 'closed']),
+  title: z.string().trim().min(4, '请填写完整需求标题'),
+})
