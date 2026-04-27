@@ -15,6 +15,7 @@
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint . && pnpm exec oxlint .",
     "lint:fix": "cross-env NODE_OPTIONS=--no-deprecation eslint . --fix",
+    "media:organize": "cross-env NODE_OPTIONS=--no-deprecation pnpm exec tsx src/scripts/backfill-media-organization.ts",
     "postbuild": "node scripts/sync-standalone-assets.mjs",
     "prepare": "husky",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",

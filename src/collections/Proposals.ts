@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { sendProposalNotification } from '@/hooks/sendProposalNotification'
 import { onProposalStatusChange } from '@/hooks/onProposalStatusChange'
+import { syncProposalAttachmentMedia } from '@/hooks/syncRelatedMedia'
 
 export const Proposals: CollectionConfig = {
   slug: 'proposals',
@@ -146,7 +147,7 @@ export const Proposals: CollectionConfig = {
     },
   ],
   hooks: {
-    afterChange: [sendProposalNotification, onProposalStatusChange],
+    afterChange: [sendProposalNotification, onProposalStatusChange, syncProposalAttachmentMedia],
     beforeChange: [
       ({ data, operation, req }) => {
         if (operation === 'create' && req.user?.id) {

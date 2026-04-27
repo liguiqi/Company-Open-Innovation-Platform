@@ -1,6 +1,6 @@
 # Docs Index
 
-当前 `docs/` 目录面向正式版 `v1.0.0`，记录本项目在 `2026-04-20` 时点的真实架构、部署、运维、测试与里程碑状态。
+当前 `docs/` 目录面向正式版 `v1.0.0` 及其后续本地增量开发，记录本项目截至 `2026-04-27` 的真实架构、部署、运维、用户操作、测试与里程碑状态。
 
 ## 文档范围
 
@@ -11,6 +11,9 @@
 | 路径                                           | 说明                                                           |
 | ---------------------------------------------- | -------------------------------------------------------------- |
 | `README.md`                                    | 文档总索引与维护范围                                           |
+| `user_doc/README.md`                           | 用户文档索引                                                   |
+| `user_doc/production-user-guide.md`            | 生产环境用户操作手册，面向公开站用户、合作伙伴、评审员与管理员 |
+| `user_doc/local-vs-production-differences.md`  | 本机开发环境与生产环境差异矩阵，重点说明 Tech Needs 差异       |
 | `architecture/README.md`                       | 架构文档索引                                                   |
 | `architecture/system-architecture.md`          | 系统边界、路由、认证、集合、业务流和外部依赖                   |
 | `architecture/deployment-topology.md`          | 当前线上拓扑、端口、standalone 运行与持久化方式                |
@@ -34,4 +37,5 @@
 1. 代码改动涉及路由、集合、认证、接口、外部服务或部署链路时，必须同步更新 `architecture/`、`deployment/deployment.md` 或 `Ops/`。
 2. 涉及正式发版、tag、回滚和 smoke test 的变更，统一同步到 `README.md` 与 `Ops/release-and-rollback.md`。
 3. 涉及短信 / 邮件 / 认证体验的用户侧调整，同时更新 `testing.md` 和 `progress/`。
-4. 历史进度记录保留原始背景，但最新实际状态以 `README.md` 和当前主文档为准。
+4. 涉及角色权限、页面入口、用户操作流程或生产 / 开发环境差异调整时，必须同步更新 `user_doc/`。
+5. 历史进度记录保留原始背景，但最新实际状态以 `README.md` 和当前主文档为准。

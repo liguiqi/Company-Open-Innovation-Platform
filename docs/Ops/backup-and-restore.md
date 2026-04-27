@@ -1,6 +1,6 @@
 # 备份与恢复说明
 
-更新日期：`2026-04-20`
+更新日期：`2026-04-27`
 
 ## 1. 需要备份的对象
 
@@ -11,7 +11,7 @@
 
 ### 1.2 文件与媒体
 
-- `media/`：上传附件和图片
+- `media/`：上传附件和图片，当前按 `document/`、`image/` 以及业务模块子目录归档
 - `public/`：品牌资源与静态文件
 - `example.com_nginx/`：证书文件
 
@@ -58,6 +58,16 @@ tar -czf backup-public.tar.gz public
 tar -czf backup-cert.tar.gz example.com_nginx
 ```
 
+`media/` 当前建议重点关注以下子目录：
+
+- `media/document/proposals/`
+- `media/document/partners/`
+- `media/image/partners/logo/`
+- `media/image/partners/svg/`
+- `media/image/case-studies/cover/`
+- `media/image/users/avatar/`
+- `media/image/tech-needs/`
+
 ## 5. 配置备份
 
 ```bash
@@ -76,7 +86,7 @@ cp .env ./.env.backup
 
 1. 停止应用写入
 2. 恢复 PostgreSQL
-3. 恢复 `media/`
+3. 恢复完整 `media/` 目录树，不能只恢复根目录平铺文件
 4. 恢复 `.env.local` / `.env`
 5. 如有需要，恢复 Nginx / systemd 配置
 6. 重新构建 standalone
@@ -103,3 +113,4 @@ docker compose exec -T postgres psql -U payload -d innovation_platform -c '\dt'
 4. Dashboard
 5. Admin
 6. 任意一条带附件的方案详情页
+7. 任意一条伙伴 Logo / 案例封面图片可正常加载

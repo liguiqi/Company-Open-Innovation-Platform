@@ -1,6 +1,6 @@
 # 系统架构说明
 
-更新日期：`2026-04-20`
+更新日期：`2026-04-27`
 
 ## 1. 系统定位
 
@@ -10,7 +10,7 @@
 - `Payload CMS 3` 以内嵌方式运行在同一个 Node 进程中，提供 Admin、REST、GraphQL 和 Local API
 - `PostgreSQL` 保存业务数据
 - `Redis` 保存邮箱 / 短信验证码缓存
-- 仓库根目录 `media/` 保存上传附件和图片
+- 仓库根目录 `media/` 保存上传附件和图片，并按业务模块分层归档
 
 站内绝大多数读写，不是走 HTTP 再调 Payload，而是直接通过 `getPayloadClient()` 使用 Payload Local API。
 
@@ -94,15 +94,15 @@
 
 ## 6. Collection 模型
 
-| Collection     | 用途             | 关键字段                                                    | 访问特点                                              |
-| -------------- | ---------------- | ----------------------------------------------------------- | ----------------------------------------------------- |
-| `users`        | 平台账号         | `username`、`email`、`phone`、`role`、验证时间戳            | 普通用户只能读改自己；管理员可管理全部                |
-| `user-groups`  | 用户组与扩展权限 | `name`、`description`、`permissions`                        | 仅管理员可读写                                        |
-| `tech-needs`   | 技术需求大厅     | `needId`、`title`、`priority`、`domain`、`status`           | 公开可读；管理员维护                                  |
-| `proposals`    | 创新方案         | `title`、`type`、`status`、`submittedBy`、`reviewNotes`     | 合作伙伴创建；管理员 / 评审员评审；合作伙伴仅看自己的 |
-| `partners`     | 生态伙伴目录     | `name`、`category`、`tier`、`sortOrder`                     | 公开可读；管理员维护                                  |
-| `case-studies` | 联合案例         | `title`、`slug`、`domain`、`content`                        | 公开可读；管理员维护                                  |
-| `media`        | 媒体与附件       | `filename`、`mimeType`、`purpose`、`proposal`、`uploadedBy` | 公开图片与受控附件并存                                |
+| Collection     | 用途             | 关键字段                                                                                 | 访问特点                                              |
+| -------------- | ---------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `users`        | 平台账号         | `username`、`email`、`phone`、`role`、验证时间戳                                         | 普通用户只能读改自己；管理员可管理全部                |
+| `user-groups`  | 用户组与扩展权限 | `name`、`description`、`permissions`                                                     | 仅管理员可读写                                        |
+| `tech-needs`   | 技术需求大厅     | `needId`、`title`、`priority`、`domain`、`status`                                        | 公开可读；管理员维护                                  |
+| `proposals`    | 创新方案         | `title`、`type`、`status`、`submittedBy`、`reviewNotes`                                  | 合作伙伴创建；管理员 / 评审员评审；合作伙伴仅看自己的 |
+| `partners`     | 生态伙伴目录     | `name`、`category`、`tier`、`sortOrder`                                                  | 公开可读；管理员维护                                  |
+| `case-studies` | 联合案例         | `title`、`slug`、`domain`、`content`                                                     | 公开可读；管理员维护                                  |
+| `media`        | 媒体与附件       | `filename`、`purpose`、`module`、`assetCategory`、`storageKey`、`proposal`、`uploadedBy` | 公开图片与受控附件并存，并按模块物理归档              |
 
 ## 7. 认证与会话
 
@@ -182,16 +182,19 @@
 
 1. 合作伙伴在 `/dashboard/proposals/new` 提交方案
 2. `/api/proposals` 创建 `proposals` 记录与关联 `media`
-3. Hook 自动补齐 `submittedBy`、通知相关用户
-4. 评审员通过 `/api/proposals/[id]/status` 更新状态与评审意见
-5. 合作伙伴再次进入详情页可看到最新状态和意见
+3. 方案附件当前支持 `TXT / PDF / PPT / PPTX / DOC / DOCX / ZIP / RAR`
+4. `media` 自动将方案附件归档到 `media/document/proposals/`
+5. Hook 自动补齐 `submittedBy`、通知相关用户
+6. 评审员通过 `/api/proposals/[id]/status` 更新状态与评审意见
+7. 合作伙伴再次进入详情页可看到最新状态和意见
 
 ### 8.4 附件下载
 
 1. 前端访问 `/api/attachments/[id]`
 2. 后端根据 `innovation-session` 识别用户
 3. 校验是否为管理员、评审员、上传者或方案所有者
-4. 读取磁盘文件并强制附件下载返回
+4. 优先按 `storageKey` 定位模块目录，找不到时再回退老路径
+5. 读取磁盘文件并强制附件下载返回
 
 ## 9. 外部服务与回退策略
 
@@ -224,6 +227,14 @@
 ## 10. 文件与部署特性
 
 - 媒体持久化目录：仓库根目录 `media/`
+- 当前目录约定：
+  - `media/document/proposals/`：方案附件
+  - `media/document/partners/`：伙伴侧文档
+  - `media/image/partners/logo/`：伙伴 Logo
+  - `media/image/partners/svg/`：伙伴 SVG
+  - `media/image/case-studies/cover/`：案例封面
+  - `media/image/users/avatar/`：用户头像
+  - `media/image/tech-needs/`：技术需求图片预留目录
 - 运行模式：`next build` + `standalone`
 - `.next/standalone/.env*` 会携带构建时环境变量副本
 - 环境变量变更后必须 rebuild + restart

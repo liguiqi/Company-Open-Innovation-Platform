@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isAdmin } from '@/access/isAdmin'
+import { syncCaseStudyCoverMedia } from '@/hooks/syncRelatedMedia'
 
 export const CaseStudies: CollectionConfig = {
   slug: 'case-studies',
@@ -68,4 +69,7 @@ export const CaseStudies: CollectionConfig = {
       required: true,
     },
   ],
+  hooks: {
+    afterChange: [syncCaseStudyCoverMedia],
+  },
 }

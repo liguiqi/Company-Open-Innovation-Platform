@@ -177,7 +177,7 @@ export function ProposalForm({
       <div className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
         <label>附件上传</label>
         <input
-          accept=".txt,.pdf,.ppt,.pptx,.doc,.docx,text/plain"
+          accept=".txt,.pdf,.ppt,.pptx,.doc,.docx,.zip,.rar,text/plain,application/zip,application/x-rar-compressed,application/vnd.rar"
           className="block w-full rounded-[0.75rem] border border-dashed border-[color:var(--ht-input-border)] bg-[var(--ht-input-bg)] px-4 py-4 text-[var(--ht-text-secondary)]"
           multiple
           name="attachments"
@@ -185,7 +185,7 @@ export function ProposalForm({
           type="file"
         />
         <p className="text-xs text-[var(--ht-text-muted)]">
-          支持 TXT / PDF / PPT / Word，可一次选择多个文件；单文件建议不超过 20MB。
+          支持 TXT / PDF / PPT / Word / ZIP / RAR，可一次选择多个文件；单文件建议不超过 20MB。
         </p>
 
         {selectedAttachments.length ? (

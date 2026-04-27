@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isAdmin } from '@/access/isAdmin'
+import { syncPartnerLogoMedia } from '@/hooks/syncRelatedMedia'
 import { partnerBrandOptions, partnerCategoryOptions } from '@/lib/partner-branding'
 
 export const Partners: CollectionConfig = {
@@ -92,4 +93,7 @@ export const Partners: CollectionConfig = {
       },
     },
   ],
+  hooks: {
+    afterChange: [syncPartnerLogoMedia],
+  },
 }

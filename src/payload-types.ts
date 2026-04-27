@@ -186,6 +186,27 @@ export interface Media {
   id: number
   alt: string
   purpose: 'image' | 'document'
+  /**
+   * 按业务模块归档媒体文件，例如 proposals / partners / tech-needs。
+   */
+  module: 'general' | 'proposals' | 'partners' | 'tech-needs' | 'case-studies' | 'users'
+  /**
+   * 更细粒度的资产分类，用于自动映射到 media/ 下的专属目录。
+   */
+  assetCategory:
+    | 'general-image'
+    | 'general-document'
+    | 'proposal-attachment'
+    | 'partner-logo'
+    | 'partner-svg'
+    | 'partner-document'
+    | 'need-image'
+    | 'case-cover'
+    | 'user-avatar'
+  /**
+   * 物理存储相对路径，由系统自动维护。
+   */
+  storageKey?: string | null
   uploadedBy?: (number | null) | User
   /**
    * 若该文档来自某条方案提交，这里会回指来源 proposal，便于二次复用。
@@ -605,6 +626,9 @@ export interface CaseStudiesSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T
   purpose?: T
+  module?: T
+  assetCategory?: T
+  storageKey?: T
   uploadedBy?: T
   proposal?: T
   updatedAt?: T

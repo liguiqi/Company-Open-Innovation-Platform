@@ -1,8 +1,7 @@
-import fsPromises from 'fs/promises'
 import { NextResponse } from 'next/server'
 
 import { getRequestUser } from '@/lib/auth'
-import { getAttachmentContentDisposition, getRuntimeMediaDirs, resolveMediaPath } from '@/lib/media'
+import { getAttachmentContentDisposition, readMediaFile } from '@/lib/media'
 import { getPayloadClient } from '@/lib/payload'
 
 function getRelationId(value: unknown) {
@@ -77,19 +76,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: '无权下载该附件' }, { status: 403 })
   }
 
-  for (const mediaDir of getRuntimeMediaDirs()) {
-    const filePath = resolveMediaPath(mediaDir, media.filename)
+  const fileBuffer = await readMediaFile({
+    filename: media.filename,
+    storageKey: media.storageKey,
+  })
 
-    if (!filePath) {
-      return NextResponse.json({ error: '附件路径无效' }, { status: 400 })
-    }
-
-    const fileBuffer = await fsPromises.readFile(filePath).catch(() => null)
-
-    if (!fileBuffer) {
-      continue
-    }
-
+  if (fileBuffer) {
     const filename = media.filename
     const headers = new Headers()
 

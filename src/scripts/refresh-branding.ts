@@ -1,3 +1,5 @@
+import type { MediaAssetCategory, MediaModule } from '@/lib/media'
+
 import { plainTextToLexical } from '@/lib/lexical'
 import { getPayloadClient } from '@/lib/payload'
 
@@ -24,13 +26,17 @@ function createSVGBuffer(title: string, subtitle: string, color: string) {
 
 async function refreshSeedMedia({
   alt,
+  assetCategory,
   color,
   filename,
+  module,
   subtitle,
 }: {
   alt: string
+  assetCategory?: MediaAssetCategory
   color: string
   filename: string
+  module?: MediaModule
   subtitle: string
 }) {
   const payload = await getPayloadClient()
@@ -58,6 +64,8 @@ async function refreshSeedMedia({
     collection: 'media',
     data: {
       alt,
+      assetCategory,
+      module,
       purpose: existing.docs[0].purpose || 'image',
     },
     file: {
@@ -115,32 +123,42 @@ async function main() {
   await Promise.all([
     refreshSeedMedia({
       alt: 'Partner A Logo',
+      assetCategory: 'partner-svg',
       color: '#00A0E9',
       filename: 'partner-a.svg',
+      module: 'partners',
       subtitle: 'MCU, DSP, FPGA',
     }),
     refreshSeedMedia({
       alt: 'Partner B Logo',
+      assetCategory: 'partner-svg',
       color: '#22c55e',
       filename: 'partner-b.svg',
+      module: 'partners',
       subtitle: 'GaN, MOSFET, Power',
     }),
     refreshSeedMedia({
       alt: 'Partner C Logo',
+      assetCategory: 'partner-svg',
       color: '#f97316',
       filename: 'partner-c.svg',
+      module: 'partners',
       subtitle: 'Thread, WiFi, Sensor',
     }),
     refreshSeedMedia({
       alt: '洗衣机直驱变频方案',
+      assetCategory: 'case-cover',
       color: '#004098',
       filename: 'case-washer.svg',
+      module: 'case-studies',
       subtitle: 'HeT × Partner A',
     }),
     refreshSeedMedia({
       alt: '低成本离线语音控制模组',
+      assetCategory: 'case-cover',
       color: '#00A0E9',
       filename: 'case-voice.svg',
+      module: 'case-studies',
       subtitle: 'HeT × Partner B',
     }),
     refreshCaseStudy({

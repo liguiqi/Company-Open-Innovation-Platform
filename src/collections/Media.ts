@@ -1,11 +1,16 @@
 import type { CollectionConfig } from 'payload'
-import fsPromises from 'fs/promises'
 
 import {
+  buildMediaStorageKey,
+  deleteMediaFiles,
+  ensureMediaFileOrganization,
   getAttachmentContentDisposition,
   getPersistentMediaDir,
-  getRuntimeMediaDirs,
-  resolveMediaPath,
+  mediaAssetCategoryOptions,
+  mediaModuleOptions,
+  normalizeMediaAssetCategory,
+  normalizeMediaModule,
+  readMediaFile,
 } from '@/lib/media'
 
 export const Media: CollectionConfig = {
@@ -44,7 +49,15 @@ export const Media: CollectionConfig = {
     delete: ({ req }) => req.user?.role === 'admin',
   },
   admin: {
-    defaultColumns: ['filename', 'purpose', 'proposal', 'uploadedBy', 'mimeType', 'updatedAt'],
+    defaultColumns: [
+      'filename',
+      'module',
+      'assetCategory',
+      'purpose',
+      'proposal',
+      'uploadedBy',
+      'updatedAt',
+    ],
     group: '内容资产',
   },
   fields: [
@@ -64,6 +77,41 @@ export const Media: CollectionConfig = {
       required: true,
     },
     {
+      name: 'module',
+      type: 'select',
+      admin: {
+        description: '按业务模块归档媒体文件，例如 proposals / partners / tech-needs。',
+      },
+      defaultValue: 'general',
+      options: mediaModuleOptions.map((option) => ({
+        label: option.label,
+        value: option.value,
+      })),
+      required: true,
+    },
+    {
+      name: 'assetCategory',
+      type: 'select',
+      admin: {
+        description: '更细粒度的资产分类，用于自动映射到 media/ 下的专属目录。',
+      },
+      defaultValue: 'general-image',
+      options: mediaAssetCategoryOptions.map((option) => ({
+        label: option.label,
+        value: option.value,
+      })),
+      required: true,
+    },
+    {
+      name: 'storageKey',
+      type: 'text',
+      admin: {
+        description: '物理存储相对路径，由系统自动维护。',
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
+    {
       name: 'uploadedBy',
       type: 'relationship',
       relationTo: 'users',
@@ -79,62 +127,146 @@ export const Media: CollectionConfig = {
   ],
   upload: {
     handlers: [
-      (_req, { doc, params }): void | Promise<Response> => {
+      (_req, { doc }): void | Promise<Response> => {
         const mediaDoc = doc as {
           filename?: string | null
           mimeType?: string | null
           purpose?: string | null
+          storageKey?: string | null
         }
 
-        if (!mediaDoc?.purpose || !params?.filename) {
+        if (!mediaDoc?.filename) {
           return
         }
 
-        if (mediaDoc.purpose !== 'document') {
-          return
-        }
-
-        const filename = mediaDoc.filename || params.filename
+        const filename = mediaDoc.filename
 
         return (async () => {
-          for (const mediaDir of getRuntimeMediaDirs()) {
-            const filePath = resolveMediaPath(mediaDir, params.filename)
+          const data = await readMediaFile({
+            filename,
+            storageKey: mediaDoc.storageKey,
+          })
 
-            if (!filePath) {
-              return new Response(null, { status: 400 })
-            }
-
-            const data = await fsPromises.readFile(filePath).catch(() => null)
-
-            if (!data) {
-              continue
-            }
-
-            const headers = new Headers()
-
-            headers.set('Content-Disposition', getAttachmentContentDisposition(filename))
-            headers.set('Content-Length', String(data.length))
-            headers.set('Content-Type', mediaDoc.mimeType || 'application/octet-stream')
-
-            return new Response(data, {
-              headers,
-              status: 200,
-            })
+          if (!data) {
+            return new Response(null, { status: 404 })
           }
 
-          return new Response(null, { status: 404 })
+          const headers = new Headers()
+
+          headers.set('Content-Length', String(data.length))
+          headers.set('Content-Type', mediaDoc.mimeType || 'application/octet-stream')
+
+          if (mediaDoc.purpose === 'document') {
+            headers.set('Content-Disposition', getAttachmentContentDisposition(filename))
+          }
+
+          return new Response(data, {
+            headers,
+            status: 200,
+          })
         })()
       },
     ],
     mimeTypes: [
       'application/pdf',
+      'application/zip',
       'application/msword',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'application/vnd.ms-powerpoint',
       'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'application/vnd.rar',
+      'application/x-rar-compressed',
+      'application/x-zip-compressed',
       'text/plain',
       'image/*',
     ],
     staticDir: getPersistentMediaDir(),
+  },
+  hooks: {
+    beforeChange: [
+      ({ data, originalDoc }) => {
+        const purpose = data?.purpose || originalDoc?.purpose || 'image'
+        const mediaModule = normalizeMediaModule({
+          module: data?.module || originalDoc?.module,
+          purpose,
+        })
+        const assetCategory = normalizeMediaAssetCategory({
+          assetCategory: data?.assetCategory,
+          filename: data?.filename || originalDoc?.filename,
+          mimeType: data?.mimeType || originalDoc?.mimeType,
+          module: mediaModule,
+          purpose,
+        })
+
+        return {
+          ...data,
+          assetCategory,
+          module: mediaModule,
+          purpose,
+        }
+      },
+    ],
+    afterChange: [
+      async ({ context, doc, previousDoc, req }) => {
+        if ((context as Record<string, unknown> | undefined)?.skipMediaOrganization) {
+          return doc
+        }
+
+        const mediaModule = normalizeMediaModule({
+          module: doc.module,
+          purpose: doc.purpose,
+        })
+        const assetCategory = normalizeMediaAssetCategory({
+          assetCategory: doc.assetCategory,
+          filename: doc.filename,
+          mimeType: doc.mimeType,
+          module: mediaModule,
+          purpose: doc.purpose,
+        })
+        const storageKey = buildMediaStorageKey({
+          assetCategory,
+          filename: doc.filename,
+        })
+
+        await ensureMediaFileOrganization({
+          filename: doc.filename,
+          previousStorageKey: previousDoc?.storageKey,
+          storageKey,
+        })
+
+        if (
+          doc.module === mediaModule &&
+          doc.assetCategory === assetCategory &&
+          doc.storageKey === storageKey
+        ) {
+          return doc
+        }
+
+        await req.payload.update({
+          id: doc.id,
+          collection: 'media',
+          data: {
+            assetCategory,
+            module: mediaModule,
+            storageKey,
+          },
+          context: {
+            ...(context || {}),
+            skipMediaOrganization: true,
+          },
+          overrideAccess: true,
+        })
+
+        return doc
+      },
+    ],
+    afterDelete: [
+      async ({ doc }) => {
+        await deleteMediaFiles({
+          filename: doc.filename,
+          storageKey: doc.storageKey,
+        })
+      },
+    ],
   },
 }

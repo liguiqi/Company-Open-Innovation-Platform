@@ -6,14 +6,25 @@ import { getPayloadClient } from '@/lib/payload'
 import { proposalCreateSchema } from '@/lib/validators'
 
 const MAX_ATTACHMENT_SIZE = 20 * 1024 * 1024
-const allowedAttachmentExtensions = new Set(['txt', 'pdf', 'ppt', 'pptx', 'doc', 'docx'])
+const allowedAttachmentExtensions = new Set([
+  'txt',
+  'pdf',
+  'ppt',
+  'pptx',
+  'doc',
+  'docx',
+  'zip',
+  'rar',
+])
 const attachmentMimeTypeMap: Record<string, string> = {
   doc: 'application/msword',
   docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   pdf: 'application/pdf',
   ppt: 'application/vnd.ms-powerpoint',
   pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  rar: 'application/vnd.rar',
   txt: 'text/plain',
+  zip: 'application/zip',
 }
 
 function toPayloadFile(file: File) {
@@ -37,7 +48,7 @@ function validateAttachmentFile(file: File) {
   const extension = getAttachmentExtension(file.name)
 
   if (!allowedAttachmentExtensions.has(extension)) {
-    return `附件 ${file.name} 格式不支持，仅支持 TXT、PDF、PPT、PPTX、DOC、DOCX。`
+    return `附件 ${file.name} 格式不支持，仅支持 TXT、PDF、PPT、PPTX、DOC、DOCX、ZIP、RAR。`
   }
 
   if (file.size > MAX_ATTACHMENT_SIZE) {
@@ -113,6 +124,8 @@ export async function POST(request: Request) {
         collection: 'media',
         data: {
           alt: file.name,
+          assetCategory: 'proposal-attachment',
+          module: 'proposals',
           proposal: proposal.id,
           purpose: 'document',
           uploadedBy: user.id,
@@ -168,7 +181,10 @@ export async function POST(request: Request) {
     console.error('[proposal:create-failed]', error)
 
     return NextResponse.json(
-      { error: '方案提交失败，请检查附件格式后重试。仅支持 TXT、PDF、PPT、PPTX、DOC、DOCX。' },
+      {
+        error:
+          '方案提交失败，请检查附件格式后重试。仅支持 TXT、PDF、PPT、PPTX、DOC、DOCX、ZIP、RAR。',
+      },
       { status: 400 },
     )
   }

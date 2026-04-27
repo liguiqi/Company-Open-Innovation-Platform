@@ -173,8 +173,9 @@ curl -k https://innovation.example.com/api/sms/send   -H 'Content-Type: applicat
 
 1. 确认当前用户是否为管理员、评审员、上传者或方案所有者
 2. 检查 `media` 表里的关联字段
-3. 检查磁盘文件是否仍在根目录 `media/`
-4. 查看 `/api/attachments/[id]` 返回信息
+3. 检查 `media` 记录中的 `module`、`assetCategory`、`storageKey` 是否正确
+4. 检查磁盘文件是否仍在 `media/document/*` 或 `media/image/*` 对应子目录
+5. 查看 `/api/attachments/[id]` 返回信息
 
 ## 6. 配置文件清单
 
