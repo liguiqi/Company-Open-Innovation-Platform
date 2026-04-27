@@ -4,6 +4,7 @@
 
 ## 文档清单
 
+- `2026-04-27-main-production-rollout.md`：`main` 分支生产覆盖部署实操记录，包含备份、上线、验证与回滚入口
 - `runbook.md`：日常巡检、服务操作、日志查看与短信问题排查
 - `release-and-rollback.md`：正式发版、tag、推送、发布与回滚流程
 - `backup-and-restore.md`：数据库、媒体、配置和证书备份恢复说明

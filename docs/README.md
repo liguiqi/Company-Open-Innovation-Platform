@@ -22,6 +22,7 @@
 | `deployment/human-containerized-deployment.md` | 面向 Human 的容器化部署方案，覆盖 Docker Compose、Nginx 与代理 |
 | `testing.md`                                   | 自动化测试现状、人工验收口径与已知缺口                         |
 | `Ops/README.md`                                | 运维文档索引                                                   |
+| `Ops/2026-04-27-main-production-rollout.md`    | `main` 分支生产覆盖部署实操记录，含备份、上线、验证与回滚入口  |
 | `Ops/runbook.md`                               | 日常巡检、故障排查、服务与短信问题定位                         |
 | `Ops/release-and-rollback.md`                  | 正式发版、tag、发布与回滚流程                                  |
 | `Ops/backup-and-restore.md`                    | 数据、媒体、配置与证书备份恢复说明                             |
