@@ -24,8 +24,10 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { FolderTableCell as FolderTableCell_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { FolderField as FolderField_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { FolderTypeField as FolderTypeField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
+import { AdminSidebarLogoutButton as AdminSidebarLogoutButton_92c6175ccaca1ee58f3b427a12cc86ee } from '@/components/payload/AdminSidebarFooter'
 import { AdminIcon as AdminIcon_7a969c861589af9322f5d573a708d2fb } from '@/components/payload/AdminIcon'
 import { AdminLoginLogo as AdminLoginLogo_96915ddba92652a664a5ad6e084903b8 } from '@/components/payload/AdminLoginLogo'
+import { default as default_92c6175ccaca1ee58f3b427a12cc86ee } from '@/components/payload/AdminSidebarFooter'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
@@ -78,8 +80,11 @@ export const importMap = {
   '@payloadcms/next/rsc#FolderTableCell': FolderTableCell_f9c02e79a4aed9a3924487c0cd4cafb1,
   '@payloadcms/next/rsc#FolderField': FolderField_f9c02e79a4aed9a3924487c0cd4cafb1,
   '@payloadcms/next/client#FolderTypeField': FolderTypeField_2b8867833a34864a02ddf429b0728a40,
+  '@/components/payload/AdminSidebarFooter#AdminSidebarLogoutButton':
+    AdminSidebarLogoutButton_92c6175ccaca1ee58f3b427a12cc86ee,
   '@/components/payload/AdminIcon#AdminIcon': AdminIcon_7a969c861589af9322f5d573a708d2fb,
   '@/components/payload/AdminLoginLogo#AdminLoginLogo':
     AdminLoginLogo_96915ddba92652a664a5ad6e084903b8,
+  '@/components/payload/AdminSidebarFooter#default': default_92c6175ccaca1ee58f3b427a12cc86ee,
   '@payloadcms/next/rsc#CollectionCards': CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
 }

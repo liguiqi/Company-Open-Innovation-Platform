@@ -22,6 +22,16 @@ const allowedOrigins = appEnv.payloadAllowedOrigins
 
 export default buildConfig({
   admin: {
+    components: {
+      afterNav: ['@/components/payload/AdminSidebarFooter'],
+      logout: {
+        Button: '@/components/payload/AdminSidebarFooter#AdminSidebarLogoutButton',
+      },
+      graphics: {
+        Icon: '@/components/payload/AdminIcon#AdminIcon',
+        Logo: '@/components/payload/AdminLoginLogo#AdminLoginLogo',
+      },
+    },
     meta: {
       icons: [
         {
@@ -45,12 +55,6 @@ export default buildConfig({
           url: '/branding/het-apple-touch-180.png',
         },
       ],
-    },
-    components: {
-      graphics: {
-        Icon: '@/components/payload/AdminIcon#AdminIcon',
-        Logo: '@/components/payload/AdminLoginLogo#AdminLoginLogo',
-      },
     },
     user: Users.slug,
     importMap: {
