@@ -14,3 +14,13 @@ export const ipSendLimiter = new RateLimiterMemory({
   duration: 60 * 60,
   points: 20,
 })
+
+export const codeVerifyLimiter = new RateLimiterMemory({
+  duration: 60 * 10,
+  points: 5,
+})
+
+export const ipVerifyLimiter = new RateLimiterMemory({
+  duration: 60 * 10,
+  points: 25,
+})

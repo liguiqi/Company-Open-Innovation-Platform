@@ -3,9 +3,11 @@ import { NextResponse } from 'next/server'
 import type { User } from '@/payload-types'
 
 import { createAuthCookie } from '@/lib/auth'
+import { getRequesterIP } from '@/lib/auth'
 import { getPayloadClient } from '@/lib/payload'
 import { smsVerifySchema } from '@/lib/validators'
 import { deleteCachedValue, getCachedValue } from '@/services/redis'
+import { codeVerifyLimiter, ipVerifyLimiter } from '@/services/rate-limit'
 
 export async function POST(request: Request) {
   const body = await request.json()
@@ -19,6 +21,17 @@ export async function POST(request: Request) {
   }
 
   const { code, phone } = parsed.data
+  const ip = getRequesterIP(request)
+
+  try {
+    await Promise.all([
+      codeVerifyLimiter.consume(`sms:${phone}`),
+      ipVerifyLimiter.consume(`sms:${ip}`),
+    ])
+  } catch {
+    return NextResponse.json({ error: '验证尝试过于频繁，请稍后再试' }, { status: 429 })
+  }
+
   const cachedCode = await getCachedValue(`sms:otp:${phone}`)
 
   if (!cachedCode || cachedCode !== code) {

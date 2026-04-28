@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server'
 
+import { getRequesterIP } from '@/lib/auth'
 import { getPayloadClient } from '@/lib/payload'
 import { buildSyntheticEmail } from '@/lib/utils'
 import { registerSchema } from '@/lib/validators'
+import { codeVerifyLimiter, ipVerifyLimiter } from '@/services/rate-limit'
 import { deleteCachedValue, getCachedValue } from '@/services/redis'
 
 function buildEmailCodeKey(email: string) {
@@ -22,9 +24,24 @@ export async function POST(request: Request) {
 
   const payload = await getPayloadClient()
   const { company, email, emailCode, name, password, phone, smsCode, username } = parsed.data
+  const ip = getRequesterIP(request)
   const normalizedEmail = email.trim().toLowerCase()
   const normalizedPhone = phone.trim()
   const effectiveEmail = normalizedEmail || buildSyntheticEmail(normalizedPhone)
+
+  try {
+    await Promise.all([
+      normalizedEmail && emailCode
+        ? codeVerifyLimiter.consume(`register:email:${normalizedEmail}`)
+        : Promise.resolve(),
+      normalizedPhone && smsCode
+        ? codeVerifyLimiter.consume(`register:sms:${normalizedPhone}`)
+        : Promise.resolve(),
+      ipVerifyLimiter.consume(`register:${ip}`),
+    ])
+  } catch {
+    return NextResponse.json({ error: '验证尝试过于频繁，请稍后再试' }, { status: 429 })
+  }
 
   const [existingEmail, existingUsername, existingPhone] = await Promise.all([
     payload.find({

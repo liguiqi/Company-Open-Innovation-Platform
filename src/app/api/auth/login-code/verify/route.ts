@@ -3,8 +3,10 @@ import { NextResponse } from 'next/server'
 import type { User } from '@/payload-types'
 
 import { createAuthCookie } from '@/lib/auth'
+import { getRequesterIP } from '@/lib/auth'
 import { getPayloadClient } from '@/lib/payload'
 import { getLoginIdentifierType, loginCodeVerifySchema } from '@/lib/validators'
+import { codeVerifyLimiter, ipVerifyLimiter } from '@/services/rate-limit'
 import { deleteCachedValue, getCachedValue } from '@/services/redis'
 
 function buildLoginCodeKey(identifierType: 'email' | 'phone', identifier: string) {
@@ -32,6 +34,16 @@ export async function POST(request: Request) {
     identifierType === 'email'
       ? parsed.data.identifier.trim().toLowerCase()
       : parsed.data.identifier.trim()
+  const ip = getRequesterIP(request)
+
+  try {
+    await Promise.all([
+      codeVerifyLimiter.consume(`login:${identifierType}:${normalizedIdentifier}`),
+      ipVerifyLimiter.consume(`login:${ip}`),
+    ])
+  } catch {
+    return NextResponse.json({ error: '验证尝试过于频繁，请稍后再试' }, { status: 429 })
+  }
 
   const cachedCode = await getCachedValue(buildLoginCodeKey(identifierType, normalizedIdentifier))
 

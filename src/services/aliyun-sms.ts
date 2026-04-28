@@ -69,6 +69,14 @@ const smsRuntimeOptions = new RuntimeOptions({
   readTimeout: 10000,
 })
 
+function maskPhone(phone: string) {
+  if (phone.length < 7) {
+    return '***'
+  }
+
+  return `${phone.slice(0, 3)}****${phone.slice(-4)}`
+}
+
 function resolveSMSFailureMessage(error: unknown) {
   const rawMessage = error instanceof Error ? error.message : String(error)
 
@@ -142,7 +150,10 @@ async function requestSMSCode(
 
 export async function sendSMSCode(phone: string, fallbackCode: string): Promise<SendSMSCodeResult> {
   if (!appEnv.smsEnabled || appEnv.smsMock) {
-    console.info(`[sms:mock] ${phone} -> ${fallbackCode}`)
+    console.info('[sms:mock]', {
+      phone: maskPhone(phone),
+      provider: 'mock',
+    })
     return {
       mocked: true,
       provider: 'mock',
@@ -172,7 +183,7 @@ export async function sendSMSCode(phone: string, fallbackCode: string): Promise<
         attempt,
         endpoint: appEnv.smsEndpoint,
         message: error instanceof Error ? error.message : String(error),
-        phone,
+        phone: maskPhone(phone),
         retryable,
       })
 
