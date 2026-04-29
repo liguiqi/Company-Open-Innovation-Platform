@@ -280,6 +280,19 @@ export interface Proposal {
     [k: string]: unknown
   } | null
   reviewedBy?: (number | null) | User
+  /**
+   * 自动记录提案提交与每次评审操作的时间线。
+   */
+  reviewTimeline?:
+    | {
+        actorName: string
+        actorRole: string
+        occurredAt: string
+        status: 'pending' | 'reviewing' | 'approved' | 'rejected'
+        notes: string
+        id?: string | null
+      }[]
+    | null
   updatedAt: string
   createdAt: string
 }
@@ -619,6 +632,16 @@ export interface ProposalsSelect<T extends boolean = true> {
   status?: T
   reviewNotes?: T
   reviewedBy?: T
+  reviewTimeline?:
+    | T
+    | {
+        actorName?: T
+        actorRole?: T
+        occurredAt?: T
+        status?: T
+        notes?: T
+        id?: T
+      }
   updatedAt?: T
   createdAt?: T
 }

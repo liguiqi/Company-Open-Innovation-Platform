@@ -2,10 +2,12 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { ProposalReviewForm } from '@/components/proposals/ProposalReviewForm'
+import { ProposalReviewTimeline } from '@/components/proposals/ProposalReviewTimeline'
 import { NeedStatusBadge, ProposalStatusBadge } from '@/components/shared/StatusBadge'
 import { requireUser } from '@/lib/auth'
 import { proposalTypeMap } from '@/lib/constants'
 import { getPayloadClient } from '@/lib/payload'
+import { buildProposalTimeline } from '@/lib/proposal-review-timeline'
 import { lexicalToPlainText } from '@/lib/richtext'
 import { formatDate } from '@/lib/utils'
 
@@ -35,6 +37,7 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
     ? proposal.attachments.filter((item) => typeof item !== 'number')
     : []
   const reviewNotesText = proposal.reviewNotes ? lexicalToPlainText(proposal.reviewNotes) : ''
+  const reviewTimeline = buildProposalTimeline(proposal)
   const reviewFormKey = `${proposal.id}-${proposal.status || 'pending'}-${reviewNotesText}`
 
   return (
@@ -126,10 +129,15 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
           </section>
 
           <section>
-            <h3 className="text-xl font-semibold text-[var(--ht-text-primary)]">评审意见</h3>
-            <p className="mt-3 whitespace-pre-line text-sm leading-8 text-[var(--ht-text-secondary)]">
-              {reviewNotesText || '当前尚未填写评审意见。'}
+            <h3 className="text-xl font-semibold text-[var(--ht-text-primary)]">
+              评审意见与状态流转
+            </h3>
+            <p className="mt-3 text-sm leading-8 text-[var(--ht-text-secondary)]">
+              从提案提交开始，按时间顺序记录每次状态流转、评审意见和操作人员。
             </p>
+            <div className="mt-4">
+              <ProposalReviewTimeline entries={reviewTimeline} />
+            </div>
           </section>
         </div>
       </div>

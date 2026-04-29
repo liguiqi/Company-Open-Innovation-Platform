@@ -8,6 +8,7 @@ import {
   duplicateProposalAttachments,
   duplicateProposalTitle,
 } from '@/hooks/duplicateProposalAttachments'
+import { createSubmissionTimelineEntry } from '@/lib/proposal-review-timeline'
 import { sendProposalNotification } from '@/hooks/sendProposalNotification'
 import { onProposalStatusChange } from '@/hooks/onProposalStatusChange'
 import { syncProposalAttachmentMedia } from '@/hooks/syncRelatedMedia'
@@ -171,6 +172,52 @@ export const Proposals: CollectionConfig = {
       },
       relationTo: 'users',
     },
+    {
+      name: 'reviewTimeline',
+      type: 'array',
+      admin: {
+        description: '自动记录提案提交与每次评审操作的时间线。',
+        readOnly: true,
+      },
+      access: {
+        create: () => false,
+        update: () => false,
+        read: ({ req }) => Boolean(req.user),
+      },
+      fields: [
+        {
+          name: 'actorName',
+          type: 'text',
+          required: true,
+        },
+        {
+          name: 'actorRole',
+          type: 'text',
+          required: true,
+        },
+        {
+          name: 'occurredAt',
+          type: 'date',
+          required: true,
+        },
+        {
+          name: 'status',
+          type: 'select',
+          options: [
+            { label: '待评审', value: 'pending' },
+            { label: '评审中', value: 'reviewing' },
+            { label: '已通过', value: 'approved' },
+            { label: '已驳回', value: 'rejected' },
+          ],
+          required: true,
+        },
+        {
+          name: 'notes',
+          type: 'textarea',
+          required: true,
+        },
+      ],
+    },
   ],
   hooks: {
     afterDelete: [deleteProposalRelatedMediaAfterDelete],
@@ -179,8 +226,22 @@ export const Proposals: CollectionConfig = {
     beforeChange: [
       ({ data, operation, req }) => {
         if (operation === 'create' && req.user?.id) {
+          const initialStatus =
+            typeof data.status === 'string' && data.status.length ? data.status : 'pending'
+
           return {
             ...data,
+            reviewTimeline:
+              Array.isArray(data.reviewTimeline) && data.reviewTimeline.length
+                ? data.reviewTimeline
+                : [
+                    createSubmissionTimelineEntry({
+                      contactName: data.contactName,
+                      createdAt: new Date().toISOString(),
+                      status: initialStatus,
+                      submittedBy: req.user,
+                    }),
+                  ],
             submittedBy: data.submittedBy || req.user.id,
           }
         }

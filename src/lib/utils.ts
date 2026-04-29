@@ -15,6 +15,14 @@ export function formatDate(value?: string | Date | null, fallback = '未发布')
   return format(new Date(value), 'yyyy-MM-dd')
 }
 
+export function formatDateTime(value?: string | Date | null, fallback = '未记录') {
+  if (!value) {
+    return fallback
+  }
+
+  return format(new Date(value), 'yyyy-MM-dd HH:mm')
+}
+
 export function getNeedDomainLabel(value?: string | null) {
   return needDomainMap[value || ''] || '未分类'
 }

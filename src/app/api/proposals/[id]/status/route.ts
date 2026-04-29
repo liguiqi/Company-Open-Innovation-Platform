@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { getRequestUser } from '@/lib/auth'
 import { plainTextToLexical } from '@/lib/lexical'
 import { getPayloadClient } from '@/lib/payload'
+import { buildProposalTimeline, createReviewTimelineEntry } from '@/lib/proposal-review-timeline'
 import { proposalReviewSchema } from '@/lib/validators'
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -28,11 +29,27 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   const { id } = await params
   const payload = await getPayloadClient()
+  const currentProposal = await payload.findByID({
+    id: Number(id),
+    collection: 'proposals',
+    depth: 2,
+    overrideAccess: true,
+  })
+
   const proposal = await payload.update({
     id: Number(id),
     collection: 'proposals',
     data: {
       reviewNotes: plainTextToLexical(parsed.data.reviewNotes),
+      reviewTimeline: [
+        ...buildProposalTimeline(currentProposal),
+        createReviewTimelineEntry({
+          notes: parsed.data.reviewNotes,
+          occurredAt: new Date().toISOString(),
+          reviewer,
+          status: parsed.data.status,
+        }),
+      ],
       reviewedBy: reviewer.id,
       status: parsed.data.status,
     },
