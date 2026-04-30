@@ -54,7 +54,7 @@ export default async function SubmitPage({
             提交前说明
           </h2>
           <div className="mt-6 space-y-4 text-sm leading-7 text-[var(--ht-text-secondary)]">
-            <p>平台接受 PDF、PPT、Word 等附件，建议控制在 20MB 以内。</p>
+            <p>平台接受 TXT、PDF、PPT、Word、ZIP、RAR 等附件，单文件建议控制在 100MB 以内。</p>
             <p>评审时效通常为 3 至 5 个工作日，特殊需求会触发评审员加速流程。</p>
             <p>未签署 NDA 前，请勿直接上传源代码、未公开电路图或其他核心机密资料。</p>
             <p>如果需要短信验证，未配置正式模板时开发环境会自动启用 mock 验证码联调。</p>

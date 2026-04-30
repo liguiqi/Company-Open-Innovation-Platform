@@ -7,6 +7,10 @@ const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // Keep headroom above the business 100MB single-file limit for multipart overhead.
+    proxyClientMaxBodySize: '120mb',
+  },
   images: {
     localPatterns: [
       {

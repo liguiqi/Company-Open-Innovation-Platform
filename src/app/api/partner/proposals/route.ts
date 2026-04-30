@@ -5,7 +5,7 @@ import { plainTextToLexical } from '@/lib/lexical'
 import { getPayloadClient } from '@/lib/payload'
 import { proposalCreateSchema } from '@/lib/validators'
 
-const MAX_ATTACHMENT_SIZE = 20 * 1024 * 1024
+const MAX_ATTACHMENT_SIZE = 100 * 1024 * 1024
 const allowedAttachmentExtensions = new Set([
   'txt',
   'pdf',
@@ -52,7 +52,7 @@ function validateAttachmentFile(file: File) {
   }
 
   if (file.size > MAX_ATTACHMENT_SIZE) {
-    return `附件 ${file.name} 超过 20MB，请压缩后重新上传。`
+    return `附件 ${file.name} 超过 100MB，请压缩后重新上传。`
   }
 
   return null

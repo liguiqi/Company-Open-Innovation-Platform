@@ -185,7 +185,7 @@ export function ProposalForm({
           type="file"
         />
         <p className="text-xs text-[var(--ht-text-muted)]">
-          支持 TXT / PDF / PPT / Word / ZIP / RAR，可一次选择多个文件；单文件建议不超过 20MB。
+          支持 TXT / PDF / PPT / Word / ZIP / RAR，可一次选择多个文件；单文件建议不超过 100MB。
         </p>
 
         {selectedAttachments.length ? (

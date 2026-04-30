@@ -16,7 +16,7 @@
 
 ### 1.2 核心业务模块
 
-平台由五个面向用户的业务模块和一个管理后台组成。**技术需求大厅**向公众展示当前面临的技术挑战，支持按领域（电机控制、传感器、新材料、AI 与算法）筛选，每条需求包含优先级标识、需求编号、所属产品线及详细描述。**创新方案提交**允许注册用户针对具体需求或开放自荐方式在线提交技术方案，支持附件上传（PDF/PPT/Word，最大 20MB），提交后进入内部评审流程。**生态伙伴目录**展示按层级分类的合作伙伴（金牌战略伙伴、认证伙伴等），支持按技术领域（核心计算芯片、功率与电源、连接与传感、产学研机构）分类浏览。**联合创新案例**以图文详情页形式展示历史合作成功案例，包含合作伙伴信息、技术亮点及可下载的技术白皮书。**合作流程**以可视化四步流程（提交方案→技术评估→PoC 验证→导入供应链）引导潜在合作伙伴理解合作路径。**管理后台**基于 Payload CMS Admin Panel，供内部运营人员管理全部内容数据、用户权限及方案审核流转。
+平台由五个面向用户的业务模块和一个管理后台组成。**技术需求大厅**向公众展示当前面临的技术挑战，支持按领域（电机控制、传感器、新材料、AI 与算法）筛选，每条需求包含优先级标识、需求编号、所属产品线及详细描述。**创新方案提交**允许注册用户针对具体需求或开放自荐方式在线提交技术方案，支持附件上传（TXT/PDF/PPT/Word/ZIP/RAR，最大 100MB），提交后进入内部评审流程。**生态伙伴目录**展示按层级分类的合作伙伴（金牌战略伙伴、认证伙伴等），支持按技术领域（核心计算芯片、功率与电源、连接与传感、产学研机构）分类浏览。**联合创新案例**以图文详情页形式展示历史合作成功案例，包含合作伙伴信息、技术亮点及可下载的技术白皮书。**合作流程**以可视化四步流程（提交方案→技术评估→PoC 验证→导入供应链）引导潜在合作伙伴理解合作路径。**管理后台**基于 Payload CMS Admin Panel，供内部运营人员管理全部内容数据、用户权限及方案审核流转。
 
 ### 1.3 目标用户角色
 
@@ -384,7 +384,7 @@ innovation-platform/
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | mimeTypes | `application/pdf`, `application/msword`, `application/vnd.openxmlformats-officedocument.*`, `application/vnd.ms-powerpoint`, `image/*` |
 | staticDir | `./media`                                                                                                                              |
-| maxSize   | 20MB（附件），5MB（图片）                                                                                                              |
+| maxSize   | 100MB（附件），5MB（图片）                                                                                                             |
 
 ---
 
@@ -468,7 +468,7 @@ server {
     ssl_ciphers HIGH:!aNULL:!MD5;
     ssl_prefer_server_ciphers on;
 
-    client_max_body_size 25M;
+    client_max_body_size 120M;
 
     # 主应用代理
     location / {
@@ -699,7 +699,7 @@ export default config
 
 ### 11.1 应用安全
 
-认证 Token 通过 httpOnly + Secure + SameSite=Lax 的 Cookie 存储，不暴露给前端 JavaScript。短信验证码接口实施 Rate Limiting，同一手机号 60 秒内只能请求一次，同一 IP 每小时最多 20 次。文件上传限制 MIME 类型白名单和 20MB 大小上限，Payload 会自动校验。所有用户输入通过 Zod Schema 校验后再入库。Payload 的 CSRF 保护已配置为仅信任 `https://innovation.example.com` 域。
+认证 Token 通过 httpOnly + Secure + SameSite=Lax 的 Cookie 存储，不暴露给前端 JavaScript。短信验证码接口实施 Rate Limiting，同一手机号 60 秒内只能请求一次，同一 IP 每小时最多 20 次。文件上传限制 MIME 类型白名单和 100MB 单文件大小上限，Payload 会自动校验。所有用户输入通过 Zod Schema 校验后再入库。Payload 的 CSRF 保护已配置为仅信任 `https://innovation.example.com` 域。
 
 ### 11.2 基础设施安全
 
