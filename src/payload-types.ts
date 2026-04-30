@@ -152,6 +152,7 @@ export interface User {
   emailVerificationToken?: string | null
   emailVerificationExpiresAt?: string | null
   phoneVerifiedAt?: string | null
+  lastAccessAt?: string | null
   updatedAt: string
   createdAt: string
   email: string
@@ -578,6 +579,7 @@ export interface UsersSelect<T extends boolean = true> {
   emailVerificationToken?: T
   emailVerificationExpiresAt?: T
   phoneVerifiedAt?: T
+  lastAccessAt?: T
   updatedAt?: T
   createdAt?: T
   email?: T

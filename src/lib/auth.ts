@@ -2,11 +2,13 @@ import { cookies } from 'next/headers'
 import { SignJWT, jwtVerify } from 'jose'
 import { redirect } from 'next/navigation'
 import type { PayloadRequest } from 'payload'
+import { cache } from 'react'
 
 import type { User } from '@/payload-types'
 
 import { appEnv } from './env'
 import { getPayloadClient } from './payload'
+import { touchUserLastAccess } from './user-access'
 
 const AUTH_COOKIE_NAME = 'innovation-session'
 const AUTH_COOKIE_MAX_AGE = 60 * 60 * 8
@@ -50,7 +52,7 @@ function parseCookie(cookieHeader: string | null, name: string) {
   return match ? decodeURIComponent(match.split('=').slice(1).join('=')) : null
 }
 
-export async function getCurrentUser() {
+export const getCurrentUser = cache(async function getCurrentUser() {
   const cookieStore = await cookies()
   const token = cookieStore.get(AUTH_COOKIE_NAME)?.value
   const session = await verifySession(token)
@@ -60,14 +62,20 @@ export async function getCurrentUser() {
   }
 
   const payload = await getPayloadClient()
-  return (await payload
+  const user = (await payload
     .findByID({
       id: Number(session.id),
       collection: 'users',
       overrideAccess: true,
     })
     .catch(() => null)) as User | null
-}
+
+  if (!user) {
+    return null
+  }
+
+  return (await touchUserLastAccess(user.id, { force: true, payload })) ?? user
+})
 
 export async function getRequestUser(request: Request) {
   const token = parseCookie(request.headers.get('cookie'), AUTH_COOKIE_NAME)
@@ -78,13 +86,19 @@ export async function getRequestUser(request: Request) {
   }
 
   const payload = await getPayloadClient()
-  return (await payload
+  const user = (await payload
     .findByID({
       id: Number(session.id),
       collection: 'users',
       overrideAccess: true,
     })
     .catch(() => null)) as User | null
+
+  if (!user) {
+    return null
+  }
+
+  return (await touchUserLastAccess(user.id, { force: true, payload })) ?? user
 }
 
 export async function requireUser() {

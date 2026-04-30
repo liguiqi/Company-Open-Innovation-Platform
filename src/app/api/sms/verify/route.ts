@@ -5,6 +5,7 @@ import type { User } from '@/payload-types'
 import { createAuthCookie } from '@/lib/auth'
 import { getRequesterIP } from '@/lib/auth'
 import { getPayloadClient } from '@/lib/payload'
+import { touchUserLastAccess } from '@/lib/user-access'
 import { smsVerifySchema } from '@/lib/validators'
 import { deleteCachedValue, getCachedValue } from '@/services/redis'
 import { codeVerifyLimiter, ipVerifyLimiter } from '@/services/rate-limit'
@@ -69,27 +70,37 @@ export async function POST(request: Request) {
     )
   }
 
+  const accessAt = new Date()
   const authenticatedUser = user.phoneVerifiedAt
     ? user
     : ((await payload.update({
         id: user.id,
         collection: 'users',
         data: {
-          phoneVerifiedAt: new Date().toISOString(),
+          lastAccessAt: accessAt.toISOString(),
+          phoneVerifiedAt: accessAt.toISOString(),
         },
         overrideAccess: true,
       })) as User)
+
+  const nextUser = user.phoneVerifiedAt
+    ? ((await touchUserLastAccess(user, {
+        force: true,
+        now: accessAt,
+        payload,
+      })) ?? authenticatedUser)
+    : authenticatedUser
 
   const response = NextResponse.json({
     ok: true,
     redirectTo: '/dashboard',
     user: {
-      name: authenticatedUser.name,
-      phone: authenticatedUser.phone,
-      role: authenticatedUser.role,
+      name: nextUser.name,
+      phone: nextUser.phone,
+      role: nextUser.role,
     },
   })
 
-  response.headers.append('Set-Cookie', await createAuthCookie(authenticatedUser))
+  response.headers.append('Set-Cookie', await createAuthCookie(nextUser))
   return response
 }

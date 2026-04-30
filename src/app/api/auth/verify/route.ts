@@ -44,6 +44,7 @@ export async function GET(request: Request) {
     data: {
       emailVerificationExpiresAt: null,
       emailVerificationToken: '',
+      lastAccessAt: new Date().toISOString(),
       emailVerifiedAt: new Date().toISOString(),
     },
     overrideAccess: true,

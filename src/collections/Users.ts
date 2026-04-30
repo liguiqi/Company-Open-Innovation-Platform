@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { isAdmin } from '@/access/isAdmin'
 import { syncUserAvatarMedia } from '@/hooks/syncRelatedMedia'
+import { touchUserLastAccess } from '@/lib/user-access'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -41,7 +42,7 @@ export const Users: CollectionConfig = {
     },
   },
   admin: {
-    defaultColumns: ['username', 'email', 'phone', 'role', 'updatedAt'],
+    defaultColumns: ['username', 'email', 'phone', 'role', 'lastAccessAt', 'updatedAt'],
     group: '权限',
     useAsTitle: 'name',
   },
@@ -138,8 +139,26 @@ export const Users: CollectionConfig = {
         position: 'sidebar',
       },
     },
+    {
+      name: 'lastAccessAt',
+      label: '最后访问时间',
+      type: 'date',
+      index: true,
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
   ],
   hooks: {
+    afterLogin: [
+      async ({ req, user }) =>
+        (await touchUserLastAccess(user, {
+          force: true,
+          now: new Date(),
+          payload: req.payload,
+        })) ?? user,
+    ],
     afterChange: [syncUserAvatarMedia],
   },
 }

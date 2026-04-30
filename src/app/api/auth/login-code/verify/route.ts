@@ -5,6 +5,7 @@ import type { User } from '@/payload-types'
 import { createAuthCookie } from '@/lib/auth'
 import { getRequesterIP } from '@/lib/auth'
 import { getPayloadClient } from '@/lib/payload'
+import { touchUserLastAccess } from '@/lib/user-access'
 import { getLoginIdentifierType, loginCodeVerifySchema } from '@/lib/validators'
 import { codeVerifyLimiter, ipVerifyLimiter } from '@/services/rate-limit'
 import { deleteCachedValue, getCachedValue } from '@/services/redis'
@@ -96,7 +97,8 @@ export async function POST(request: Request) {
   }
 
   let authenticatedUser = user
-  const verifiedAt = new Date().toISOString()
+  const accessAt = new Date()
+  const verifiedAt = accessAt.toISOString()
 
   if (identifierType === 'email' && !user.emailVerifiedAt) {
     authenticatedUser = (await payload.update({
@@ -104,6 +106,7 @@ export async function POST(request: Request) {
       collection: 'users',
       data: {
         emailVerifiedAt: verifiedAt,
+        lastAccessAt: verifiedAt,
       },
       overrideAccess: true,
     })) as User
@@ -114,10 +117,23 @@ export async function POST(request: Request) {
       id: user.id,
       collection: 'users',
       data: {
+        lastAccessAt: verifiedAt,
         phoneVerifiedAt: verifiedAt,
       },
       overrideAccess: true,
     })) as User
+  }
+
+  if (
+    (identifierType === 'email' && user.emailVerifiedAt) ||
+    (identifierType === 'phone' && user.phoneVerifiedAt)
+  ) {
+    authenticatedUser =
+      (await touchUserLastAccess(user, {
+        force: true,
+        now: accessAt,
+        payload,
+      })) ?? authenticatedUser
   }
 
   const response = NextResponse.json({
