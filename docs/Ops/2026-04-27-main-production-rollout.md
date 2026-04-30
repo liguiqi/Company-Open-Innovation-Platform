@@ -2,6 +2,11 @@
 
 更新日期：`2026-04-27`
 
+> 历史快照说明
+>
+> 1. 本文记录的是 `2026-04-27` 当次生产覆盖部署的现场过程与当时基线。
+> 2. 当前通用部署标准请以 `docs/deployment/deployment.md`、`docs/Ops/runbook.md` 和 `docs/Ops/release-and-rollback.md` 为准。
+
 ## 1. 目标与边界
 
 - 本次目标：将生产环境从当前运行基线 `b21d518` 升级到 `main` 最新提交 `1d17b93`

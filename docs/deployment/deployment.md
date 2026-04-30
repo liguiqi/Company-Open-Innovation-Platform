@@ -1,88 +1,69 @@
 # 部署说明（AI Agent / Human 双版本）
 
-更新日期：`2026-04-20`
+更新日期：`2026-04-30`
 
 ## 1. 文档用途
 
 本文档同时覆盖两类部署场景：
 
-- `AI Agent 自动化落地版`：适合在新服务器基础环境已经准备完成后，由 AI Agent 进行非交互式部署、升级和 smoke test
-- `Human 手动运维版`：适合人工从零准备新服务器、创建专属账号、处理代理与镜像、安装依赖并完成正式部署
+1. `AI Agent 自动化落地版`
+   适合服务器基础环境已经准备好，由 AI Agent 按明确授权执行代码同步、构建、重启和验活。
+2. `Human 手动运维版`
+   适合人工从零准备新服务器、创建专属账号、处理代理、安装依赖并完成正式部署。
 
-本文档描述两条线：
+本文档默认描述的是当前仓库主线的真实落地方式，而不是理想化架构。
 
-- `当前线上真实基线`：现网 `innovation.example.com` 仍运行在老机器上的 `lgq` 账号下
-- `新服务器迁移标准`：后续迁移到另一台服务器时，统一改为专属部署账号 `deploy`
+## 2. 当前仓库部署事实
 
-如果目标是面向人工运维的容器化部署，请配套阅读 `docs/deployment/human-containerized-deployment.md`。
+| 项目             | 当前事实                                                                   |
+| ---------------- | -------------------------------------------------------------------------- |
+| 仓库版本         | `package.json -> 2.0.0`                                                    |
+| 主框架           | `Next.js 16.2.3 + Payload CMS 3.82.1 + React 19.2.4 + Tailwind CSS 4.1.14` |
+| 运行模式         | `pnpm build` 产出 `.next/standalone`，再由 `pnpm start` 拉起               |
+| 正式运行端口     | `127.0.0.1:3005`                                                           |
+| 本机开发域名     | `https://innovation.example.com`                                   |
+| 生产调试域名     | `https://openinnovation.example.com`                               |
+| 反向代理         | `nginx`                                                                    |
+| 进程守护         | `systemd`                                                                  |
+| 数据存储         | `PostgreSQL + Redis + media/`                                              |
+| 单文件业务上限   | `100MB`                                                                    |
+| Next 请求体上限  | `120mb`                                                                    |
+| Nginx 请求体上限 | `120M`                                                                     |
 
-## 2. 当前线上真实基线
+关键事实：
 
-当前正式环境已经验证可用的运行事实如下：
+1. 公开站、注册登录、工作台和 Payload Admin 运行在同一 Node 进程内。
+2. 当前没有单独的 Java 或 Python 后端服务。
+3. 只要环境变量发生变化，就必须重新执行 `pnpm build`，因为 standalone 运行目录会复制 `.env` 与 `.env.local`。
 
-| 项目        | 当前状态                                         |
-| ----------- | ------------------------------------------------ |
-| 分支 / 版本 | `dev-bugfix` / `v1.0.0`                          |
-| 仓库路径    | `/home/deploy/apps/open-innovation-platform`      |
-| 服务用户    | `lgq`                                            |
-| 应用端口    | `127.0.0.1:3005`                                 |
-| 域名        | `https://innovation.example.com`         |
-| 反向代理    | `nginx`                                          |
-| 进程守护    | `systemd`                                        |
-| 运行模式    | `pnpm build` + `.next/standalone` + `pnpm start` |
-| 媒体目录    | 仓库根目录 `media/`                              |
+## 3. 环境矩阵
 
-当前线上链路：
+| 环境         | 访问域名                                     | 说明                        |
+| ------------ | -------------------------------------------- | --------------------------- |
+| 本机开发环境 | `https://innovation.example.com`     | 日常开发、联调、验收主环境  |
+| 生产调试环境 | `https://openinnovation.example.com` | `10.0.0.1` 上的部署实例 |
 
-```text
-Browser
-  -> nginx :443
-  -> innovation-platform.service
-  -> .next/standalone/server.js
-  -> Next.js / Payload Local API
-  -> PostgreSQL / Redis / media/
-```
+共通约束：
 
-当前仓库内现成模板文件：
+1. `nginx -> 127.0.0.1:3005 -> innovation-platform.service`
+2. `Payload CORS / CSRF` 允许来源必须覆盖对应实际域名
+3. `media/`、数据库和 Redis 必须一起迁移或一起恢复
 
-- `deploy/systemd/innovation-platform.service`
-- `deploy/nginx/innovation.example.com.conf`
+## 4. 部署账号标准
 
-注意：这两个模板目前仍反映老服务器 `lgq` 路径，仅可作为参考；迁移到新服务器时，应改为 `deploy` 专属账号路径。
+### 4.1 推荐专属账号
 
-## 3. 新服务器迁移标准
+新服务器统一推荐使用：`deploy`
 
-后续迁移到另一台服务器时，统一按以下标准实施：
+原因：
 
-- 部署专属账号：`deploy`
-- 应用目录：`/home/deploy/apps/open-innovation-platform`
-- 域名：`innovation.example.com`
-- 应用监听：`127.0.0.1:3005`
-- 服务名：`innovation-platform.service`
-- SSL 证书目录：项目内 `example.com_nginx/`，或等价的专属证书目录
-- 运行方式：`pnpm build` 生成 standalone，再由 `systemd` 以 `pnpm start` 拉起
+1. 服务与个人开发账号边界清晰。
+2. systemd、SSH、日志和证书目录易于交接。
+3. 便于后续区分 AI Agent 和人工运维动作。
 
-推荐不要继续沿用个人账号 `lgq` 直接托管生产应用。原因很简单：
+### 4.2 Human 手动运维场景
 
-- 个人账号和业务服务边界不清晰
-- 后续交接给 AI Agent 或其他运维人员时权限难以收敛
-- systemd、日志、SSH Key 和应用目录会混在个人工作目录中
-
-## 4. 专属 sudo 账号标准
-
-### 4.1 推荐账号名
-
-新服务器统一使用：`deploy`
-
-说明：
-
-- 名称短、语义清晰，适合 systemd、SSH、日志和脚本中长期使用
-- 既能用于人工运维，也能用于 AI Agent 自动化执行
-- 后续如需扩展 Bothub 或其他平台，可继续沿用“项目专属部署账号”模式
-
-### 4.2 Human 手动运维场景的账号创建方式
-
-以下步骤使用当前已有 sudo 权限的引导账号执行：
+使用已有 sudo 账号执行：
 
 ```bash
 sudo adduser deploy
@@ -91,9 +72,12 @@ sudo usermod -aG docker deploy
 sudo mkdir -p /home/deploy/.ssh
 sudo chown -R deploy:deploy /home/deploy/.ssh
 sudo chmod 700 /home/deploy/.ssh
+sudo passwd deploy
+id deploy
+sudo -l -U deploy
 ```
 
-如果需要沿用现有管理机上的 SSH 公钥：
+如需复制现有管理机 SSH 公钥：
 
 ```bash
 sudo cp /home/<bootstrap-user>/.ssh/authorized_keys /home/deploy/.ssh/authorized_keys
@@ -101,21 +85,13 @@ sudo chown deploy:deploy /home/deploy/.ssh/authorized_keys
 sudo chmod 600 /home/deploy/.ssh/authorized_keys
 ```
 
-然后为 `deploy` 设置登录密码，并确认 sudo 权限：
+正式生产建议保留“有密码的 sudo”，不要默认开放 `NOPASSWD: ALL`。
 
-```bash
-sudo passwd deploy
-id deploy
-sudo -l -U deploy
-```
+### 4.3 AI Agent 自动化场景
 
-人工运维模式建议保留“有密码的 sudo”，不要直接给 `NOPASSWD`，这样更适合正式生产运维审计。
+AI Agent 仍使用 `deploy`，但建议搭配 SSH Key 和受控 sudo。
 
-### 4.3 AI Agent 自动化场景的账号创建方式
-
-AI Agent 仍使用 `deploy`，但建议配合 SSH Key 和非交互 sudo。
-
-如果该服务器是专门给本项目使用的独立内网服务器，可以使用：
+若服务器是项目独占环境，可按需开放：
 
 ```bash
 echo 'deploy ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/90-deploy
@@ -123,23 +99,25 @@ sudo chmod 440 /etc/sudoers.d/90-deploy
 sudo visudo -cf /etc/sudoers.d/90-deploy
 ```
 
-这样 AI Agent 可以无人工干预执行：
+若服务器为共享主机，则应只开放白名单命令，不要开放全量无密码 sudo。
 
-- `systemctl daemon-reload`
-- `systemctl restart innovation-platform.service`
-- `systemctl reload nginx`
-- `journalctl -u innovation-platform.service`
-- 部署目录权限修正、证书文件落位、软链接更新
+## 5. 通用前置检查
 
-如果服务器不是本项目独占，而是共享机器，则不要给 `NOPASSWD: ALL`，应改为只对白名单命令开放 sudo。
+无论采用哪种部署方式，先确认以下事项：
 
-## 5. 中国国内网络与代理方案
+1. 目标域名已正确解析到目标服务器。
+2. `443` 端口已经可达。
+3. `127.0.0.1:3005` 未被其他服务占用。
+4. PostgreSQL 和 Redis 的部署方式已确定。
+5. `.env.local` 已准备好 `DATABASE_*`、`REDIS_URL`、`PAYLOAD_SECRET`、`SMTP_*`、`ALIYUN_SMS_*`。
+6. 证书文件已准备：
+   - `example.com_nginx/example.com_bundle.pem`
+   - `example.com_nginx/example.com.key`
+7. 目标机可访问 GitHub、npm registry 与 Docker registry，或已准备可用代理/镜像。
 
-如果新服务器在国内网络环境下访问 GitHub、Node 源、Docker Hub 或 Playwright 资源较慢，部署前请先处理代理或镜像，否则非常容易卡在依赖安装环节。
+## 6. 中国国内网络与代理准备
 
-### 5.1 临时代理环境变量
-
-如果公司已经提供 HTTP/HTTPS 代理：
+### 6.1 临时代理环境变量
 
 ```bash
 export http_proxy=http://<proxy-host>:<proxy-port>
@@ -148,28 +126,16 @@ export all_proxy=socks5://<proxy-host>:<proxy-port>
 export no_proxy=127.0.0.1,localhost,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
 ```
 
-验证代理是否生效：
+验证：
 
 ```bash
 curl -I https://github.com
 curl -I https://registry.npmjs.org
 ```
 
-如果只需要单次命令走代理，可写成：
+### 6.2 GitHub SSH 走 443
 
-```bash
-https_proxy=http://<proxy-host>:<proxy-port> pnpm install --frozen-lockfile
-```
-
-### 5.2 GitHub SSH 使用 443 端口
-
-很多公司网络会拦截 `22` 端口，但放行 `443`。当前仓库远程地址是：
-
-```text
-git@github.com:your-org/open-innovation-platform.git
-```
-
-此时建议为 `deploy` 写入 `~/.ssh/config`：
+为部署账号写入：
 
 ```sshconfig
 Host github.com
@@ -180,100 +146,56 @@ Host github.com
   ServerAliveCountMax 3
 ```
 
-然后验证：
+验证：
 
 ```bash
 ssh -T git@github.com
 ```
 
-### 5.3 Ubuntu APT 镜像
+### 6.3 Ubuntu APT 镜像
 
-如果 `apt update` 很慢，优先换成国内镜像。常用镜像源：
+常用国内镜像：
 
-- `https://mirrors.aliyun.com/ubuntu/`
-- `https://mirrors.tuna.tsinghua.edu.cn/ubuntu/`
+1. `https://mirrors.aliyun.com/ubuntu/`
+2. `https://mirrors.tuna.tsinghua.edu.cn/ubuntu/`
 
-#### Ubuntu 22.04 常见处理方式
-
-```bash
-sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak.$(date +%F-%H%M%S)
-sudo sed -i 's@http://archive.ubuntu.com/ubuntu/@https://mirrors.aliyun.com/ubuntu/@g' /etc/apt/sources.list
-sudo sed -i 's@http://security.ubuntu.com/ubuntu/@https://mirrors.aliyun.com/ubuntu/@g' /etc/apt/sources.list
-sudo apt update
-```
-
-#### Ubuntu 24.04 Deb822 常见处理方式
-
-```bash
-sudo cp /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list.d/ubuntu.sources.bak.$(date +%F-%H%M%S)
-sudo sed -i 's@http://archive.ubuntu.com/ubuntu/@https://mirrors.aliyun.com/ubuntu/@g' /etc/apt/sources.list.d/ubuntu.sources
-sudo sed -i 's@http://security.ubuntu.com/ubuntu/@https://mirrors.aliyun.com/ubuntu/@g' /etc/apt/sources.list.d/ubuntu.sources
-sudo apt update
-```
-
-### 5.4 Node / pnpm 镜像
-
-建议为 `deploy` 设置：
+### 6.4 Node / pnpm 镜像
 
 ```bash
 npm config set registry https://registry.npmmirror.com
 pnpm config set registry https://registry.npmmirror.com
-```
-
-如果使用 `nvm` 或需要下载 Node 二进制，也建议设置：
-
-```bash
 export NVM_NODEJS_ORG_MIRROR=https://npmmirror.com/mirrors/node
 ```
 
-如果部署机需要运行 Playwright 下载浏览器，可额外设置：
+## 7. 域名与允许来源配置
 
-```bash
-export PLAYWRIGHT_DOWNLOAD_HOST=https://npmmirror.com/mirrors/playwright
+当前代码中以下变量与域名强相关：
+
+1. `NEXT_PUBLIC_SERVER_URL`
+2. `PAYLOAD_ALLOWED_ORIGINS`
+
+建议配置示例：
+
+```env
+NEXT_PUBLIC_SERVER_URL=https://openinnovation.example.com
+PAYLOAD_ALLOWED_ORIGINS=https://openinnovation.example.com,https://innovation.example.com
 ```
 
-### 5.5 Docker 镜像加速
+说明：
 
-如果生产机需要通过 Docker 拉起 PostgreSQL / Redis，建议提前为 Docker 配置镜像加速：
+1. 若目标机实际使用 `innovation.example.com`，就把 `NEXT_PUBLIC_SERVER_URL` 改成该值。
+2. 若遗漏实际访问域名，常见后果是 Payload Admin 登录后无法保存、无法登出或出现 CSRF / origin 错误。
 
-```json
-{
-  "registry-mirrors": ["https://<your-company-or-cloud-mirror>"]
-}
-```
+## 8. AI Agent 自动化落地版
 
-写入 `/etc/docker/daemon.json` 后执行：
+本版本假设以下底座已由人工准备完成：
 
-```bash
-sudo systemctl daemon-reload
-sudo systemctl restart docker
-```
+1. `deploy` 账号已创建并具备所需 sudo 权限。
+2. `git`、`node`、`pnpm`、`nginx`、`docker` 已安装。
+3. SSL 证书已落位。
+4. 域名已经指向目标服务器。
 
-## 6. 部署通用前置检查
-
-无论是 AI Agent 还是 Human 手动部署，迁移前都先确认以下事项：
-
-1. 新服务器已经能解析并访问 `innovation.example.com`
-2. 外部或内网路由已放通 `443`，本机回环可监听 `127.0.0.1:3005`
-3. PostgreSQL 与 Redis 的部署方式已经确定
-4. `.env.local` 中的数据库、Redis、SMTP、Aliyun SMS、Payload Secret 等值已经准备好
-5. 证书文件已准备：
-   - `example.com_nginx/example.com_bundle.pem`
-   - `example.com_nginx/example.com.key`
-6. GitHub SSH Key 已加入 `deploy` 账号
-7. 如果使用公司代理，已验证 GitHub、npm registry、Docker registry 至少有一种可达
-
-## 7. AI Agent 自动化落地版
-
-本版本假设“系统底座已经由人工准备好”，即：
-
-- `deploy` 账号已创建
-- `sudo` 策略已配置
-- `git`、`node`、`pnpm`、`nginx`、`docker` 已安装
-- SSL 证书已落位
-- 域名已经指向新服务器
-
-### 7.1 登录并准备目录
+### 8.1 登录并准备目录
 
 ```bash
 sudo -iu deploy
@@ -281,7 +203,7 @@ mkdir -p /home/deploy/apps
 cd /home/deploy/apps
 ```
 
-### 7.2 拉取正式版代码
+### 8.2 拉取代码
 
 首次部署：
 
@@ -289,7 +211,13 @@ cd /home/deploy/apps
 git clone git@github.com:your-org/open-innovation-platform.git
 cd open-innovation-platform
 git fetch --all --tags
-git checkout v1.0.0
+git checkout main
+```
+
+若按明确发布点部署，请替换为：
+
+```bash
+git checkout <release-tag-or-commit>
 ```
 
 后续升级：
@@ -297,30 +225,30 @@ git checkout v1.0.0
 ```bash
 cd /home/deploy/apps/open-innovation-platform
 git fetch --all --tags
-git checkout v1.0.0
+git checkout main
+git pull --ff-only origin main
 ```
 
-如果后续改为部署其他 tag，只替换最后一行的 tag 即可。
-
-### 7.3 写入环境变量
+### 8.3 准备环境变量
 
 ```bash
 cp .env.example .env.local
 vi .env.local
 ```
 
-至少检查以下项：
+至少检查：
 
-- `NEXT_PUBLIC_SERVER_URL=https://innovation.example.com`
-- `PAYLOAD_SECRET=...`
-- `DATABASE_URI=...`
-- `REDIS_URL=...`
-- `SMTP_*`
-- `ALIYUN_SMS_SIGN=平台验证码`
-- `ALIYUN_SMS_TEMPLATE=100001`
-- `ALIYUN_SMS_SCHEME_NAME=平台验证码`
+1. `NEXT_PUBLIC_SERVER_URL`
+2. `PAYLOAD_ALLOWED_ORIGINS`
+3. `PAYLOAD_SECRET`
+4. `DATABASE_URI` 或 `DATABASE_URL`
+5. `REDIS_URL`
+6. `SMTP_HOST`、`SMTP_PORT`、`SMTP_USER`、`SMTP_PASS`
+7. `ALIYUN_SMS_SIGN=平台验证码`
+8. `ALIYUN_SMS_TEMPLATE=100001`
+9. `ALIYUN_SMS_SCHEME_NAME=平台验证码`
 
-### 7.4 安装依赖与生成辅助文件
+### 8.4 安装依赖与生成辅助文件
 
 ```bash
 pnpm install --frozen-lockfile
@@ -328,41 +256,56 @@ pnpm generate:types
 pnpm generate:importmap
 ```
 
-### 7.5 启动数据库与 Redis（如使用本机 Docker）
+### 8.5 启动数据库与 Redis
+
+若继续使用仓库内 compose：
 
 ```bash
 docker compose up -d postgres redis
 docker compose ps
 ```
 
-### 7.6 正式构建
+### 8.6 构建与整理媒体
 
 ```bash
 pnpm lint
 pnpm typecheck
 pnpm build
+pnpm media:organize
 ```
 
-关键说明：当前项目生产运行读取的是 `.next/standalone/.env*` 副本，不是直接读取仓库根目录 `.env*`。因此只要改过环境变量，就必须重新执行 `pnpm build`。
+说明：
 
-### 7.7 systemd 服务文件
+1. `pnpm media:organize` 用于回填已有媒体记录的目录、模块和分类信息，迁移后建议执行一次。
+2. 若只是常规日更、媒体库已稳定，也可以只在需要时手动执行。
 
-如果新服务器采用 system-wide Node 和 global pnpm，推荐服务文件如下：
+### 8.7 systemd 服务文件
+
+推荐直接基于仓库模板 `deploy/systemd/innovation-platform.service` 调整。
+
+关键项必须改成目标机真实值：
+
+1. `User`
+2. `WorkingDirectory`
+3. `HOME`
+4. `PATH`
+5. `ExecStart`
+
+参考写法：
 
 ```ini
 [Unit]
-Description=HeT Open Innovation Platform
-After=network.target docker.service
+Description=H&T Open Innovation Platform
+After=network.target
 
 [Service]
 Type=simple
 User=deploy
 WorkingDirectory=/home/deploy/apps/open-innovation-platform
 Environment=HOME=/home/deploy
-Environment=NODE_ENV=production
 Environment=PORT=3005
-Environment=PATH=/usr/local/bin:/usr/bin:/bin
-ExecStart=/usr/bin/pnpm start
+Environment=PATH=/home/deploy/.nvm/versions/node/v24.15.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStart=/home/deploy/.nvm/versions/node/v24.15.0/bin/node /home/deploy/.nvm/versions/node/v24.15.0/lib/node_modules/corepack/dist/pnpm.js start
 Restart=always
 RestartSec=5
 
@@ -370,49 +313,41 @@ RestartSec=5
 WantedBy=multi-user.target
 ```
 
-写入后执行：
+加载并启动：
 
 ```bash
-sudo tee /etc/systemd/system/innovation-platform.service >/dev/null <<'EOF'
-[Unit]
-Description=HeT Open Innovation Platform
-After=network.target docker.service
-
-[Service]
-Type=simple
-User=deploy
-WorkingDirectory=/home/deploy/apps/open-innovation-platform
-Environment=HOME=/home/deploy
-Environment=NODE_ENV=production
-Environment=PORT=3005
-Environment=PATH=/usr/local/bin:/usr/bin:/bin
-ExecStart=/usr/bin/pnpm start
-Restart=always
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
+sudo cp deploy/systemd/innovation-platform.service /etc/systemd/system/innovation-platform.service
+sudo vi /etc/systemd/system/innovation-platform.service
 sudo systemctl daemon-reload
 sudo systemctl enable innovation-platform.service
 sudo systemctl restart innovation-platform.service
 sudo systemctl status innovation-platform.service --no-pager
 ```
 
-### 7.8 nginx 配置
+### 8.8 nginx 配置
 
-```bash
-sudo tee /etc/nginx/sites-available/innovation.example.com.conf >/dev/null <<'EOF'
+推荐基于仓库模板 `deploy/nginx/innovation.example.com.conf` 调整：
+
+必须替换：
+
+1. `server_name`
+2. `ssl_certificate`
+3. `ssl_certificate_key`
+4. `proxy_pass` 保持 `127.0.0.1:3005`
+5. `client_max_body_size 120M`
+
+若目标环境使用 `openinnovation.example.com`，可参考：
+
+```nginx
 server {
     listen 80;
-    server_name innovation.example.com;
+    server_name openinnovation.example.com;
     return 301 https://$host$request_uri;
 }
 
 server {
     listen 443 ssl http2;
-    server_name innovation.example.com;
+    server_name openinnovation.example.com;
 
     ssl_certificate     /home/deploy/apps/open-innovation-platform/example.com_nginx/example.com_bundle.pem;
     ssl_certificate_key /home/deploy/apps/open-innovation-platform/example.com_nginx/example.com.key;
@@ -439,20 +374,22 @@ server {
         add_header Cache-Control "public, immutable";
     }
 }
-EOF
+```
 
-sudo ln -sf /etc/nginx/sites-available/innovation.example.com.conf /etc/nginx/sites-enabled/innovation.example.com.conf
+启用：
+
+```bash
 sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-### 7.9 自动化 smoke test
+### 8.9 自动化 smoke test
 
 ```bash
-curl -k -I https://innovation.example.com
+curl -k -I https://openinnovation.example.com
 curl -I http://127.0.0.1:3005
 systemctl is-active innovation-platform.service
-curl -sk -H 'Content-Type: application/json'   -d '{"phone":"13800000000"}'   https://innovation.example.com/api/sms/send
+docker compose ps
 ```
 
 建议再人工打开：
@@ -463,74 +400,43 @@ curl -sk -H 'Content-Type: application/json'   -d '{"phone":"13800000000"}'   ht
 4. `/dashboard`
 5. `/admin`
 
-## 8. Human 手动运维版
+## 9. Human 手动运维版
 
-本版本适合运维人员从零接管一台新机器，手动完成所有准备和部署动作。步骤比 AI Agent 版更细，适合作为正式迁移 SOP。
+本版本用于从零接管新机器，步骤更细。
 
-### 8.1 系统基础包安装
-
-先用已有 sudo 用户登录新服务器，执行：
+### 9.1 系统基础包安装
 
 ```bash
 sudo apt update
-sudo apt install -y   git   curl   wget   unzip   build-essential   ca-certificates   gnupg   lsb-release   nginx   docker.io   docker-compose-plugin
+sudo apt install -y \
+  git \
+  curl \
+  wget \
+  unzip \
+  build-essential \
+  ca-certificates \
+  gnupg \
+  lsb-release \
+  nginx \
+  docker.io \
+  docker-compose-plugin
 ```
 
-然后启动 Docker 和 nginx：
+启动基础服务：
 
 ```bash
 sudo systemctl enable --now docker
 sudo systemctl enable --now nginx
 ```
 
-### 8.2 创建项目专属账号 `deploy`
+### 9.2 安装 Node.js 与 pnpm
 
-```bash
-sudo adduser deploy
-sudo usermod -aG sudo deploy
-sudo usermod -aG docker deploy
-sudo passwd deploy
-```
+推荐：
 
-确认组信息：
+1. `Node.js 22 LTS` 或 `Node.js 24 LTS`
+2. `pnpm 10`
 
-```bash
-id deploy
-```
-
-预期至少包含：`sudo`、`docker`。
-
-### 8.3 配置 SSH Key 与 GitHub 访问
-
-切换到 `deploy`：
-
-```bash
-sudo -iu deploy
-mkdir -p ~/.ssh
-chmod 700 ~/.ssh
-vi ~/.ssh/config
-```
-
-建议写入：
-
-```sshconfig
-Host github.com
-  HostName ssh.github.com
-  Port 443
-  User git
-  ServerAliveInterval 60
-  ServerAliveCountMax 3
-```
-
-导入私钥、公钥或部署密钥后，验证：
-
-```bash
-ssh -T git@github.com
-```
-
-### 8.4 安装 Node.js 24 与 pnpm
-
-#### 方案 A：公网可用时，优先使用官方脚本
+如使用 NodeSource：
 
 ```bash
 curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
@@ -540,27 +446,9 @@ node -v
 pnpm -v
 ```
 
-#### 方案 B：国内网络不稳定时，使用镜像下载 Node 二进制
+若使用 `nvm`，请确认最终 `systemd` 能拿到完整 `node` 与 `pnpm` 绝对路径。
 
-```bash
-cd /tmp
-wget https://npmmirror.com/mirrors/node/v24.12.0/node-v24.12.0-linux-x64.tar.xz
-sudo tar -xJf node-v24.12.0-linux-x64.tar.xz -C /usr/local --strip-components=1
-sudo npm install -g pnpm@10
-node -v
-pnpm -v
-```
-
-如果 `/usr/bin/pnpm` 不存在，可执行：
-
-```bash
-which node
-which pnpm
-```
-
-确保 systemd 能拿到 `node` 和 `pnpm`。
-
-### 8.5 拉取代码与 checkout 正式版
+### 9.3 拉取代码
 
 ```bash
 sudo -iu deploy
@@ -569,233 +457,153 @@ cd /home/deploy/apps
 git clone git@github.com:your-org/open-innovation-platform.git
 cd open-innovation-platform
 git fetch --all --tags
-git checkout v1.0.0
+git checkout main
 ```
 
-### 8.6 准备 `.env.local`
+若本次是正式发版，请把 `main` 替换成获准部署的 tag 或 commit。
+
+### 9.4 准备环境变量
 
 ```bash
 cp .env.example .env.local
 vi .env.local
 ```
 
-请逐项填写：
+重点检查：
 
-- `NEXT_PUBLIC_SERVER_URL`
-- `PAYLOAD_SECRET`
-- `DATABASE_URI` / `DATABASE_URL`
-- `REDIS_URL`
-- `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS`
-- `ALIYUN_SMS_ACCESS_KEY_ID`
-- `ALIYUN_SMS_ACCESS_KEY_SECRET`
-- `ALIYUN_SMS_SIGN=平台验证码`
-- `ALIYUN_SMS_TEMPLATE=100001`
-- `ALIYUN_SMS_SCHEME_NAME=平台验证码`
+1. `NEXT_PUBLIC_SERVER_URL`
+2. `PAYLOAD_ALLOWED_ORIGINS`
+3. `DATABASE_URI` / `DATABASE_URL`
+4. `REDIS_URL`
+5. `PAYLOAD_SECRET`
+6. `SMTP_*`
+7. `ALIYUN_SMS_*`
+8. `DEFAULT_*` 初始化账号变量
 
-### 8.7 启动 PostgreSQL 与 Redis
-
-如果继续沿用仓库内 docker compose：
+### 9.5 启动 PostgreSQL 与 Redis
 
 ```bash
 docker compose up -d postgres redis
 docker compose ps
 ```
 
-如果数据库和 Redis 使用外部托管实例，只要 `.env.local` 中连接串正确，这一步可以跳过。
+默认端口映射：
 
-### 8.8 安装依赖与生成 Payload 辅助文件
+1. PostgreSQL：宿主机 `5433`
+2. Redis：宿主机 `6380`
+
+### 9.6 安装依赖并构建
 
 ```bash
 pnpm install --frozen-lockfile
 pnpm generate:types
 pnpm generate:importmap
+pnpm lint
+pnpm typecheck
+pnpm build
+pnpm media:organize
 ```
 
-### 8.9 首次种子数据（可选）
-
-如果是空库初始化，可执行：
+如需初始化数据：
 
 ```bash
 pnpm seed
 ```
 
-如果是生产迁移后的已有数据恢复场景，不要再跑 seed，以免插入演示数据。
+### 9.7 配置 systemd 与 nginx
 
-### 8.10 正式构建
-
-```bash
-pnpm lint
-pnpm typecheck
-pnpm build
-```
-
-这一步完成后，`.next/standalone/.env*` 会携带当前环境变量副本。后续只要 `.env.local` 改过，就必须重新构建。
-
-### 8.11 放置证书
-
-如果证书沿用项目目录方式：
+1. 复制并修改 `deploy/systemd/innovation-platform.service`
+2. 复制并修改 `deploy/nginx/innovation.example.com.conf`
+3. 根据目标域名替换 `server_name` 与证书路径
+4. 执行：
 
 ```bash
-mkdir -p /home/deploy/apps/open-innovation-platform/example.com_nginx
-```
-
-然后把以下文件放到该目录：
-
-- `example.com_bundle.pem`
-- `example.com.key`
-
-完成后检查权限：
-
-```bash
-ls -l /home/deploy/apps/open-innovation-platform/example.com_nginx
-```
-
-### 8.12 写入 systemd 服务
-
-```bash
-sudo tee /etc/systemd/system/innovation-platform.service >/dev/null <<'EOF'
-[Unit]
-Description=HeT Open Innovation Platform
-After=network.target docker.service
-
-[Service]
-Type=simple
-User=deploy
-WorkingDirectory=/home/deploy/apps/open-innovation-platform
-Environment=HOME=/home/deploy
-Environment=NODE_ENV=production
-Environment=PORT=3005
-Environment=PATH=/usr/local/bin:/usr/bin:/bin
-ExecStart=/usr/bin/pnpm start
-Restart=always
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
 sudo systemctl daemon-reload
 sudo systemctl enable innovation-platform.service
 sudo systemctl restart innovation-platform.service
-sudo systemctl status innovation-platform.service --no-pager
-```
-
-如果服务启动失败，先看日志：
-
-```bash
-sudo journalctl -u innovation-platform.service -n 200 --no-pager
-```
-
-### 8.13 写入 nginx 配置
-
-```bash
-sudo tee /etc/nginx/sites-available/innovation.example.com.conf >/dev/null <<'EOF'
-server {
-    listen 80;
-    server_name innovation.example.com;
-    return 301 https://$host$request_uri;
-}
-
-server {
-    listen 443 ssl http2;
-    server_name innovation.example.com;
-
-    ssl_certificate     /home/deploy/apps/open-innovation-platform/example.com_nginx/example.com_bundle.pem;
-    ssl_certificate_key /home/deploy/apps/open-innovation-platform/example.com_nginx/example.com.key;
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers HIGH:!aNULL:!MD5;
-
-    client_max_body_size 120M;
-
-    location / {
-        proxy_pass http://127.0.0.1:3005;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-    }
-
-    location /_next/static {
-        proxy_pass http://127.0.0.1:3005/_next/static;
-        proxy_cache_valid 200 365d;
-        add_header Cache-Control "public, immutable";
-    }
-}
-EOF
-
-sudo ln -sf /etc/nginx/sites-available/innovation.example.com.conf /etc/nginx/sites-enabled/innovation.example.com.conf
 sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-### 8.14 手工验收
+### 9.8 首次验收
 
-先做命令级检查：
+命令级：
 
 ```bash
 curl -I http://127.0.0.1:3005
-curl -k -I https://innovation.example.com
+curl -k -I https://openinnovation.example.com
 systemctl is-active innovation-platform.service
 docker compose ps
 ```
 
-再做页面级检查：
+页面级：
 
-1. 首页 `https://innovation.example.com/`
-2. 登录页 `https://innovation.example.com/login`
-3. 注册页 `https://innovation.example.com/register`
-4. 工作台 `https://innovation.example.com/dashboard`
-5. Payload Admin `https://innovation.example.com/admin`
-6. 短信发送接口 `/api/sms/send`
-7. 邮箱验证码发送链路
-8. 附件上传与下载
-9. `/dashboard/settings` 个人资料更新
+1. 打开首页 `/`
+2. 打开 `/login`
+3. 打开 `/register`
+4. 打开 `/dashboard`
+5. 打开 `/admin`
+6. 测试邮箱验证码、短信验证码、附件上传与下载
 
-### 8.15 常见故障优先排查项
+## 10. 何时必须重新构建
 
-#### 页面 502 / 504
+以下变更必须重新执行 `pnpm build`：
 
-优先检查：
+1. `.env.local` 发生变化。
+2. 域名、允许来源、短信、邮件、数据库或 Redis 配置变化。
+3. Next 页面、Payload 集合、API 或公共静态资源变化。
 
-- `systemctl status innovation-platform.service`
-- `journalctl -u innovation-platform.service`
-- `nginx -t`
-- `curl -I http://127.0.0.1:3005`
+以下动作通常只需重启服务：
 
-#### 页面能开但短信失败
+1. systemd 环境变量和路径未变化，仅进程短暂异常。
+2. Nginx 配置无变化，仅 Node 进程需要拉起。
 
-优先检查：
+## 11. 常见故障排查
 
-- `.env.local` 中的 `ALIYUN_SMS_*`
-- `.next/standalone/.env*` 是否同步为最新值
-- 修改环境变量后是否重新执行过 `pnpm build`
+### 11.1 Admin 无法保存或无法登出
 
-#### 构建成功但启动后仍读旧配置
+优先排查：
 
-这是当前项目最常见的运维坑。原因通常是：
+1. `NEXT_PUBLIC_SERVER_URL` 是否与实际域名一致。
+2. `PAYLOAD_ALLOWED_ORIGINS` 是否覆盖当前访问域名。
+3. 改完环境变量后是否重新执行过 `pnpm build`。
 
-- 只改了根目录 `.env.local`
-- 但没有重新执行 `pnpm build`
-- 导致运行中的 standalone 继续使用旧副本
+### 11.2 短信发送失败
 
-#### 附件丢失
+优先排查：
 
-优先检查：
+1. `ALIYUN_SMS_SIGN` 是否仍为 `平台验证码`。
+2. `ALIYUN_SMS_TEMPLATE` 是否为 `100001`。
+3. `ALIYUN_SMS_SCHEME_NAME` 是否为 `平台验证码`。
+4. 是否误用了未审核通过的新签名。
 
-- 根目录 `media/` 是否存在
-- 部署迁移时是否漏同步 `media/`
-- 是否错误把文件写进 `.next/standalone/media`
+### 11.3 附件上传失败
 
-## 9. 文档配套关系
+优先排查三层限制是否一致：
 
-迁移与运维过程中，建议同时参照：
+1. 业务接口：`100MB`
+2. Next：`120mb`
+3. Nginx：`120M`
 
-- 架构说明：`docs/architecture/system-architecture.md`
-- 部署拓扑：`docs/architecture/deployment-topology.md`
-- 运维 Runbook：`docs/Ops/runbook.md`
-- 发版与回滚：`docs/Ops/release-and-rollback.md`
-- 测试与验收：`docs/testing.md`
+### 11.4 附件或图片丢失
+
+优先排查：
+
+1. `media/` 是否与数据库一起迁移。
+2. 是否遗漏执行 `pnpm media:organize`。
+3. 是否误删了 `media/`、挂载点或证书目录。
+
+### 11.5 登录页、公开站或后台样式异常
+
+优先排查：
+
+1. `pnpm build` 是否成功。
+2. `.next/static` 是否被正确复制并由 Nginx 放行。
+3. `public/branding/` 等静态资源是否同步到了目标机。
+
+## 12. 发布纪律
+
+1. 本地仓库推送到 GitHub 与生产部署是两个动作，不能混为一谈。
+2. 生产环境覆盖更新必须获得明确授权。
+3. 生产回滚至少要能回退以下三类对象：代码、数据库、`media/`。
+4. 若只是本机开发环境变更，文档中应明确写成本机能力，不应直接写成生产既有能力。

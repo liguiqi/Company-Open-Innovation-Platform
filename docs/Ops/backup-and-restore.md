@@ -1,17 +1,18 @@
 # 备份与恢复说明
 
-更新日期：`2026-04-27`
+更新日期：`2026-04-30`
 
 ## 1. 需要备份的对象
 
 ### 1.1 PostgreSQL 业务数据
 
 - 库名：`innovation_platform`
-- 主表包括：`users`、`user_groups`、`tech_needs`、`proposals`、`proposals_rels`、`partners`、`case_studies`、`media`
+- 主表包括：`users`、`user_groups`、`tech_needs`、`proposals`、`proposals_review_timeline`、`proposals_rels`、`partners`、`case_studies`、`media`
+- Payload 辅助表包括：`payload_migrations`、`payload_preferences`、`payload_folders`、`payload_locked_documents*`
 
 ### 1.2 文件与媒体
 
-- `media/`：上传附件和图片，当前按 `document/`、`image/` 以及业务模块子目录归档
+- `media/`：上传附件和图片，当前按 `document/`、`image/`、模块目录和资产分类目录归档
 - `public/`：品牌资源与静态文件
 - `example.com_nginx/`：证书文件
 
@@ -21,15 +22,17 @@
 - `.env`
 - `/etc/systemd/system/innovation-platform.service`
 - `/etc/nginx/sites-available/innovation-platform-apps.conf`
+- 生产调试环境下的 `/etc/nginx/sites-available/openinnovation.example.com.conf`
 
 ### 1.4 Redis
 
-Redis 当前只用于 OTP 缓存，不承载业务主数据。常规备份时可以不单独备份 Redis。
+Redis 当前只用于 OTP 缓存与频控辅助，不承载业务主数据。常规备份时可以不单独备份 Redis。
 
 ## 2. PostgreSQL 备份
 
 ```bash
-docker compose exec -T postgres   pg_dump -U payload innovation_platform > backup-innovation_platform.sql
+docker compose exec -T postgres \
+  pg_dump -U payload innovation_platform > backup-innovation_platform.sql
 ```
 
 如需压缩：
@@ -41,13 +44,15 @@ gzip -f backup-innovation_platform.sql
 ## 3. PostgreSQL 恢复
 
 ```bash
-gunzip -c backup-innovation_platform.sql.gz |   docker compose exec -T postgres psql -U payload innovation_platform
+gunzip -c backup-innovation_platform.sql.gz | \
+  docker compose exec -T postgres psql -U payload innovation_platform
 ```
 
 未压缩文件：
 
 ```bash
-cat backup-innovation_platform.sql |   docker compose exec -T postgres psql -U payload innovation_platform
+cat backup-innovation_platform.sql | \
+  docker compose exec -T postgres psql -U payload innovation_platform
 ```
 
 ## 4. 文件备份
@@ -114,3 +119,4 @@ docker compose exec -T postgres psql -U payload -d innovation_platform -c '\dt'
 5. Admin
 6. 任意一条带附件的方案详情页
 7. 任意一条伙伴 Logo / 案例封面图片可正常加载
+8. `users` 列表中的“最后访问时间”字段可见

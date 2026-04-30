@@ -2,86 +2,102 @@
 
 ## 目标
 
-本文档用于说明 `bothub` 当前邮箱验证码与阿里云短信验证码的实现思路，方便在其他项目中复用同一套能力。
+本文档说明 `bothub` 已有的邮箱验证码与阿里云短信验证码能力，如何在当前 `innovation-platform` 项目中复用，以及当前项目已经实际落地了哪些内容。
 
-设计目标不是把短信和邮箱发送逻辑直接写死在业务接口里，而是拆成以下三层：
+核心原则不是把验证码逻辑散落到业务接口，而是拆成三层：
 
-1. 业务入口层：注册、登录、重置密码等接口负责判断场景与账号状态。
-2. 验证码中心层：负责生成验证码、频控、落库、验证、过期和错误次数控制。
-3. 通道适配层：负责真正调用 SMTP 邮件服务和阿里云短信服务。
+1. 业务入口层
+   注册、登录、资料维护等接口只负责场景判断和账号状态判断。
+2. 验证码中心层
+   负责生成验证码、限流、缓存、过期和校验。
+3. 通道适配层
+   负责真正调用 SMTP 邮件通道和阿里云短信通道。
 
-## 当前 bothub 的落地结构
+## 当前两个项目的关系
 
-相关代码位置：
+### 1. `bothub` 提供的可复用经验
 
-- `bothub/src/routes/auth.js`
-- `bothub/src/services/codeService.js`
-- `bothub/src/services/emailService.js`
-- `bothub/src/services/smsService.js`
-- `bothub/src/db/schema.sql`
+`bothub` 已经验证过以下两条通道：
 
-核心思路：
+1. 企业邮箱 SMTP 发验证码。
+2. 阿里云 `Dypnsapi` 发短信验证码。
 
-- `auth.js` 不直接处理第三方平台细节，只负责选择 `phone` 或 `email` 通道。
-- `codeService.js` 统一生成 6 位验证码，并使用 `Redis + PostgreSQL` 管理发送频率、验证码状态和验证次数。
-- `emailService.js` 只做邮件发送。
-- `smsService.js` 只做阿里云短信发送。
-- 实际验证码明文不入库，只保存 `sha256(code + JWT_SECRET)` 后的哈希值。
+### 2. `innovation-platform` 的当前复用结果
+
+当前开放创新平台已经复用了：
+
+1. SMTP 通道接入思路。
+2. 阿里云 `Dypnsapi` 接入思路。
+3. 发送频控和验证码 TTL 设计。
+4. 注册场景和登录场景分离的验证码 key 命名方式。
+5. mock 开关与开发联调兜底。
+
+当前开放创新平台没有完整照搬 `bothub` 的点：
+
+1. 没有单独落地 `verification_codes` 表。
+2. 没有把验证码哈希后写入 PostgreSQL。
+3. 当前验证码主要使用 `Redis` 作为临时存储。
+
+因此，当前项目属于“轻量复用版”，适合当前业务量和一体化部署形态。
 
 ## 一、邮箱验证码复用思路
 
 ### 1. 通道选型
 
-`bothub` 当前使用的是 `nodemailer + SMTP`，而不是调用某个邮件 SaaS 的 HTTP API。
+当前仍然采用 `nodemailer + SMTP`，而不是外部邮件 SaaS 的 HTTP API。
 
-这样做的优点：
+优点：
 
-- 更容易迁移到不同项目。
-- 只要邮箱服务商支持 SMTP，就能复用。
-- 与业务代码解耦，不依赖某一个邮件平台 SDK。
+1. 更容易迁移到不同项目。
+2. 只要邮箱服务商支持 SMTP 就能复用。
+3. 不依赖某个特定邮件平台的 SDK。
 
-### 2. 当前 bothub 的实际落地
+### 2. 当前实际落地
 
-当前运行态使用的是：
+当前项目邮件发送代码位置：
 
-- SMTP 主机：`smtp.example.com`
-- SMTP 端口：`994`
-- `secure=true`
-- 发件账号：`confluence@example.com`
-- 发件地址：`confluence@example.com`
-- 发件显示名：`BotHub`
-- `EMAIL_MOCK=false`
+1. `src/services/email.ts`
+2. `src/payload.config.ts`
+3. `src/lib/env.ts`
 
-注意：
+当前支持的邮件场景：
 
-- `bothub` 实际使用的是 `994 + SSL`。
-- 你之前提供的 `25` 端口并不是当前 bothub 运行态落地值。
-- IMAP 只用于收件，不参与 bothub 验证码发送流程，所以另一个项目如果只是做验证码下发，不需要 IMAP。
+1. 邮箱注册链接验证。
+2. 注册验证码发送。
+3. 登录验证码发送。
+4. 提案提交通知。
+5. 提案状态更新通知。
 
-### 3. 复用时建议的配置项
+### 3. 当前配置抽象
 
-建议另一个项目至少保留下面这些环境变量：
+当前项目保留了以下环境变量抽象：
 
 ```env
 SMTP_HOST=
-SMTP_PORT=994
-SMTP_SECURE=true
+SMTP_PORT=
+SMTP_SECURE=
 SMTP_USER=
 SMTP_PASS=
-SMTP_FROM_NAME=BotHub
+SMTP_FROM_NAME=
 SMTP_FROM_ADDRESS=
-SMTP_TLS_REJECT_UNAUTHORIZED=true
-EMAIL_MOCK=false
+SMTP_TLS_REJECT_UNAUTHORIZED=
+EMAIL_MOCK=
 ```
+
+当前行为细节：
+
+1. `SMTP_PORT` 为 `465` 或 `994` 时，若未显式配置 `SMTP_SECURE`，系统会自动推断为 `secure=true`。
+2. 若 `EMAIL_MOCK=true` 或 SMTP 配置不完整，邮件接口会走 `skipped` 兜底，不直接抛出未处理异常。
+3. 对于验证码链路，生产环境下如果只剩 mock，不应视为真正可用。
 
 ### 4. 推荐封装方式
 
-建议保留一个独立的 `emailService`：
+当前 `sendEmail()` 的返回结构是：
 
-- 输入：`toEmail`、`code`
-- 输出：`{ success, provider, requestId, error }`
+1. 成功时返回 `nodemailer.SentMessageInfo`
+2. 跳过或失败兜底时返回 `{ skipped: true }`
 
-推荐返回结构：
+如果未来要在其他项目进一步抽象，建议统一为：
 
 ```json
 {
@@ -91,252 +107,283 @@ EMAIL_MOCK=false
 }
 ```
 
-这样做的好处是：
-
-- 业务层不需要知道底层是 SMTP 还是其他邮件网关。
-- 后续如果切换腾讯云邮件、SendCloud、阿里云邮件推送，只要替换适配层。
-
 ## 二、阿里云短信验证码复用思路
 
-> 发布注记（innovation 平台正式版 `v1.0.0`）：当前项目最终沿用已审核通过的短信签名 `平台验证码`、模板 `100001` 与场景名 `平台验证码`。阿里云 `Dypnsapi` 的签名不能只通过代码改名，若更换签名，必须先在阿里云控制台完成审核通过。
+### 1. 当前必须保留的事实
 
-### 1. 通道选型
+开放创新平台当前正式可用的短信签名与模板，必须保持为阿里云已审核通过的旧值：
 
-`bothub` 当前使用的是阿里云 `Dypnsapi` 的 `SendSmsVerifyCode` 接口，而不是旧版 `Dysmsapi`。
+1. 签名：`平台验证码`
+2. 模板：`100001`
+3. 业务场景名：`平台验证码`
 
-当前 Node 依赖：
+重要说明：
 
-- `@alicloud/dypnsapi20170525`
-- `@alicloud/openapi-client`
-- `@alicloud/credentials`
-- `@alicloud/tea-util`
+1. 阿里云 `Dypnsapi` 的签名不能只通过代码改名。
+2. 若更换短信签名，必须先在阿里云控制台完成审核。
+3. 之前尝试直接改为新的签名文案，会导致“签名或者模板无效”。
 
-### 2. 当前 bothub 的实际落地
+### 2. 当前通道选型
 
-当前运行态短信配置是：
+当前项目采用：
 
-- 短信服务端点：`dypnsapi.aliyuncs.com`
-- 国家码：`86`
-- 短信签名：`平台验证码`
-- 模板编码：`100001`
-- 业务场景名：`平台验证码`
-- `SMS_MOCK=false`
+1. `@alicloud/dypnsapi20170525`
+2. `@alicloud/openapi-client`
+3. `@alicloud/tea-util`
 
-AK/SK 当前确实是通过环境变量注入到容器里运行，但不建议在任何项目文档、仓库文件或前端代码中明文保存。
+代码位置：
 
-### 3. 复用时建议的配置项
+1. `src/services/aliyun-sms.ts`
+2. `src/lib/env.ts`
 
-建议另一个项目保留这些环境变量：
+### 3. 当前实现特点
+
+当前短信发送实现不是旧版 `Dysmsapi`，而是阿里云 `Dypnsapi` 的 `SendSmsVerifyCode`。
+
+当前实现细节：
+
+1. 自动生成 6 位验证码。
+2. 发送参数中固定使用 `codeLength=6`、`validTime=300`、`interval=60`。
+3. SDK 打开 `returnVerifyCode=true`，优先使用阿里云返回的验证码值。
+4. 短信发送失败时会做一次轻量重试。
+5. 连接超时、网络抖动等异常会被识别为可重试错误。
+
+### 4. 当前配置抽象
 
 ```env
 ALIYUN_ACCESS_KEY_ID=
 ALIYUN_ACCESS_KEY_SECRET=
-ALIYUN_SMS_SIGN=
-ALIYUN_SMS_TEMPLATE=
-ALIYUN_SMS_SCHEME_NAME=
+ALIYUN_SMS_ACCESS_KEY_ID=
+ALIYUN_SMS_ACCESS_KEY_SECRET=
 ALIYUN_SMS_COUNTRY_CODE=86
 ALIYUN_SMS_ENDPOINT=dypnsapi.aliyuncs.com
+ALIYUN_SMS_SIGN=平台验证码
+ALIYUN_SMS_TEMPLATE=100001
+ALIYUN_SMS_SCHEME_NAME=平台验证码
 SMS_MOCK=false
 ```
 
-### 4. 推荐封装方式
+说明：
 
-建议保留一个独立的 `smsService`：
+1. 当前代码同时兼容 `ALIYUN_ACCESS_KEY_ID` 和 `ALIYUN_SMS_ACCESS_KEY_ID` 两套命名。
+2. `ALIYUN_SMS_SIGN` 与 `ALIYUN_SMS_SIGN_NAME` 也会做兼容读取。
+3. 若配置不完整，项目会退回 mock 模式，但生产环境不应依赖该模式。
 
-- 输入：`phone`、`code`
-- 输出：`{ success, provider, requestId, error }`
+### 5. 当前返回结构
 
-推荐返回结构：
+当前 `sendSMSCode()` 返回两类结构：
+
+1. mock：
 
 ```json
 {
-  "success": true,
-  "provider": "aliyun-dypnsapi",
-  "requestId": "A1B2C3..."
+  "mocked": true,
+  "provider": "mock",
+  "requestId": "mock-1713333333333",
+  "verifyCode": "123456"
 }
 ```
 
-这样可以让业务层完全不依赖阿里云 SDK 的返回字段格式。
+2. 阿里云：
 
-## 三、验证码中心层的复用建议
+```json
+{
+  "provider": "aliyun-dypnsapi",
+  "requestId": "A1B2C3",
+  "verifyCode": "123456",
+  "success": true
+}
+```
 
-### 1. 不要把验证码直接存在 Redis 明文
+失败时会补充：
 
-`bothub` 当前做法是：
+1. `code`
+2. `message`
+3. `success=false`
 
-- Redis 只存频控信息
-- PostgreSQL 存验证码记录
-- 验证码入库前先做哈希
+## 三、验证码中心层在当前项目中的实现
 
-推荐保留的能力：
+### 1. 当前缓存策略
 
-- 发送冷却时间，例如 60 秒
-- 每日发送上限，例如 10 次
-- 验证码有效期，例如 5 分钟
-- 最大输错次数，例如 5 次
-- 发送记录状态：`pending/sent/verified/expired/failed/superseded`
+当前开放创新平台主要使用 Redis 保存验证码，而不是数据库表。
 
-### 2. 推荐数据表设计
+当前 key 设计：
 
-另一个项目如果也走公网正式验证，建议保留类似 `verification_codes` 表。
+1. 注册邮箱验证码：`email:otp:{email}`
+2. 注册手机验证码：`sms:otp:{phone}`
+3. 登录邮箱验证码：`login:email:otp:{email}`
+4. 登录手机验证码：`login:phone:otp:{phone}`
 
-核心字段建议保留：
+统一特征：
 
-- `channel`
-- `identifier`
-- `scene`
-- `code_hash`
-- `status`
-- `provider`
-- `provider_request_id`
-- `attempts`
-- `error_message`
-- `expires_at`
-- `sent_at`
-- `verified_at`
+1. TTL 为 `300 秒`
+2. 场景隔离，避免注册验证码和登录验证码串用
+3. 校验成功后立即删除
 
-### 3. 业务接口不要直接信任通道返回成功
+### 2. 当前限流策略
 
-推荐顺序：
+当前项目使用 `rate-limiter-flexible` 控制：
 
-1. 业务接口先做账号状态校验。
-2. 验证码中心先做频控校验。
-3. 生成验证码并创建数据库记录。
-4. 调用邮件或短信适配器发送。
-5. 根据发送结果回写数据库状态。
+1. 单邮箱发送频率。
+2. 单手机号发送频率。
+3. 单 IP 发送频率。
+4. 单验证码校验尝试次数。
+5. 注册场景和登录场景的不同前缀。
 
-这样做的好处是：
+### 3. 当前与 `bothub` 的差异
 
-- 发送失败也有审计记录。
-- 后面查问题时能定位到底是业务拦截、频控拦截还是第三方通道失败。
+| 项目         | `bothub` 思路               | 当前开放创新平台             |
+| ------------ | --------------------------- | ---------------------------- |
+| 验证码持久化 | Redis + PostgreSQL          | Redis 为主                   |
+| 验证码明文   | 不入库，哈希后落库          | 不入库，缓存即用即删         |
+| 验证码表     | 推荐有 `verification_codes` | 当前未单独建表               |
+| 适用场景     | 更偏通用认证中心            | 更偏当前业务平台的一体化实现 |
 
-## 四、另一个项目复用时的推荐拆分
+结论：
 
-建议按下面 4 个模块拆：
+1. 当前平台已经足够支撑注册、登录和基础验证。
+2. 若未来验证码业务变复杂，例如要审计每次发送记录、接入更多场景、做风控分析，再考虑升级为 `bothub` 那套“Redis + 数据库”中心化结构。
 
-### 1. `verificationService`
+## 四、当前开放创新平台中的业务场景拆分
 
-负责：
+### 1. 注册场景
 
-- 生成验证码
-- 哈希验证码
-- Redis 频控
-- PostgreSQL 落库
-- 校验验证码
-- 失败次数累加
+当前注册接口：
 
-### 2. `emailService`
+1. `POST /api/auth/email-code`
+2. `POST /api/sms/send`
+3. `POST /api/auth/register`
 
-负责：
+逻辑特点：
 
-- 初始化 SMTP transporter
-- 发送邮件模板
-- 返回统一结果结构
+1. 基础信息先填。
+2. 邮箱或手机号至少完成一种验证。
+3. 校验通过后创建 `partner` 角色用户。
+4. 注册完成后跳转回登录页。
 
-### 3. `smsService`
+### 2. 验证码登录场景
 
-负责：
+当前登录接口：
 
-- 初始化阿里云客户端
-- 发送短信验证码
-- 解析阿里云返回结构
-- 返回统一结果结构
+1. `POST /api/auth/login-code/send`
+2. `POST /api/auth/login-code/verify`
 
-### 4. `auth/usecase`
+逻辑特点：
 
-负责：
+1. 自动识别邮箱或手机号。
+2. 验证码校验成功后，查询 `users` 集合。
+3. 只有已有账号才允许登录。
+4. 若账号不存在，返回 `redirectTo=/register?...` 给前端弹窗使用。
 
-- 注册场景是否允许发码
-- 登录场景是否允许发码
-- 重置密码场景是否允许发码
-- 选择 `phone` 或 `email` 通道
+### 3. 个人资料变更场景
+
+当前资料接口：
+
+1. `PATCH /api/account/profile`
+
+逻辑特点：
+
+1. 用户修改邮箱或手机号后，会重置对应验证状态。
+2. 非管理员账号必须至少保留一个已验证通道。
+3. 这是当前项目对“账号安全性”的额外补充，不属于 `bothub` 原始复用范围。
 
 ## 五、对外接口建议
 
-另一个项目如果复用 same pattern，建议接口保持简单：
+如果另一个项目要复用当前实现思路，建议至少保留以下接口拆分：
 
-### 1. 发送验证码
+### 1. 发送注册邮箱验证码
 
-`POST /api/auth/send-code`
+`POST /api/auth/email-code`
 
-请求体：
+### 2. 发送注册短信验证码
 
-```json
-{
-  "type": "email",
-  "identifier": "dev@example.com",
-  "scene": "register"
-}
-```
+`POST /api/sms/send`
 
-### 2. 校验验证码并完成注册/绑定/重置
+### 3. 注册
 
-不要额外提供一个“裸 verify-code”接口给前端长期暴露，推荐直接在业务接口里完成校验并落业务状态。
+`POST /api/auth/register`
 
-原因：
+### 4. 发送登录验证码
 
-- 减少验证码可重放风险
-- 降低前端状态管理复杂度
-- 让验证码生命周期更贴近业务动作
+`POST /api/auth/login-code/send`
 
-## 六、复用到另一个项目时的注意事项
+### 5. 验证登录验证码
 
-### 1. 不要复用明文密钥写进仓库
+`POST /api/auth/login-code/verify`
+
+为什么这样拆：
+
+1. 注册和登录是不同业务语义，不能共享同一组 key。
+2. 登录验证码通过并不代表允许自动注册。
+3. 注册场景与登录场景的错误提示、跳转和限流策略都不同。
+
+## 六、安全注意事项
+
+### 1. 不在仓库或文档中记录明文凭据
 
 正确做法：
 
-- 本地开发放 `.env.local`
-- 服务器放系统环境变量或部署平台密文配置
-- 不在 Markdown、源码、前端配置里保存 AK/SK 和邮箱密码
+1. 本地开发放 `.env.local`
+2. 服务器放系统环境变量或密文配置
+3. Markdown 文档只记录变量名，不记录明文 AK/SK、邮箱密码和 token
 
-### 2. 邮箱端口优先按实测值走
+### 2. 验证码不要长期保留
 
-虽然供应商文档可能给出多个端口，但 `bothub` 当前实测可用的是：
+当前项目做法：
 
-- `smtp.example.com:994`
-- `secure=true`
+1. TTL 统一 5 分钟
+2. 校验成功即删除
+3. 不做长期业务表持久化
 
-如果另一个项目要快速复用，优先直接照这个组合测试。
+### 3. 验证码登录不能自动注册
 
-### 3. 短信通道要区分“模板、签名、业务名”
+这是本项目已经踩过并修正的重点：
 
-这三项缺一不可：
+1. 验证码登录只做“已有用户快速登录”
+2. 若用户不存在，必须让其主动走注册流程
 
-- `ALIYUN_SMS_SIGN`
-- `ALIYUN_SMS_TEMPLATE`
-- `ALIYUN_SMS_SCHEME_NAME`
+### 4. 生产环境不能依赖 mock
 
-很多项目短信调不通，不是 AK/SK 有问题，而是模板或业务场景名没有配齐。
+`EMAIL_MOCK` 和 `SMS_MOCK` 只适合：
 
-### 4. 统一 mock 开关
+1. 本地联调
+2. 内部开发测试
 
-建议两个通道都保留 mock 开关：
-
-- `EMAIL_MOCK`
-- `SMS_MOCK`
-
-这样本地联调时可以先走假发送，不必每次都真实触发第三方。
+不适合生产正式验证链路。
 
 ## 七、推荐的最小复用方案
 
-如果另一个项目时间紧，不需要完整复制 `bothub` 全部认证体系，最低建议复用下面这套：
+若另一个项目需要快速复用当前能力，最低建议复制以下内容：
 
-1. `emailService`
-2. `smsService`
-3. `verification_codes` 表
-4. `Redis` 冷却时间控制
-5. `send-code` 接口
-6. 在注册/登录/重置接口内部完成验证码校验
+1. `src/services/email.ts`
+2. `src/services/aliyun-sms.ts`
+3. `src/services/redis.ts`
+4. `src/services/rate-limit.ts`
+5. `src/lib/env.ts`
+6. 注册验证码与登录验证码分场景的 key 设计
+7. 注册接口与登录接口分离的业务规则
 
-这 6 项足够支撑大部分公网验证码业务。
+## 八、何时要升级为更重的验证码中心
 
-## 八、总结
+当出现以下需求时，应考虑从当前轻量方案升级到 `bothub` 那种更完整的验证码中心：
 
-`bothub` 当前的做法本质上是“验证码中心 + 多通道适配器”的结构，而不是把验证码发送逻辑散落在各个业务接口里。另一个项目如果要复用，建议直接复制这种分层方式：
+1. 需要审计每一次发送和验证结果。
+2. 需要追踪失败次数与风控命中原因。
+3. 需要接入更多通道，例如企业微信、WhatsApp 或语音验证码。
+4. 需要跨多个业务系统共享同一套验证码中心。
 
-- 业务层只关心场景与账号状态
-- 验证码中心层统一做频控、哈希、落库、校验
-- 邮件和短信各自做通道适配
-- 所有敏感配置只通过环境变量注入
+## 九、总结
 
-这样后续即使替换邮箱服务商、替换短信平台、增加 WhatsApp 或企业微信验证码通道，也不需要重写业务主流程。
+当前开放创新平台已经成功复用了 `bothub` 中最有价值的两项基础能力：
+
+1. SMTP 邮箱验证码发送。
+2. 阿里云 `Dypnsapi` 短信验证码发送。
+
+同时，当前项目根据自身业务做了更贴近实际的平台化裁剪：
+
+1. 注册与登录场景严格分离。
+2. 验证码登录不自动注册。
+3. Redis 轻量缓存替代数据库验证码表。
+4. 邮箱和短信配置都保留 mock 兜底与生产禁用约束。
+
+如果后续另一个项目时间紧，直接复用当前这套“Redis + SMTP + Dypnsapi + 场景分离”的结构，已经足够支撑大多数验证码业务。

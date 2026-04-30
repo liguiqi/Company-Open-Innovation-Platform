@@ -1,6 +1,6 @@
 # 运维 Runbook
 
-更新日期：`2026-04-20`
+更新日期：`2026-04-30`
 
 ## 1. 运行对象
 
@@ -38,7 +38,7 @@ ss -ltnp | grep -E ':80|:443|:3005|:5433|:6380'
 ### 2.4 容器状态
 
 ```bash
-docker ps --format 'table {{.Names}}	{{.Image}}	{{.Status}}	{{.Ports}}'
+docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
 docker compose ps
 ```
 
@@ -46,6 +46,7 @@ docker compose ps
 
 ```bash
 curl -k -I https://innovation.example.com
+curl -k -I https://openinnovation.example.com
 curl -I http://127.0.0.1:3005
 ```
 
@@ -65,7 +66,7 @@ sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-如监听、证书或主配置变更，再执行：
+如监听、证书、域名或 `client_max_body_size` 发生变化，再执行：
 
 ```bash
 sudo systemctl restart nginx
@@ -83,13 +84,15 @@ docker compose ps
 ### 4.1 首选：Payload Admin
 
 - 地址：`/admin`
-- 适合：内容维护、字段核对、关系追踪、上传文件定位
+- 适合：内容维护、字段核对、关系追踪、上传文件定位、用户最近访问时间查看
 
 ### 4.2 其次：Payload REST / GraphQL
 
 ```bash
 curl http://127.0.0.1:3005/api/tech-needs?limit=5
-curl -X POST http://127.0.0.1:3005/api/graphql   -H 'Content-Type: application/json'   -d '{"query":"query { TechNeeds(limit: 3) { docs { id title needId status } } }"}'
+curl -X POST http://127.0.0.1:3005/api/graphql \
+  -H 'Content-Type: application/json' \
+  -d '{"query":"query { TechNeeds(limit: 3) { docs { id title needId status } } }"}'
 ```
 
 ### 4.3 最后：直接 PostgreSQL
@@ -100,7 +103,7 @@ docker compose exec -T postgres psql -U payload -d innovation_platform
 
 ## 5. 典型故障处理
 
-### 5.1 域名访问返回 502
+### 5.1 域名访问返回 502 / 504
 
 排查顺序：
 
@@ -116,7 +119,7 @@ docker compose exec -T postgres psql -U payload -d innovation_platform
 
 1. 是否执行过 `pnpm build`
 2. 是否通过 `scripts/start-standalone.mjs` 启动
-3. `.next/static` 与 `public/` 是否同步到了 `.next/standalone`
+3. `.next/static` 与 `public/` 是否已同步到 `.next/standalone`
 
 ### 5.3 Dashboard 登录或跳转异常
 
@@ -125,7 +128,7 @@ docker compose exec -T postgres psql -U payload -d innovation_platform
 1. 浏览器是否存在 `innovation-session`
 2. `PAYLOAD_SECRET` 是否变动
 3. `src/lib/auth.ts` 的 Cookie 签发和校验是否正常
-4. 最新构建是否已部署到 `standalone`
+4. 最新构建是否已部署到 standalone
 
 ### 5.4 数据库连接异常
 
@@ -153,11 +156,10 @@ sudo systemctl restart innovation-platform.service
 6. 再验证接口：
 
 ```bash
-curl -k https://innovation.example.com/api/sms/send   -H 'Content-Type: application/json'   -d '{"phone":"13800000000"}'
+curl -sk -H 'Content-Type: application/json' \
+  -d '{"phone":"13800000000"}' \
+  https://innovation.example.com/api/sms/send
 ```
-
-7. 若返回 `验证码发送过于频繁`，先等待 60 秒冷却
-8. 若阿里云返回 `biz.FREQUENCY`，说明已触发供应商侧频控
 
 ### 5.6 邮件未收到
 
@@ -165,32 +167,52 @@ curl -k https://innovation.example.com/api/sms/send   -H 'Content-Type: applicat
 
 1. 检查 `SMTP_*` 是否完整
 2. 查看日志中的 `[email:send-failed]`
-3. 确认 `NEXT_PUBLIC_SERVER_URL` 是否仍指向正式域名
+3. 确认 `NEXT_PUBLIC_SERVER_URL` 与 `PAYLOAD_ALLOWED_ORIGINS` 是否正确
 
-### 5.7 附件下载 403 / 404
+### 5.7 附件上传返回 400 / 413
+
+排查：
+
+1. 确认文件类型是否在白名单中
+2. 确认单文件是否超过业务上限 `100MB`
+3. 检查 `next.config.ts` 中 `proxyClientMaxBodySize` 是否为 `120mb`
+4. 检查当前生效 Nginx 配置中的 `client_max_body_size` 是否为 `120M`
+5. 如刚改完配置，重新 `pnpm build`、重启应用并 reload Nginx
+
+### 5.8 附件下载 403 / 404
 
 排查：
 
 1. 确认当前用户是否为管理员、评审员、上传者或方案所有者
-2. 检查 `media` 表里的关联字段
-3. 检查 `media` 记录中的 `module`、`assetCategory`、`storageKey` 是否正确
-4. 检查磁盘文件是否仍在 `media/document/*` 或 `media/image/*` 对应子目录
-5. 查看 `/api/attachments/[id]` 返回信息
+2. 检查 `media` 表中的 `module`、`assetCategory`、`storageKey` 是否正确
+3. 检查磁盘文件是否仍在 `media/document/*` 或 `media/image/*` 子目录
+4. 查看 `/api/attachments/[id]` 返回结果
+
+### 5.9 用户“最后访问时间”未刷新
+
+排查：
+
+1. 先确认用户是通过真实登录或真实访问受保护页面进入
+2. 检查 `users.last_access_at` 是否存在于数据库
+3. 确认 `src/lib/auth.ts` 与 `users.afterLogin` Hook 是否已在当前构建中生效
+4. 若修改过认证代码但后台仍旧值，先 `pnpm build` 再重启服务
 
 ## 6. 配置文件清单
 
-| 文件                                               | 作用                       |
-| -------------------------------------------------- | -------------------------- |
-| `/etc/systemd/system/innovation-platform.service`  | 应用服务定义               |
-| `/etc/nginx/sites-available/innovation-platform-apps.conf`       | 域名转发配置               |
-| `deploy/systemd/innovation-platform.service`       | 仓库内 systemd 样例        |
-| `deploy/nginx/innovation.example.com.conf` | 仓库内 nginx 样例          |
-| `.env.local` / `.env`                              | 环境变量源文件             |
-| `.next/standalone/.env*`                           | 构建后的运行态环境变量副本 |
+| 文件                                                                 | 作用                       |
+| -------------------------------------------------------------------- | -------------------------- |
+| `/etc/systemd/system/innovation-platform.service`                    | 应用服务定义               |
+| `/etc/nginx/sites-available/innovation-platform-apps.conf`                         | 本机开发域名转发配置       |
+| `/etc/nginx/sites-available/openinnovation.example.com.conf` | 生产调试环境站点配置       |
+| `deploy/systemd/innovation-platform.service`                         | 仓库内 systemd 样例        |
+| `deploy/nginx/innovation.example.com.conf`                   | 仓库内 nginx 样例          |
+| `.env.local` / `.env`                                                | 环境变量源文件             |
+| `.next/standalone/.env*`                                             | 构建后的运行态环境变量副本 |
 
 ## 7. 高风险注意事项
 
-- `.env`、`.env.local` 和 `.next/standalone/.env*` 都应视为敏感文件
-- 当前项目与其他项目同机混部，改 Nginx 配置前必须确认不会误伤其他域名
-- 当前没有独立健康检查接口，运维主要依赖首页、登录页、Dashboard 和 API 验活
-- 直接改数据库会绕过 Payload 校验、Hook 与权限控制，除非抢修，不建议直接写表
+1. `.env`、`.env.local` 和 `.next/standalone/.env*` 都应视为敏感文件。
+2. 当前项目与其他项目可能同机混部，改 Nginx 配置前必须确认不会误伤其他域名。
+3. 当前没有独立健康检查接口，运维主要依赖首页、登录页、Dashboard 和关键 API 验活。
+4. 直接改数据库会绕过 Payload 校验、Hook 与权限控制，除非抢修，不建议直接写表。
+5. 生产环境部署必须经过明确授权，不得默认把本机最新代码直接覆盖到 `10.0.0.1`。

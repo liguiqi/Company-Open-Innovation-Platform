@@ -1,6 +1,6 @@
 # Payload 后端数据库连接与数据查看
 
-更新日期：`2026-04-20`
+更新日期：`2026-04-30`
 
 ## 1. 先说结论
 
@@ -23,7 +23,8 @@
 - 内容维护
 - 字段核对
 - 附件与关系字段排查
-- 用户验证状态查看
+- 用户验证状态与最后访问时间查看
+- 评审时间线查看
 
 ### 2.2 第二优先级：Payload REST / GraphQL
 
@@ -37,7 +38,9 @@
 
 ```bash
 curl http://127.0.0.1:3005/api/tech-needs?limit=5
-curl -X POST http://127.0.0.1:3005/api/graphql   -H 'Content-Type: application/json'   -d '{"query":"query { TechNeeds(limit: 3) { docs { id title needId status } } }"}'
+curl -X POST http://127.0.0.1:3005/api/graphql \
+  -H 'Content-Type: application/json' \
+  -d '{"query":"query { TechNeeds(limit: 3) { docs { id title needId status } } }"}'
 ```
 
 ### 2.3 第三优先级：直接 PostgreSQL
@@ -46,7 +49,7 @@ curl -X POST http://127.0.0.1:3005/api/graphql   -H 'Content-Type: application/j
 
 - DBA / 运维排障
 - 确认真实表结构
-- 看原始数据、关系表、JSONB 字段
+- 看原始数据、关系表、时间线表和 JSON 富文本
 
 ## 3. 如何连接 PostgreSQL
 
@@ -69,18 +72,20 @@ docker compose exec -T postgres psql -U payload -d innovation_platform
 
 ## 4. 主表与典型含义
 
-| 表名                  | 含义               |
-| --------------------- | ------------------ |
-| `users`               | 平台用户           |
-| `user_groups`         | 用户组             |
-| `tech_needs`          | 技术需求           |
-| `proposals`           | 创新方案           |
-| `proposals_rels`      | 方案与附件等关系表 |
-| `partners`            | 生态伙伴           |
-| `case_studies`        | 联合案例           |
-| `media`               | 图片与文档附件     |
-| `payload_migrations`  | Payload 迁移记录   |
-| `payload_preferences` | Payload 偏好设置   |
+| 表名                        | 含义                 |
+| --------------------------- | -------------------- |
+| `users`                     | 平台用户             |
+| `user_groups`               | 用户组               |
+| `tech_needs`                | 技术需求             |
+| `proposals`                 | 创新方案             |
+| `proposals_review_timeline` | 方案评审时间线       |
+| `proposals_rels`            | 方案与附件等关系表   |
+| `partners`                  | 生态伙伴             |
+| `case_studies`              | 联合案例             |
+| `media`                     | 图片与文档附件       |
+| `payload_migrations`        | Payload 迁移记录     |
+| `payload_preferences`       | Payload 偏好设置     |
+| `payload_folders`           | Media 文件夹与浏览树 |
 
 进入 `psql` 后先执行：
 
@@ -90,10 +95,20 @@ docker compose exec -T postgres psql -U payload -d innovation_platform
 
 ## 5. 常用 SQL 查询
 
-### 5.1 查用户
+### 5.1 查用户与最后访问时间
 
 ```sql
-SELECT id, email, phone, role, username, name, company, email_verified_at, phone_verified_at
+SELECT
+  id,
+  email,
+  phone,
+  role,
+  username,
+  name,
+  company,
+  email_verified_at,
+  phone_verified_at,
+  last_access_at
 FROM users
 ORDER BY id DESC
 LIMIT 20;
@@ -102,7 +117,7 @@ LIMIT 20;
 ### 5.2 查需求
 
 ```sql
-SELECT id, need_id, title, status
+SELECT id, need_id, title, status, priority, domain, published_at
 FROM tech_needs
 ORDER BY id DESC
 LIMIT 20;
@@ -111,13 +126,27 @@ LIMIT 20;
 ### 5.3 查方案
 
 ```sql
-SELECT id, title, status, submitted_by_id
+SELECT id, title, status, submitted_by_id, reviewed_by_id, updated_at
 FROM proposals
 ORDER BY id DESC
 LIMIT 20;
 ```
 
-### 5.4 查方案附件
+### 5.4 查方案评审时间线
+
+```sql
+SELECT
+  _parent_id AS proposal_id,
+  actor_name,
+  actor_role,
+  occurred_at,
+  status,
+  notes
+FROM proposals_review_timeline
+ORDER BY _parent_id DESC, _order ASC;
+```
+
+### 5.5 查方案附件
 
 ```sql
 SELECT
@@ -125,7 +154,10 @@ SELECT
   p.title,
   m.id AS media_id,
   m.filename,
-  m.mime_type
+  m.mime_type,
+  m.module,
+  m.asset_category,
+  m.storage_key
 FROM proposals p
 LEFT JOIN proposals_rels pr
   ON pr.parent_id = p.id
@@ -172,8 +204,8 @@ const proposals = await payload.find({
 ## 8. 直接查库时必须知道的风险
 
 1. 直接 SQL 不会走 Payload 访问控制
-2. 不会触发 Hook、邮件通知、短信逻辑和附件权限逻辑
-3. 直接改表容易破坏关系表和文件关联
+2. 不会触发 Hook、邮件通知、短信逻辑、访问记录刷新和附件权限逻辑
+3. 直接改表容易破坏关系表、文件关联和时间线完整性
 
 因此：
 
@@ -189,5 +221,6 @@ docker compose exec -T postgres psql -U payload -d innovation_platform
 
 docker compose exec -T postgres psql -U payload -d innovation_platform -c '\dt'
 
-docker compose exec -T postgres psql -U payload -d innovation_platform   -c "SELECT id, email, phone, role, username FROM users ORDER BY id DESC LIMIT 20;"
+docker compose exec -T postgres psql -U payload -d innovation_platform \
+  -c "SELECT id, email, phone, role, username, last_access_at FROM users ORDER BY id DESC LIMIT 20;"
 ```
