@@ -47,7 +47,7 @@ export async function POST(request: Request) {
   })
 
   if (existingEmail.docs[0]) {
-    return NextResponse.json({ error: '该邮箱已注册' }, { status: 409 })
+    return NextResponse.json({ error: '验证码发送失败，请稍后重试' }, { status: 409 })
   }
 
   const code = String(Math.floor(100000 + Math.random() * 900000))
@@ -55,7 +55,7 @@ export async function POST(request: Request) {
   const emailSkipped = Boolean(emailResult && 'skipped' in emailResult)
 
   if (emailSkipped && !appEnv.isDevelopment) {
-    return NextResponse.json({ error: '邮箱验证码发送失败，请稍后重试' }, { status: 503 })
+    return NextResponse.json({ error: '验证码发送失败，请稍后重试' }, { status: 503 })
   }
 
   await setCachedValue(buildEmailCodeKey(email), code, 300)
@@ -63,8 +63,6 @@ export async function POST(request: Request) {
   return NextResponse.json({
     debugCode: appEnv.isDevelopment && emailSkipped ? code : undefined,
     message: '邮箱验证码已发送，请在 5 分钟内完成验证',
-    mocked: emailSkipped,
     ok: true,
-    provider: emailSkipped ? 'mock' : 'smtp',
   })
 }
