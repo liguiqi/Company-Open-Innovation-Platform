@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server'
 
+import { getRequesterIP } from '@/lib/auth'
 import { getPayloadClient } from '@/lib/payload'
 import { resolveLoginEmail } from '@/lib/data'
 import { loginSchema } from '@/lib/validators'
 import { createAuthCookie } from '@/lib/auth'
+import { loginAccountLimiter, loginIpLimiter } from '@/services/rate-limit'
 
 export async function POST(request: Request) {
   const body = await request.json()
@@ -16,10 +18,24 @@ export async function POST(request: Request) {
     )
   }
 
+  const ip = getRequesterIP(request)
+
+  try {
+    await loginIpLimiter.consume(ip)
+  } catch {
+    return NextResponse.json({ error: '登录尝试过于频繁，请15分钟后再试' }, { status: 429 })
+  }
+
   const email = await resolveLoginEmail(parsed.data.identifier)
 
   if (!email) {
     return NextResponse.json({ error: '账号不存在' }, { status: 404 })
+  }
+
+  try {
+    await loginAccountLimiter.consume(email)
+  } catch {
+    return NextResponse.json({ error: '该账号登录尝试过多，请15分钟后再试' }, { status: 429 })
   }
 
   try {
