@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server'
 import { readMediaFile } from '@/lib/media'
 import { getPayloadClient } from '@/lib/payload'
 
+const ALLOWED_MODULES = new Set(['partners', 'case-studies', 'tech-needs'])
+
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const payload = await getPayloadClient()
@@ -15,7 +17,12 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     })
     .catch(() => null)
 
-  if (!media || media.purpose !== 'image' || !media.filename) {
+  if (
+    !media ||
+    media.purpose !== 'image' ||
+    !media.filename ||
+    !ALLOWED_MODULES.has(media.module)
+  ) {
     return NextResponse.json({ error: '媒体文件不存在' }, { status: 404 })
   }
 
