@@ -78,6 +78,11 @@ export const Users: CollectionConfig = {
       name: 'role',
       type: 'select',
       defaultValue: 'viewer',
+      access: {
+        create: ({ req }) => req.user?.role === 'admin',
+        read: () => true,
+        update: ({ req }) => req.user?.role === 'admin',
+      },
       options: [
         { label: '管理员', value: 'admin' },
         { label: '评审员', value: 'reviewer' },
