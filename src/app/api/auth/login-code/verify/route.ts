@@ -81,10 +81,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         action: 'register',
-        error:
-          identifierType === 'email'
-            ? '该邮箱账号未注册，请先创建合作伙伴账号'
-            : '该手机账号未注册，请先创建合作伙伴账号',
+        error: '验证码错误或已过期',
         identifier: normalizedIdentifier,
         identifierType,
         redirectTo:

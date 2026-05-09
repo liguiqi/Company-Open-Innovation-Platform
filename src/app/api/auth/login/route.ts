@@ -29,7 +29,7 @@ export async function POST(request: Request) {
   const email = await resolveLoginEmail(parsed.data.identifier)
 
   if (!email) {
-    return NextResponse.json({ error: '账号不存在' }, { status: 404 })
+    return NextResponse.json({ error: '邮箱/手机号或密码错误' }, { status: 401 })
   }
 
   try {
