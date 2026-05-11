@@ -61,7 +61,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         action: 'register',
-        error: '该手机账号未注册，请先创建合作伙伴账号',
+        error: '验证码错误或已过期',
         identifier: phone,
         identifierType: 'phone',
         redirectTo: `/register?phone=${encodeURIComponent(phone)}`,

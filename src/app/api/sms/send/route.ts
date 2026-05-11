@@ -22,10 +22,7 @@ export async function POST(request: Request) {
   const ip = getRequesterIP(request)
 
   if (!appEnv.smsEnabled && !appEnv.isDevelopment) {
-    return NextResponse.json(
-      { error: '短信服务尚未完成配置，请联系管理员补充短信模板后再试' },
-      { status: 503 },
-    )
+    return NextResponse.json({ error: '验证码发送失败，请稍后重试' }, { status: 503 })
   }
 
   try {
@@ -40,17 +37,11 @@ export async function POST(request: Request) {
   const resolvedCode = smsResult.verifyCode || fallbackCode
 
   if (mocked && !appEnv.isDevelopment) {
-    return NextResponse.json(
-      { error: '短信服务尚未完成配置，请联系管理员补充短信模板后再试' },
-      { status: 503 },
-    )
+    return NextResponse.json({ error: '验证码发送失败，请稍后重试' }, { status: 503 })
   }
 
   if (smsResult.provider === 'aliyun-dypnsapi' && smsResult.success === false) {
-    return NextResponse.json(
-      { error: smsResult.message || '短信验证码发送失败，请稍后再试' },
-      { status: 502 },
-    )
+    return NextResponse.json({ error: '验证码发送失败，请稍后重试' }, { status: 502 })
   }
 
   await setCachedValue(`sms:otp:${phone}`, resolvedCode, 300)
@@ -59,7 +50,5 @@ export async function POST(request: Request) {
     debugCode: appEnv.isDevelopment ? resolvedCode : undefined,
     message: '验证码已发送，请在 5 分钟内完成验证',
     ok: true,
-    mocked,
-    provider: smsResult.provider,
   })
 }

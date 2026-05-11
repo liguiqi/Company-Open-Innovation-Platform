@@ -162,3 +162,18 @@ export const appEnv = {
     Boolean(env.SMTP_USER) &&
     Boolean(env.SMTP_PASS),
 }
+
+if (appEnv.isProduction) {
+  const missing: string[] = []
+
+  if (!appEnv.databaseURL) missing.push('DATABASE_URI')
+  if (!env.PAYLOAD_SECRET || env.PAYLOAD_SECRET === 'development-only-payload-secret-please-change')
+    missing.push('PAYLOAD_SECRET')
+  if (!env.NEXT_PUBLIC_SERVER_URL) missing.push('NEXT_PUBLIC_SERVER_URL')
+
+  if (missing.length > 0) {
+    throw new Error(
+      `[FATAL] Missing required production environment variables: ${missing.join(', ')}. Refusing to start.`,
+    )
+  }
+}

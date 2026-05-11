@@ -24,3 +24,13 @@ export const ipVerifyLimiter = new RateLimiterMemory({
   duration: 60 * 10,
   points: 25,
 })
+
+export const loginIpLimiter = new RateLimiterMemory({
+  duration: 60 * 15,
+  points: 10,
+})
+
+export const loginAccountLimiter = new RateLimiterMemory({
+  duration: 60 * 15,
+  points: 5,
+})
