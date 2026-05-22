@@ -39,7 +39,7 @@ An open-source enterprise innovation collaboration platform built with **Next.js
   </tr>
   <tr>
     <td align="center"><b>Innovation Workspace dark-mode</b></td>
-    <td align="center"><b>Admin Panel dark-mode</b></td>
+    <td align="center"><b>Public Homepage dark-mode</b></td>
   </tr>
   <tr>
     <td><img src="docs/assets/platform7-wechat_2026-05-22_095328_491.png" alt="Innovation Workspace" width="480"/></td>
