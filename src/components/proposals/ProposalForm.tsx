@@ -118,7 +118,7 @@ export function ProposalForm({
   return (
     <form className="theme-dashboard-panel space-y-8 rounded-[1rem] p-8" onSubmit={onSubmit}>
       <div className="grid gap-6 md:grid-cols-2">
-        <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+        <label className="space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
           方案类型
           <select
             className="theme-input w-full rounded-lg px-4 py-3"
@@ -132,7 +132,7 @@ export function ProposalForm({
           </select>
         </label>
 
-        <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+        <label className="space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
           关联需求
           <select
             className="theme-input w-full rounded-lg px-4 py-3"
@@ -150,7 +150,7 @@ export function ProposalForm({
         </label>
       </div>
 
-      <div className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+      <div className="space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
         <label>方案标题</label>
         <input
           className="theme-input w-full rounded-lg px-4 py-3"
@@ -164,7 +164,7 @@ export function ProposalForm({
         />
       </div>
 
-      <div className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+      <div className="space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
         <label>技术描述</label>
         <textarea
           className="theme-input min-h-44 w-full rounded-[0.75rem] px-4 py-3"
@@ -174,42 +174,42 @@ export function ProposalForm({
         />
       </div>
 
-      <div className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+      <div className="space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
         <label>附件上传</label>
         <input
           accept=".txt,.pdf,.ppt,.pptx,.doc,.docx,.zip,.rar,text/plain,application/zip,application/x-rar-compressed,application/vnd.rar"
-          className="block w-full rounded-[0.75rem] border border-dashed border-[color:var(--ht-input-border)] bg-[var(--ht-input-bg)] px-4 py-4 text-[var(--ht-text-secondary)]"
+          className="block w-full rounded-[0.75rem] border border-dashed border-[color:var(--oip-input-border)] bg-[var(--oip-input-bg)] px-4 py-4 text-[var(--oip-text-secondary)]"
           multiple
           name="attachments"
           onChange={onAttachmentChange}
           type="file"
         />
-        <p className="text-xs text-[var(--ht-text-muted)]">
+        <p className="text-xs text-[var(--oip-text-muted)]">
           支持 TXT / PDF / PPT / Word / ZIP / RAR，可一次选择多个文件；单文件建议不超过 100MB。
         </p>
 
         {selectedAttachments.length ? (
-          <div className="overflow-hidden rounded-[0.75rem] border border-[color:var(--ht-border-soft)] bg-[var(--ht-card-soft)]">
-            <div className="grid grid-cols-[minmax(0,1fr)_88px_64px] gap-2 border-b border-[color:var(--ht-border-soft)] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--ht-text-muted)]">
+          <div className="overflow-hidden rounded-[0.75rem] border border-[color:var(--oip-border-soft)] bg-[var(--oip-card-soft)]">
+            <div className="grid grid-cols-[minmax(0,1fr)_88px_64px] gap-2 border-b border-[color:var(--oip-border-soft)] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--oip-text-muted)]">
               <span>附件名称</span>
               <span className="text-right">大小</span>
               <span className="text-right">操作</span>
             </div>
 
-            <div className="divide-y divide-[color:var(--ht-border-soft)]">
+            <div className="divide-y divide-[color:var(--oip-border-soft)]">
               {selectedAttachments.map(({ file, id }) => (
                 <div
                   key={id}
-                  className="grid grid-cols-[minmax(0,1fr)_88px_64px] items-center gap-2 px-3 py-2 text-sm text-[var(--ht-text-secondary)]"
+                  className="grid grid-cols-[minmax(0,1fr)_88px_64px] items-center gap-2 px-3 py-2 text-sm text-[var(--oip-text-secondary)]"
                 >
-                  <span className="truncate font-medium text-[var(--ht-text-primary)]">
+                  <span className="truncate font-medium text-[var(--oip-text-primary)]">
                     {file.name}
                   </span>
-                  <span className="text-right text-xs text-[var(--ht-text-muted)]">
+                  <span className="text-right text-xs text-[var(--oip-text-muted)]">
                     {formatFileSize(file.size)}
                   </span>
                   <button
-                    className="justify-self-end rounded-md border border-[color:var(--ht-border-soft)] px-2 py-1 text-[11px] font-semibold text-[var(--ht-text-secondary)] transition hover:border-rose-300 hover:text-rose-500"
+                    className="justify-self-end rounded-md border border-[color:var(--oip-border-soft)] px-2 py-1 text-[11px] font-semibold text-[var(--oip-text-secondary)] transition hover:border-rose-300 hover:text-rose-500"
                     onClick={() => {
                       setSelectedAttachments((current) =>
                         current.filter((attachment) => attachment.id !== id),
@@ -227,11 +227,11 @@ export function ProposalForm({
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+        <label className="space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
           联系人姓名
           <input className="theme-input w-full rounded-lg px-4 py-3" name="contactName" required />
         </label>
-        <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+        <label className="space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
           联系邮箱
           <input
             className="theme-input w-full rounded-lg px-4 py-3"
@@ -240,7 +240,7 @@ export function ProposalForm({
             type="email"
           />
         </label>
-        <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+        <label className="space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
           公司名称
           <input
             className="theme-input w-full rounded-lg px-4 py-3"
@@ -253,9 +253,9 @@ export function ProposalForm({
       <div
         className="rounded-[0.75rem] border p-5 text-sm leading-7"
         style={{
-          background: 'var(--ht-warning-bg)',
-          borderColor: 'var(--ht-warning-border)',
-          color: 'var(--ht-warning-text)',
+          background: 'var(--oip-warning-bg)',
+          borderColor: 'var(--oip-warning-border)',
+          color: 'var(--oip-warning-text)',
         }}
       >
         <p className="font-semibold">知识产权保护声明</p>
@@ -269,9 +269,9 @@ export function ProposalForm({
         <p
           className="rounded-lg border px-4 py-3 text-sm"
           style={{
-            background: 'var(--ht-danger-bg)',
-            borderColor: 'var(--ht-danger-border)',
-            color: 'var(--ht-danger-text)',
+            background: 'var(--oip-danger-bg)',
+            borderColor: 'var(--oip-danger-border)',
+            color: 'var(--oip-danger-text)',
           }}
         >
           {error}

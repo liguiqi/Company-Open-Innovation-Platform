@@ -9,9 +9,9 @@ skinparam EntityBorderColor #0B5CAD
 skinparam EntityBackgroundColor #F8FBFF
 hide methods
 hide stereotypes
-footer HeT Open Innovation Platform | Generated at 20260422-164252
+footer Open Innovation Platform | Generated at 20260422-164252
 
-title HeT 开放创新平台 - 主要实体关系图
+title Open Innovation Platform - 主要实体关系图
 
 entity "users" as users {
   * id : number

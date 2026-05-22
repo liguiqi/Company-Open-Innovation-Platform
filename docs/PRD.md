@@ -1,4 +1,4 @@
-# HeT Open Innovation Platform
+# Open Innovation Platform
 
 > 文档类型：PRD + 当前落地说明
 > 文档版本：`2026-04-30 / package 2.0.0`
@@ -12,7 +12,7 @@
 
 ### 1.1 项目定位
 
-本项目是深圳Open Innovation智能控制股份有限公司面向全球创新伙伴的开放创新平台，承载以下核心业务：
+本项目是深圳Open Innovation智能控制股份有限公司面向全球创新伙伴的Open Innovation Platform，承载以下核心业务：
 
 1. 技术需求公开发布与展示。
 2. 合作伙伴注册、登录与身份验证。

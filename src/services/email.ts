@@ -59,7 +59,7 @@ export async function sendEmail({
 
   try {
     return await transporter.sendMail({
-      from: `${appEnv.SMTP_FROM_NAME || 'H&T Innovation Platform'} <${appEnv.SMTP_FROM_ADDRESS || appEnv.SMTP_USER}>`,
+      from: `${appEnv.SMTP_FROM_NAME || 'Open Innovation Platform'} <${appEnv.SMTP_FROM_ADDRESS || appEnv.SMTP_USER}>`,
       html,
       subject,
       text,

@@ -36,19 +36,19 @@ export default async function NeedDetailPage({ params }: { params: Promise<{ id:
         <div className="flex flex-wrap items-center gap-4">
           <NeedPriorityBadge priority={need.priority} />
           <NeedStatusBadge status={need.status} />
-          <span className="text-sm font-mono text-[var(--ht-text-muted)]">{need.needId}</span>
-          <span className="text-sm text-[var(--ht-text-muted)]">
+          <span className="text-sm font-mono text-[var(--oip-text-muted)]">{need.needId}</span>
+          <span className="text-sm text-[var(--oip-text-muted)]">
             {getNeedDomainLabel(need.domain)}
           </span>
-          <span className="text-sm text-[var(--ht-text-muted)]">
+          <span className="text-sm text-[var(--oip-text-muted)]">
             发布日期：{formatDate(need.publishedAt)}
           </span>
         </div>
 
-        <h1 className="mt-6 font-display text-5xl font-semibold text-[var(--ht-text-primary)]">
+        <h1 className="mt-6 font-display text-5xl font-semibold text-[var(--oip-text-primary)]">
           {need.title}
         </h1>
-        <p className="mt-4 text-lg text-[var(--ht-text-muted)]">
+        <p className="mt-4 text-lg text-[var(--oip-text-muted)]">
           {need.productLine || '开放技术方向'}
         </p>
 

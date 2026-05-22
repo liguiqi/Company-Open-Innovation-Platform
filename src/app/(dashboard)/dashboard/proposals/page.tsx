@@ -53,10 +53,10 @@ export default async function ProposalsPage() {
             <div key={proposal.id} className="theme-dashboard-panel rounded-[1rem] p-6">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <h3 className="text-2xl font-semibold text-[var(--ht-text-primary)]">
+                  <h3 className="text-2xl font-semibold text-[var(--oip-text-primary)]">
                     {proposal.title}
                   </h3>
-                  <p className="mt-2 text-sm text-[var(--ht-text-muted)]">
+                  <p className="mt-2 text-sm text-[var(--oip-text-muted)]">
                     {proposalTypeMap[proposal.type]} · {proposal.contactCompany} · 提交时间{' '}
                     {formatDate(proposal.createdAt)}
                   </p>
@@ -64,7 +64,7 @@ export default async function ProposalsPage() {
                 <ProposalStatusBadge status={proposal.status} />
               </div>
 
-              <div className="mt-5 flex flex-wrap gap-4 text-sm text-[var(--ht-text-muted)]">
+              <div className="mt-5 flex flex-wrap gap-4 text-sm text-[var(--oip-text-muted)]">
                 <span>联系人：{proposal.contactName}</span>
                 <span>邮箱：{proposal.contactEmail}</span>
                 {proposal.relatedNeed && typeof proposal.relatedNeed !== 'number' ? (

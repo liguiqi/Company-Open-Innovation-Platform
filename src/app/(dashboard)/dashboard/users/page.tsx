@@ -29,13 +29,13 @@ export default async function UsersAdminPage() {
           <article key={user.id} className="theme-dashboard-panel rounded-[1rem] p-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <h3 className="text-xl font-semibold text-[var(--ht-text-primary)]">
+                <h3 className="text-xl font-semibold text-[var(--oip-text-primary)]">
                   {user.name}{' '}
-                  <span className="text-sm font-normal text-[var(--ht-text-muted)]">
+                  <span className="text-sm font-normal text-[var(--oip-text-muted)]">
                     (@{user.username})
                   </span>
                 </h3>
-                <p className="mt-2 text-sm text-[var(--ht-text-muted)]">
+                <p className="mt-2 text-sm text-[var(--oip-text-muted)]">
                   {user.email} · {user.phone || '未绑定手机'} · {roleLabelMap[user.role]}
                 </p>
               </div>

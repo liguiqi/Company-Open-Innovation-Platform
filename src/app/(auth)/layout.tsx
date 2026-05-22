@@ -2,7 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { RouteTransition } from '@/components/shared/RouteTransition'
-import { HetBrandLogo } from '@/components/shared/HetBrandLogo'
+import { BrandLogo } from '@/components/shared/BrandLogo'
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -19,16 +19,16 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
       <div className="container-shell relative flex min-h-screen flex-col py-8 lg:py-12">
         <div className="grid flex-1 w-full items-center gap-10 lg:grid-cols-[minmax(0,1fr)_520px] lg:gap-14">
-          <div className="space-y-10 text-[var(--ht-auth-text)]">
+          <div className="space-y-10 text-[var(--oip-auth-text)]">
             <div className="space-y-4">
               <Link className="inline-flex" href="/">
-                <HetBrandLogo className="theme-logo-adaptive w-[180px] md:w-[210px]" priority />
+                <BrandLogo className="theme-logo-adaptive w-[180px] md:w-[210px]" priority />
               </Link>
               <div className="space-y-2">
-                <p className="text-xs uppercase tracking-[0.42em] text-[var(--ht-auth-muted)]">
+                <p className="text-xs uppercase tracking-[0.42em] text-[var(--oip-auth-muted)]">
                   Open Innovation Platform
                 </p>
-                <p className="text-sm font-semibold text-[var(--ht-auth-text)]">
+                <p className="text-sm font-semibold text-[var(--oip-auth-text)]">
                   Open Innovation Platform
                 </p>
               </div>
@@ -40,7 +40,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                 <br />
                 高效导入。
               </h1>
-              <p className="max-w-xl text-base leading-8 text-[var(--ht-auth-muted)] md:text-lg">
+              <p className="max-w-xl text-base leading-8 text-[var(--oip-auth-muted)] md:text-lg">
                 从公开需求发布、合作伙伴方案提交到内部评审流转，登录后即可进入与官网视觉一致的创新协作入口。
               </p>
             </div>
@@ -64,7 +64,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         <p className="theme-auth-footer mt-8 text-center text-xs">
-          © 2026 Shenzhen HET Intelligent Control Co., Ltd. All rights reserved. Powered by LGQ
+          © 2026 Open Innovation Platform All rights reserved. Open Innovation Platform
           {' | '}Ver 2026.04
         </p>
       </div>

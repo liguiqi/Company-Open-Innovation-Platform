@@ -66,7 +66,7 @@ export function ProposalReviewForm({
   return (
     <form action={onSubmit} className="theme-dashboard-panel space-y-5 rounded-[1rem] p-6">
       <div className="grid gap-4 md:grid-cols-[220px_1fr]">
-        <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+        <label className="space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
           状态流转
           <select
             className="theme-input w-full rounded-lg px-4 py-3"
@@ -81,7 +81,7 @@ export function ProposalReviewForm({
           </select>
         </label>
 
-        <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+        <label className="space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
           评审意见
           <textarea
             className="theme-input min-h-36 w-full rounded-[0.75rem] px-4 py-3"
@@ -98,9 +98,9 @@ export function ProposalReviewForm({
         <p
           className="rounded-lg border px-4 py-3 text-sm"
           style={{
-            background: 'var(--ht-danger-bg)',
-            borderColor: 'var(--ht-danger-border)',
-            color: 'var(--ht-danger-text)',
+            background: 'var(--oip-danger-bg)',
+            borderColor: 'var(--oip-danger-border)',
+            color: 'var(--oip-danger-text)',
           }}
         >
           {error}

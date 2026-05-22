@@ -17,7 +17,7 @@
 
 - 生产访问域名：`https://openinnovation.example.com`
 - 本机开发域名：`https://innovation.example.com`
-- 生产服务目录：`/home/user/Workprojects/open-innovation-platform`
+- 生产服务目录：`/home/deploy/apps/open-innovation-platform`
 - 生产 systemd 服务：`innovation-platform.service`
 - 生产应用端口：`3005`
 
@@ -62,7 +62,7 @@
 
 已核对到的生产环境关键事实：
 
-- 实际 systemd 工作目录为 `/home/user/Workprojects/open-innovation-platform`
+- 实际 systemd 工作目录为 `/home/deploy/apps/open-innovation-platform`
 - `innovation-platform.service` 当前为 `active (running)`
 - 生产 Nginx 站点文件为 `/etc/nginx/sites-available/openinnovation.example.com.conf`
 - 生产 PostgreSQL / Redis 通过项目根目录 `docker compose` 运行
@@ -167,7 +167,7 @@ scp /tmp/open-innovation-platform-main-20260427-210753.bundle \
 
 ### 7.2 生产机备份
 
-在 `/home/user/Workprojects/open-innovation-platform` 内执行：
+在 `/home/deploy/apps/open-innovation-platform` 内执行：
 
 ```bash
 tar --exclude='./node_modules' \
@@ -214,7 +214,7 @@ sudo nginx -t
 ### 7.4 实际部署结果
 
 - 实际部署提交：`1d17b93661fe1802d13abadcb1a1c2f2c6f29bc4`
-- 生产服务目录：`/home/user/Workprojects/open-innovation-platform`
+- 生产服务目录：`/home/deploy/apps/open-innovation-platform`
 - 生产域名保持不变：`https://openinnovation.example.com`
 - 本机开发域名保持不变：`https://innovation.example.com`
 - `pnpm media:organize` 实际回填：`25` 条媒体记录

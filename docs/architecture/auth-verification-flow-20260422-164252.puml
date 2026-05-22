@@ -15,9 +15,9 @@ skinparam databaseBorderColor #0B5CAD
 skinparam databaseBackgroundColor #F2F8FF
 skinparam noteBackgroundColor #FFFBEA
 skinparam noteBorderColor #D4A72C
-footer HeT Open Innovation Platform | Generated at 20260422-164252
+footer Open Innovation Platform | Generated at 20260422-164252
 
-title HeT 开放创新平台 - 认证与验证码业务流
+title Open Innovation Platform - 认证与验证码业务流
 
 autonumber
 actor "用户" as User

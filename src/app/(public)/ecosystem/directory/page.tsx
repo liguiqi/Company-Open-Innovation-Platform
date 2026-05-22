@@ -33,9 +33,9 @@ export default async function PartnerDirectoryPage() {
           <section key={group.tier} className="space-y-5">
             <div className="flex items-center gap-3">
               <span className="h-6 w-1 rounded-full bg-ht-blue" />
-              <h3 className="text-2xl font-semibold text-[var(--ht-text-primary)]">
+              <h3 className="text-2xl font-semibold text-[var(--oip-text-primary)]">
                 {group.meta.title}
-                <span className="ml-2 text-lg font-medium text-[var(--ht-text-muted)]">
+                <span className="ml-2 text-lg font-medium text-[var(--oip-text-muted)]">
                   ({group.meta.subtitle})
                 </span>
               </h3>

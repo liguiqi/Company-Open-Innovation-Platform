@@ -1,4 +1,4 @@
-export const ROUTE_TRANSITION_EVENT = 'het:route-transition-start'
+export const ROUTE_TRANSITION_EVENT = 'oip:route-transition-start'
 
 export function emitRouteTransitionStart() {
   if (typeof window === 'undefined') {

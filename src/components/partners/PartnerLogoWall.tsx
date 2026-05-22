@@ -81,8 +81,8 @@ export function PartnerLogoCard({
     'group flex items-center justify-center overflow-hidden border px-4 transition-all duration-200',
     compact ? 'h-[5.25rem] rounded-[0.7rem]' : 'h-[5.9rem] rounded-[0.8rem]',
     tone === 'contrast'
-      ? 'border-white/12 bg-white/[0.04] text-[var(--ht-contrast-muted)] hover:border-sky-300/30 hover:bg-white/[0.07] hover:text-[var(--ht-contrast-text)]'
-      : 'border-[color:var(--ht-border-soft)] bg-[var(--ht-card-solid)] text-[var(--ht-text-muted)] shadow-[0_12px_28px_rgba(15,23,42,0.04)] hover:border-[color:var(--ht-border-strong)] hover:text-[var(--ht-text-primary)]',
+      ? 'border-white/12 bg-white/[0.04] text-[var(--oip-contrast-muted)] hover:border-sky-300/30 hover:bg-white/[0.07] hover:text-[var(--oip-contrast-text)]'
+      : 'border-[color:var(--oip-border-soft)] bg-[var(--oip-card-solid)] text-[var(--oip-text-muted)] shadow-[0_12px_28px_rgba(15,23,42,0.04)] hover:border-[color:var(--oip-border-strong)] hover:text-[var(--oip-text-primary)]',
     className,
   )
 

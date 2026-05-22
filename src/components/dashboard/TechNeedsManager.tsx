@@ -245,38 +245,38 @@ export function TechNeedsManager({ needs, role }: { needs: DashboardNeed[]; role
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div className="theme-dashboard-panel rounded-xl p-5">
-          <div className="flex items-center gap-3 text-[var(--ht-text-secondary)]">
+          <div className="flex items-center gap-3 text-[var(--oip-text-secondary)]">
             <ClipboardList size={16} />
             <span className="text-sm">需求总数</span>
           </div>
-          <p className="mt-4 font-display text-4xl font-semibold text-[var(--ht-text-primary)]">
+          <p className="mt-4 font-display text-4xl font-semibold text-[var(--oip-text-primary)]">
             {counts.all}
           </p>
         </div>
         <div className="theme-dashboard-panel rounded-xl p-5">
-          <div className="flex items-center gap-3 text-[var(--ht-text-secondary)]">
+          <div className="flex items-center gap-3 text-[var(--oip-text-secondary)]">
             <Sparkles size={16} />
             <span className="text-sm">开放中</span>
           </div>
-          <p className="mt-4 font-display text-4xl font-semibold text-[var(--ht-text-primary)]">
+          <p className="mt-4 font-display text-4xl font-semibold text-[var(--oip-text-primary)]">
             {counts.open}
           </p>
         </div>
         <div className="theme-dashboard-panel rounded-xl p-5">
-          <div className="flex items-center gap-3 text-[var(--ht-text-secondary)]">
+          <div className="flex items-center gap-3 text-[var(--oip-text-secondary)]">
             <FolderKanban size={16} />
             <span className="text-sm">推进中</span>
           </div>
-          <p className="mt-4 font-display text-4xl font-semibold text-[var(--ht-text-primary)]">
+          <p className="mt-4 font-display text-4xl font-semibold text-[var(--oip-text-primary)]">
             {counts.inProgress}
           </p>
         </div>
         <div className="theme-dashboard-panel rounded-xl p-5">
-          <div className="flex items-center gap-3 text-[var(--ht-text-secondary)]">
+          <div className="flex items-center gap-3 text-[var(--oip-text-secondary)]">
             <CalendarDays size={16} />
             <span className="text-sm">已关闭</span>
           </div>
-          <p className="mt-4 font-display text-4xl font-semibold text-[var(--ht-text-primary)]">
+          <p className="mt-4 font-display text-4xl font-semibold text-[var(--oip-text-primary)]">
             {counts.closed}
           </p>
         </div>
@@ -294,7 +294,7 @@ export function TechNeedsManager({ needs, role }: { needs: DashboardNeed[]; role
                   key={need.id}
                   className={`theme-dashboard-panel w-full rounded-xl p-6 text-left transition ${
                     isActive
-                      ? 'border-[color:var(--ht-primary)] shadow-[0_0_0_1px_var(--ht-primary)]'
+                      ? 'border-[color:var(--oip-primary)] shadow-[0_0_0_1px_var(--oip-primary)]'
                       : ''
                   }`}
                   onClick={() => switchToEditMode(need)}
@@ -305,14 +305,14 @@ export function TechNeedsManager({ needs, role }: { needs: DashboardNeed[]; role
                       <div className="flex flex-wrap items-center gap-2">
                         <NeedPriorityBadge priority={need.priority} />
                         <NeedStatusBadge status={need.status} />
-                        <span className="text-xs font-mono text-[var(--ht-text-muted)]">
+                        <span className="text-xs font-mono text-[var(--oip-text-muted)]">
                           {need.needId}
                         </span>
                       </div>
-                      <h3 className="mt-4 text-2xl font-semibold text-[var(--ht-text-primary)]">
+                      <h3 className="mt-4 text-2xl font-semibold text-[var(--oip-text-primary)]">
                         {need.title}
                       </h3>
-                      <p className="mt-2 text-sm text-[var(--ht-text-muted)]">
+                      <p className="mt-2 text-sm text-[var(--oip-text-muted)]">
                         {getNeedDomainLabel(need.domain)} · {need.productLine || '未指定产品线'} ·
                         发布日期 {formatDate(need.publishedAt)}
                       </p>
@@ -329,7 +329,7 @@ export function TechNeedsManager({ needs, role }: { needs: DashboardNeed[]; role
                       </Link>
                       {role === 'admin' ? (
                         <Link
-                          className="text-[var(--ht-text-secondary)]"
+                          className="text-[var(--oip-text-secondary)]"
                           href={`/admin/collections/tech-needs/${need.id}`}
                           rel="noreferrer"
                           target="_blank"
@@ -340,7 +340,7 @@ export function TechNeedsManager({ needs, role }: { needs: DashboardNeed[]; role
                     </div>
                   </div>
 
-                  <p className="mt-4 text-sm leading-7 text-[var(--ht-text-secondary)]">
+                  <p className="mt-4 text-sm leading-7 text-[var(--oip-text-secondary)]">
                     {truncateText(plainText || '暂无需求描述')}
                   </p>
                 </button>
@@ -348,8 +348,8 @@ export function TechNeedsManager({ needs, role }: { needs: DashboardNeed[]; role
             })
           ) : (
             <div className="theme-dashboard-panel rounded-xl p-6">
-              <h3 className="text-xl font-semibold text-[var(--ht-text-primary)]">暂无技术需求</h3>
-              <p className="mt-3 text-sm leading-7 text-[var(--ht-text-secondary)]">
+              <h3 className="text-xl font-semibold text-[var(--oip-text-primary)]">暂无技术需求</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--oip-text-secondary)]">
                 当前尚未录入公开需求，可以直接在右侧创建第一条技术需求。
               </p>
             </div>
@@ -359,13 +359,13 @@ export function TechNeedsManager({ needs, role }: { needs: DashboardNeed[]; role
         <form className="theme-dashboard-panel h-fit rounded-xl p-6" onSubmit={onSubmit}>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.24em] text-[var(--ht-text-muted)]">
+              <p className="text-xs uppercase tracking-[0.24em] text-[var(--oip-text-muted)]">
                 {mode === 'create' ? 'Create Need' : 'Update Need'}
               </p>
-              <h3 className="mt-2 text-2xl font-semibold text-[var(--ht-text-primary)]">
+              <h3 className="mt-2 text-2xl font-semibold text-[var(--oip-text-primary)]">
                 {mode === 'create' ? '创建技术需求' : '编辑技术需求'}
               </h3>
-              <p className="mt-2 text-sm text-[var(--ht-text-muted)]">
+              <p className="mt-2 text-sm text-[var(--oip-text-muted)]">
                 {selectedNeed?.needId
                   ? `当前编号：${selectedNeed.needId}`
                   : '保存后将自动生成 RD-年份-流水号'}
@@ -383,7 +383,7 @@ export function TechNeedsManager({ needs, role }: { needs: DashboardNeed[]; role
           </div>
 
           <div className="mt-6 space-y-5">
-            <label className="block space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+            <label className="block space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
               需求标题
               <input
                 className="theme-input w-full rounded-lg px-4 py-3"
@@ -394,7 +394,7 @@ export function TechNeedsManager({ needs, role }: { needs: DashboardNeed[]; role
             </label>
 
             <div className="grid gap-5 md:grid-cols-2">
-              <label className="block space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+              <label className="block space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
                 优先级
                 <select
                   className="theme-input w-full rounded-lg px-4 py-3"
@@ -409,7 +409,7 @@ export function TechNeedsManager({ needs, role }: { needs: DashboardNeed[]; role
                 </select>
               </label>
 
-              <label className="block space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+              <label className="block space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
                 需求状态
                 <select
                   className="theme-input w-full rounded-lg px-4 py-3"
@@ -426,7 +426,7 @@ export function TechNeedsManager({ needs, role }: { needs: DashboardNeed[]; role
             </div>
 
             <div className="grid gap-5 md:grid-cols-2">
-              <label className="block space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+              <label className="block space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
                 技术域
                 <select
                   className="theme-input w-full rounded-lg px-4 py-3"
@@ -441,7 +441,7 @@ export function TechNeedsManager({ needs, role }: { needs: DashboardNeed[]; role
                 </select>
               </label>
 
-              <label className="block space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+              <label className="block space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
                 发布日期
                 <input
                   className="theme-input w-full rounded-lg px-4 py-3"
@@ -452,7 +452,7 @@ export function TechNeedsManager({ needs, role }: { needs: DashboardNeed[]; role
               </label>
             </div>
 
-            <label className="block space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+            <label className="block space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
               产品线 / 业务线
               <input
                 className="theme-input w-full rounded-lg px-4 py-3"
@@ -462,7 +462,7 @@ export function TechNeedsManager({ needs, role }: { needs: DashboardNeed[]; role
               />
             </label>
 
-            <label className="block space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+            <label className="block space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
               需求描述
               <textarea
                 className="theme-input min-h-56 w-full rounded-lg px-4 py-3"

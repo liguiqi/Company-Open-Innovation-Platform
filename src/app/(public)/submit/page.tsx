@@ -26,7 +26,7 @@ export default async function SubmitPage({
             tone="contrast"
             title="提交您的创新方案"
           />
-          <div className="mt-10 space-y-5 text-sm leading-7 text-[var(--ht-contrast-muted)]">
+          <div className="mt-10 space-y-5 text-sm leading-7 text-[var(--oip-contrast-muted)]">
             <p>1. 使用邮箱密码或手机短信完成认证。</p>
             <p>2. 选择公开需求或开放式技术自荐类型。</p>
             <p>3. 填写技术摘要、联系人信息并上传附件。</p>
@@ -50,10 +50,10 @@ export default async function SubmitPage({
 
         <div className="theme-card rounded-[1rem] p-8">
           <p className="text-xs uppercase tracking-[0.35em] text-ht-light-blue">Notice</p>
-          <h2 className="mt-4 font-display text-4xl font-semibold text-[var(--ht-text-primary)]">
+          <h2 className="mt-4 font-display text-4xl font-semibold text-[var(--oip-text-primary)]">
             提交前说明
           </h2>
-          <div className="mt-6 space-y-4 text-sm leading-7 text-[var(--ht-text-secondary)]">
+          <div className="mt-6 space-y-4 text-sm leading-7 text-[var(--oip-text-secondary)]">
             <p>平台接受 TXT、PDF、PPT、Word、ZIP、RAR 等附件，单文件建议控制在 100MB 以内。</p>
             <p>评审时效通常为 3 至 5 个工作日，特殊需求会触发评审员加速流程。</p>
             <p>未签署 NDA 前，请勿直接上传源代码、未公开电路图或其他核心机密资料。</p>

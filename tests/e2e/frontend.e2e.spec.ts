@@ -11,7 +11,7 @@ test.describe('Frontend', () => {
   test('can go on homepage', async () => {
     await page.goto('http://localhost:3000')
 
-    await expect(page).toHaveTitle(/H&T Open Innovation Platform/)
+    await expect(page).toHaveTitle(/Open Innovation Platform/)
 
     const heading = page.locator('h1').first()
 

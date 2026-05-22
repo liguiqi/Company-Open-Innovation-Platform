@@ -51,7 +51,7 @@ export function AdminLoginLogo() {
   }, [])
 
   return (
-    <div aria-label="Open Innovation HeT" className="payload-brand-logo" role="img">
+    <div aria-label="Open Innovation OIP" className="payload-brand-logo" role="img">
       <img
         alt=""
         aria-hidden="true"
@@ -59,7 +59,7 @@ export function AdminLoginLogo() {
           'payload-brand-logo__image',
           theme === 'dark' && 'payload-brand-logo__image--inverted',
         )}
-        src="/branding/het-full-en.png"
+        src="/branding/brand-full-logo.png"
       />
     </div>
   )

@@ -8,7 +8,7 @@
 
 适用项目：
 
-- `HeT 开放创新平台`
+- `Open Innovation Platform`
 - 开发环境域名：`innovation.example.com`
 - 生产调试域名：`openinnovation.example.com`
 - 部署形态：`单机混部`

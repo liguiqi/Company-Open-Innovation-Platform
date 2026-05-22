@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-import { HetBrandLogo } from '@/components/shared/HetBrandLogo'
+import { BrandLogo } from '@/components/shared/BrandLogo'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { cn } from '@/lib/utils'
 
@@ -23,20 +23,20 @@ export function PublicHeader({ isLoggedIn }: { isLoggedIn: boolean }) {
       <div className="container-shell flex min-h-20 flex-wrap items-center justify-between gap-4 py-4">
         <div className="flex shrink-0 items-center gap-3">
           <Link className="flex items-center gap-3" href="/">
-            <HetBrandLogo className="theme-logo-adaptive w-[168px] lg:w-[182px]" priority />
-            <div className="h-9 w-px bg-[color:var(--ht-border-soft)]" />
+            <BrandLogo className="theme-logo-adaptive w-[168px] lg:w-[182px]" priority />
+            <div className="h-9 w-px bg-[color:var(--oip-border-soft)]" />
             <div className="space-y-1 leading-tight">
-              <p className="text-[11px] uppercase tracking-[0.35em] text-[var(--ht-text-muted)]">
+              <p className="text-[11px] uppercase tracking-[0.35em] text-[var(--oip-text-muted)]">
                 Open Innovation
               </p>
-              <p className="text-sm font-semibold text-[var(--ht-text-primary)]">
+              <p className="text-sm font-semibold text-[var(--oip-text-primary)]">
                 Open Innovation Platform
               </p>
             </div>
           </Link>
         </div>
 
-        <nav className="hidden items-center gap-8 text-sm font-medium text-[var(--ht-text-secondary)] lg:flex">
+        <nav className="hidden items-center gap-8 text-sm font-medium text-[var(--oip-text-secondary)] lg:flex">
           {navItems.map((item) => {
             const active =
               pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))

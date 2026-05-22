@@ -48,7 +48,7 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
             <p className="text-xs uppercase tracking-[0.35em] text-ht-light-blue">
               {proposalTypeMap[proposal.type]}
             </p>
-            <h2 className="mt-3 text-4xl font-semibold text-[var(--ht-text-primary)]">
+            <h2 className="mt-3 text-4xl font-semibold text-[var(--oip-text-primary)]">
               {proposal.title}
             </h2>
           </div>
@@ -57,28 +57,28 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
 
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <div className="theme-dashboard-panel-soft rounded-[0.75rem] p-4">
-            <p className="text-xs uppercase tracking-[0.3em] text-[var(--ht-text-muted)]">联系人</p>
-            <p className="mt-2 text-sm font-medium text-[var(--ht-text-primary)]">
+            <p className="text-xs uppercase tracking-[0.3em] text-[var(--oip-text-muted)]">联系人</p>
+            <p className="mt-2 text-sm font-medium text-[var(--oip-text-primary)]">
               {proposal.contactName}
             </p>
           </div>
           <div className="theme-dashboard-panel-soft rounded-[0.75rem] p-4">
-            <p className="text-xs uppercase tracking-[0.3em] text-[var(--ht-text-muted)]">邮箱</p>
-            <p className="mt-2 text-sm font-medium text-[var(--ht-text-primary)]">
+            <p className="text-xs uppercase tracking-[0.3em] text-[var(--oip-text-muted)]">邮箱</p>
+            <p className="mt-2 text-sm font-medium text-[var(--oip-text-primary)]">
               {proposal.contactEmail}
             </p>
           </div>
           <div className="theme-dashboard-panel-soft rounded-[0.75rem] p-4">
-            <p className="text-xs uppercase tracking-[0.3em] text-[var(--ht-text-muted)]">公司</p>
-            <p className="mt-2 text-sm font-medium text-[var(--ht-text-primary)]">
+            <p className="text-xs uppercase tracking-[0.3em] text-[var(--oip-text-muted)]">公司</p>
+            <p className="mt-2 text-sm font-medium text-[var(--oip-text-primary)]">
               {proposal.contactCompany}
             </p>
           </div>
           <div className="theme-dashboard-panel-soft rounded-[0.75rem] p-4">
-            <p className="text-xs uppercase tracking-[0.3em] text-[var(--ht-text-muted)]">
+            <p className="text-xs uppercase tracking-[0.3em] text-[var(--oip-text-muted)]">
               提交时间
             </p>
-            <p className="mt-2 text-sm font-medium text-[var(--ht-text-primary)]">
+            <p className="mt-2 text-sm font-medium text-[var(--oip-text-primary)]">
               {formatDate(proposal.createdAt)}
             </p>
           </div>
@@ -86,16 +86,16 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
 
         <div className="mt-8 space-y-8">
           <section>
-            <h3 className="text-xl font-semibold text-[var(--ht-text-primary)]">技术描述</h3>
-            <p className="mt-3 whitespace-pre-line text-sm leading-8 text-[var(--ht-text-secondary)]">
+            <h3 className="text-xl font-semibold text-[var(--oip-text-primary)]">技术描述</h3>
+            <p className="mt-3 whitespace-pre-line text-sm leading-8 text-[var(--oip-text-secondary)]">
               {lexicalToPlainText(proposal.description)}
             </p>
           </section>
 
           {proposal.relatedNeed && typeof proposal.relatedNeed !== 'number' ? (
             <section>
-              <h3 className="text-xl font-semibold text-[var(--ht-text-primary)]">关联需求</h3>
-              <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-[var(--ht-text-secondary)]">
+              <h3 className="text-xl font-semibold text-[var(--oip-text-primary)]">关联需求</h3>
+              <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-[var(--oip-text-secondary)]">
                 <p>{proposal.relatedNeed.title}</p>
                 <NeedStatusBadge status={proposal.relatedNeed.status} />
               </div>
@@ -109,7 +109,7 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
           ) : null}
 
           <section>
-            <h3 className="text-xl font-semibold text-[var(--ht-text-primary)]">附件</h3>
+            <h3 className="text-xl font-semibold text-[var(--oip-text-primary)]">附件</h3>
             <div className="mt-3 flex flex-wrap gap-3">
               {attachments.length ? (
                 attachments.map((item) => (
@@ -123,16 +123,16 @@ export default async function ProposalDetailPage({ params }: { params: Promise<{
                   </a>
                 ))
               ) : (
-                <p className="text-sm text-[var(--ht-text-muted)]">当前没有上传附件。</p>
+                <p className="text-sm text-[var(--oip-text-muted)]">当前没有上传附件。</p>
               )}
             </div>
           </section>
 
           <section>
-            <h3 className="text-xl font-semibold text-[var(--ht-text-primary)]">
+            <h3 className="text-xl font-semibold text-[var(--oip-text-primary)]">
               评审意见与状态流转
             </h3>
-            <p className="mt-3 text-sm leading-8 text-[var(--ht-text-secondary)]">
+            <p className="mt-3 text-sm leading-8 text-[var(--oip-text-secondary)]">
               从提案提交开始，按时间顺序记录每次状态流转、评审意见和操作人员。
             </p>
             <div className="mt-4">

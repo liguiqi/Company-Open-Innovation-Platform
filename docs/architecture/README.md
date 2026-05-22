@@ -16,7 +16,7 @@
 | `auth-verification-flow-20260422-164252.puml/.svg`  | 邮箱 / 短信验证码链路图                                            |
 | `proposal-lifecycle-flow-20260422-164252.puml/.svg` | 提案生命周期与附件下载链路图                                       |
 | `domain-entity-model-20260422-164252.puml/.svg`     | 领域实体关系图                                                     |
-| `image_prompt/demo-20260422-164252/`                | 架构演示图的 GPT-image prompt 素材，统一附带 `Powered by LGQ` 要求 |
+| `image_prompt/demo-20260422-164252/`                | 架构演示图的 GPT-image prompt 素材，统一附带 `Open Innovation Platform` 要求 |
 
 ## 使用原则
 

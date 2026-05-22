@@ -40,9 +40,9 @@ export default async function EcosystemPage() {
         <section className="mt-12 space-y-5" id="strategic-partners">
           <div className="flex items-center gap-3">
             <span className="h-6 w-1 rounded-full bg-ht-blue" />
-            <h3 className="text-2xl font-semibold text-[var(--ht-text-primary)]">
+            <h3 className="text-2xl font-semibold text-[var(--oip-text-primary)]">
               {strategicGroup.meta.title}
-              <span className="ml-2 text-lg font-medium text-[var(--ht-text-muted)]">
+              <span className="ml-2 text-lg font-medium text-[var(--oip-text-muted)]">
                 ({strategicGroup.meta.subtitle})
               </span>
             </h3>

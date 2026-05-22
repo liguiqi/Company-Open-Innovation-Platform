@@ -24,7 +24,7 @@
 
 ### 2. `innovation-platform` 的当前复用结果
 
-当前开放创新平台已经复用了：
+当前Open Innovation Platform已经复用了：
 
 1. SMTP 通道接入思路。
 2. 阿里云 `Dypnsapi` 接入思路。
@@ -32,7 +32,7 @@
 4. 注册场景和登录场景分离的验证码 key 命名方式。
 5. mock 开关与开发联调兜底。
 
-当前开放创新平台没有完整照搬 `bothub` 的点：
+当前Open Innovation Platform没有完整照搬 `bothub` 的点：
 
 1. 没有单独落地 `verification_codes` 表。
 2. 没有把验证码哈希后写入 PostgreSQL。
@@ -111,7 +111,7 @@ EMAIL_MOCK=
 
 ### 1. 当前必须保留的事实
 
-开放创新平台当前正式可用的短信签名与模板，必须保持为阿里云已审核通过的旧值：
+Open Innovation Platform当前正式可用的短信签名与模板，必须保持为阿里云已审核通过的旧值：
 
 1. 签名：`平台验证码`
 2. 模板：`100001`
@@ -205,7 +205,7 @@ SMS_MOCK=false
 
 ### 1. 当前缓存策略
 
-当前开放创新平台主要使用 Redis 保存验证码，而不是数据库表。
+当前Open Innovation Platform主要使用 Redis 保存验证码，而不是数据库表。
 
 当前 key 设计：
 
@@ -232,7 +232,7 @@ SMS_MOCK=false
 
 ### 3. 当前与 `bothub` 的差异
 
-| 项目         | `bothub` 思路               | 当前开放创新平台             |
+| 项目         | `bothub` 思路               | 当前Open Innovation Platform             |
 | ------------ | --------------------------- | ---------------------------- |
 | 验证码持久化 | Redis + PostgreSQL          | Redis 为主                   |
 | 验证码明文   | 不入库，哈希后落库          | 不入库，缓存即用即删         |
@@ -244,7 +244,7 @@ SMS_MOCK=false
 1. 当前平台已经足够支撑注册、登录和基础验证。
 2. 若未来验证码业务变复杂，例如要审计每次发送记录、接入更多场景、做风控分析，再考虑升级为 `bothub` 那套“Redis + 数据库”中心化结构。
 
-## 四、当前开放创新平台中的业务场景拆分
+## 四、当前Open Innovation Platform中的业务场景拆分
 
 ### 1. 注册场景
 
@@ -374,7 +374,7 @@ SMS_MOCK=false
 
 ## 九、总结
 
-当前开放创新平台已经成功复用了 `bothub` 中最有价值的两项基础能力：
+当前Open Innovation Platform已经成功复用了 `bothub` 中最有价值的两项基础能力：
 
 1. SMTP 邮箱验证码发送。
 2. 阿里云 `Dypnsapi` 短信验证码发送。

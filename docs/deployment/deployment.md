@@ -295,7 +295,7 @@ pnpm media:organize
 
 ```ini
 [Unit]
-Description=H&T Open Innovation Platform
+Description=Open Innovation Platform
 After=network.target
 
 [Service]

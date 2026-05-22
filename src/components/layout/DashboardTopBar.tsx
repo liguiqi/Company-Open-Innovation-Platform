@@ -21,11 +21,11 @@ export function DashboardTopBar({ user }: { user: Pick<User, 'name' | 'role' | '
   return (
     <div className="theme-dashboard-panel mb-8 flex flex-col gap-4 rounded-xl p-5 md:flex-row md:items-center md:justify-between">
       <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-[var(--ht-text-muted)]">Workspace</p>
-        <h1 className="mt-2 text-2xl font-semibold text-[var(--ht-text-primary)]">
+        <p className="text-xs uppercase tracking-[0.3em] text-[var(--oip-text-muted)]">Workspace</p>
+        <h1 className="mt-2 text-2xl font-semibold text-[var(--oip-text-primary)]">
           欢迎回来，{user.name}
         </h1>
-        <p className="mt-1 text-sm text-[var(--ht-text-muted)]">
+        <p className="mt-1 text-sm text-[var(--oip-text-muted)]">
           {roleLabelMap[user.role]} · {user.email}
         </p>
       </div>

@@ -4,9 +4,9 @@
 
 ## 1. 系统定位
 
-开放创新平台当前是一个单仓全栈项目，不存在独立拆分的后端服务：
+Open Innovation Platform当前是一个单仓全栈项目，不存在独立拆分的后端服务：
 
-- `Next.js App Router` 同时承载公开站、登录注册页、开放创新工作台和自定义业务 API
+- `Next.js App Router` 同时承载公开站、登录注册页、Innovation Workspace和自定义业务 API
 - `Payload CMS 3` 以内嵌方式运行在同一个 Node 进程中，对外提供 Admin、REST、GraphQL 和 Local API
 - `PostgreSQL` 保存业务主数据
 - `Redis` 保存验证码缓存与验证码相关限流辅助状态

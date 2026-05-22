@@ -2,9 +2,9 @@ import Image from 'next/image'
 
 import { cn } from '@/lib/utils'
 
-export function HetWordmark({
+export function PlatformWordmark({
   className,
-  title = 'Open Innovation HET',
+  title = 'Open Innovation Open Innovation Platform',
 }: {
   className?: string
   title?: string

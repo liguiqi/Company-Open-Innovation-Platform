@@ -41,13 +41,13 @@ export default function ProcessPage() {
             key={step.number}
             className={`theme-card rounded-[1rem] border-t-4 p-7 text-center ${index === 1 ? 'border-t-ht-light-blue' : index === 2 ? 'border-t-ht-blue' : index === 3 ? 'border-t-emerald-500' : 'border-t-slate-300'}`}
           >
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-md bg-[var(--ht-input-bg)] text-lg font-semibold text-[var(--ht-text-secondary)]">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-md bg-[var(--oip-input-bg)] text-lg font-semibold text-[var(--oip-text-secondary)]">
               {step.number}
             </div>
-            <h3 className="mt-4 text-xl font-semibold text-[var(--ht-text-primary)]">
+            <h3 className="mt-4 text-xl font-semibold text-[var(--oip-text-primary)]">
               {step.title}
             </h3>
-            <p className="mt-3 text-sm leading-7 text-[var(--ht-text-muted)]">{step.description}</p>
+            <p className="mt-3 text-sm leading-7 text-[var(--oip-text-muted)]">{step.description}</p>
           </article>
         ))}
       </div>

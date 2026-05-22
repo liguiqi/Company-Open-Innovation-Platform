@@ -31,8 +31,8 @@ export default function AdminSidebarFooter() {
           </svg>
         </Link>
         <div className="payload-admin-sidebar-footer__text">
-          <p>2026 HET. All rights reserved.</p>
-          <p>HET Tech Research Inst. | LGQ</p>
+          <p>2026 Open Innovation Platform. All rights reserved.</p>
+          <p>Open Innovation Platform</p>
         </div>
       </div>
     </div>

@@ -320,7 +320,7 @@ export function RegisterForm({ initialEmail = '', initialPhone = '' }: RegisterF
                   <input
                     className="theme-input w-full rounded-lg px-4 py-3"
                     onChange={(event) => setUsername(event.target.value)}
-                    placeholder="如 lgq_partner"
+                    placeholder="如 partner_demo"
                     value={username}
                   />
                   {usernameError ? <span className="auth-field-error">{usernameError}</span> : null}

@@ -21,8 +21,8 @@ skinparam NodeBorderColor #0B5CAD
 skinparam NodeBackgroundColor #F8FBFF
 skinparam NoteBackgroundColor #FFFBEA
 skinparam NoteBorderColor #D4A72C
-footer HeT Open Innovation Platform | Generated at 20260422-164252
-title HeT 开放创新平台 - 运行部署拓扑图
+footer Open Innovation Platform | Generated at 20260422-164252
+title Open Innovation Platform - 运行部署拓扑图
 top to bottom direction
 
 cloud "Browser / 内网终端" as Browser

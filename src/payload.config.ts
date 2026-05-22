@@ -39,20 +39,20 @@ export default buildConfig({
           rel: 'icon',
           sizes: '32x32',
           type: 'image/png',
-          url: '/branding/het-favicon-32.png',
+          url: '/branding/brand-favicon-32.png',
         },
         {
           media: '(prefers-color-scheme: dark)',
           rel: 'icon',
           sizes: '32x32',
           type: 'image/png',
-          url: '/branding/het-favicon-32-white.png',
+          url: '/branding/brand-favicon-32-white.png',
         },
         {
           rel: 'apple-touch-icon',
           sizes: '180x180',
           type: 'image/png',
-          url: '/branding/het-apple-touch-180.png',
+          url: '/branding/brand-apple-touch-180.png',
         },
       ],
     },
@@ -71,7 +71,7 @@ export default buildConfig({
   }),
   email: await nodemailerAdapter({
     defaultFromAddress: appEnv.SMTP_FROM_ADDRESS || appEnv.SMTP_USER || 'innovation@example.com',
-    defaultFromName: appEnv.SMTP_FROM_NAME || 'HeT Innovation Platform',
+    defaultFromName: appEnv.SMTP_FROM_NAME || 'Open Innovation Platform',
     skipVerify: true,
     transportOptions: appEnv.smtpEnabled
       ? {
@@ -100,7 +100,7 @@ export default buildConfig({
     await backfillMediaFolders({
       payload,
     })
-    payload.logger.info('H&T Open Innovation Platform initialized')
+    payload.logger.info('Open Innovation Platform initialized')
   },
   routes: {
     admin: '/admin',

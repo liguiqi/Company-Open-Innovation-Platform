@@ -33,7 +33,7 @@ export default async function HomePage() {
         <div className="container-shell relative py-24 md:py-32">
           <div className="max-w-3xl text-white">
             <p className="text-xs uppercase tracking-[0.4em] text-sky-200">
-              HeT Open Innovation Platform
+              Open Innovation Platform
             </p>
             <h1 className="mt-6 font-display text-5xl font-semibold leading-[1.14] md:text-7xl md:leading-[1.08]">
               连接全球智慧，
@@ -61,12 +61,12 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="border-b border-[color:var(--ht-border-soft)] bg-[var(--ht-card-solid)]">
+      <section className="border-b border-[color:var(--oip-border-soft)] bg-[var(--oip-card-solid)]">
         <div className="container-shell grid gap-8 py-10 md:grid-cols-4">
           {publicStats.map((item) => (
             <div key={item.label} className="text-center">
               <p className="font-display text-5xl font-semibold text-ht-blue">{item.value}</p>
-              <p className="mt-2 text-xs uppercase tracking-[0.3em] text-[var(--ht-text-muted)]">
+              <p className="mt-2 text-xs uppercase tracking-[0.3em] text-[var(--oip-text-muted)]">
                 {item.label}
               </p>
             </div>
@@ -84,13 +84,13 @@ export default async function HomePage() {
           {heroDomains.map((domain) => (
             <article
               key={domain.title}
-              className={`theme-card rounded-[1rem] border-t-4 ${domain.accent} bg-[var(--ht-card)] p-8`}
+              className={`theme-card rounded-[1rem] border-t-4 ${domain.accent} bg-[var(--oip-card)] p-8`}
             >
               <div className="text-4xl">{domain.icon}</div>
-              <h3 className="mt-4 text-2xl font-semibold text-[var(--ht-text-primary)]">
+              <h3 className="mt-4 text-2xl font-semibold text-[var(--oip-text-primary)]">
                 {domain.title}
               </h3>
-              <p className="mt-4 text-sm leading-7 text-[var(--ht-text-secondary)]">
+              <p className="mt-4 text-sm leading-7 text-[var(--oip-text-secondary)]">
                 {domain.description}
               </p>
             </article>
@@ -120,9 +120,9 @@ export default async function HomePage() {
         <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="theme-card-contrast rounded-[1rem] p-8 shadow-sm shadow-slate-300/40">
             <p className="text-xs uppercase tracking-[0.35em] text-sky-200">Ecosystem</p>
-            <h2 className="mt-4 font-display text-4xl font-semibold">HeT 全球合作伙伴联盟</h2>
+            <h2 className="mt-4 font-display text-4xl font-semibold">OIP 全球合作伙伴联盟</h2>
             <div className="mt-4 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-              <p className="max-w-2xl text-sm leading-8 text-[var(--ht-contrast-muted)]">
+              <p className="max-w-2xl text-sm leading-8 text-[var(--oip-contrast-muted)]">
                 平台目前覆盖芯片、功率、电源、连接与传感、产学研合作机构等多类生态角色，可在供应链导入和联合研发之间实现快速闭环。
               </p>
               <div className="flex justify-end xl:shrink-0">
@@ -154,22 +154,22 @@ export default async function HomePage() {
             <p className="text-xs uppercase tracking-[0.35em] text-ht-light-blue">
               Success Stories
             </p>
-            <h2 className="font-display text-4xl font-semibold text-[var(--ht-text-primary)]">
+            <h2 className="font-display text-4xl font-semibold text-[var(--oip-text-primary)]">
               联合创新案例
             </h2>
             {cases.map((item) => (
               <Link
                 key={item.id}
-                className="block rounded-[0.75rem] border border-[color:var(--ht-border-soft)] p-5 transition hover:border-ht-light-blue"
+                className="block rounded-[0.75rem] border border-[color:var(--oip-border-soft)] p-5 transition hover:border-ht-light-blue"
                 href={`/cases/${item.slug}`}
               >
                 <p className="text-xs uppercase tracking-[0.3em] text-ht-light-blue">
                   {getCaseDomainLabel(item.domain)}
                 </p>
-                <h3 className="mt-3 text-xl font-semibold text-[var(--ht-text-primary)]">
+                <h3 className="mt-3 text-xl font-semibold text-[var(--oip-text-primary)]">
                   {item.title}
                 </h3>
-                <p className="mt-2 text-sm leading-7 text-[var(--ht-text-secondary)]">
+                <p className="mt-2 text-sm leading-7 text-[var(--oip-text-secondary)]">
                   {item.summary}
                 </p>
               </Link>

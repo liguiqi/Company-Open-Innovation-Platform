@@ -152,7 +152,7 @@ export function SettingsForm({ user }: { user: SettingsUser }) {
               更新当前登录账号的基础资料与联系方式，保存后会同步写入 Payload 用户数据。
             </p>
           </div>
-          <div className="inline-flex items-center gap-2 rounded-md border border-[color:var(--ht-border-soft)] bg-[var(--ht-card-soft)] px-4 py-2 text-sm text-[var(--ht-text-secondary)]">
+          <div className="inline-flex items-center gap-2 rounded-md border border-[color:var(--oip-border-soft)] bg-[var(--oip-card-soft)] px-4 py-2 text-sm text-[var(--oip-text-secondary)]">
             <BadgeCheck size={16} />
             当前角色：{roleLabelMap[user.role]}
           </div>
@@ -161,11 +161,11 @@ export function SettingsForm({ user }: { user: SettingsUser }) {
         <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_320px]">
           <form className="theme-dashboard-panel-soft space-y-6 rounded-xl p-6" onSubmit={onSubmit}>
             <div className="grid gap-5 md:grid-cols-2">
-              <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+              <label className="space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
                 联系人姓名
                 <div className="relative">
                   <UserRound
-                    className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[var(--ht-text-muted)]"
+                    className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[var(--oip-text-muted)]"
                     size={16}
                   />
                   <input
@@ -177,7 +177,7 @@ export function SettingsForm({ user }: { user: SettingsUser }) {
                 </div>
               </label>
 
-              <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+              <label className="space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
                 用户名
                 <input
                   className="theme-input w-full rounded-lg px-4 py-3"
@@ -188,11 +188,11 @@ export function SettingsForm({ user }: { user: SettingsUser }) {
               </label>
             </div>
 
-            <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+            <label className="space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
               公司名称
               <div className="relative">
                 <Building2
-                  className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[var(--ht-text-muted)]"
+                  className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[var(--oip-text-muted)]"
                   size={16}
                 />
                 <input
@@ -205,11 +205,11 @@ export function SettingsForm({ user }: { user: SettingsUser }) {
             </label>
 
             <div className="grid gap-5 md:grid-cols-2">
-              <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+              <label className="space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
                 联系邮箱
                 <div className="relative">
                   <Mail
-                    className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[var(--ht-text-muted)]"
+                    className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[var(--oip-text-muted)]"
                     size={16}
                   />
                   <input
@@ -222,11 +222,11 @@ export function SettingsForm({ user }: { user: SettingsUser }) {
                 </div>
               </label>
 
-              <label className="space-y-2 text-sm font-medium text-[var(--ht-text-secondary)]">
+              <label className="space-y-2 text-sm font-medium text-[var(--oip-text-secondary)]">
                 联系手机
                 <div className="relative">
                   <Smartphone
-                    className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[var(--ht-text-muted)]"
+                    className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[var(--oip-text-muted)]"
                     size={16}
                   />
                   <input
@@ -242,9 +242,9 @@ export function SettingsForm({ user }: { user: SettingsUser }) {
             <div
               className="rounded-lg border px-4 py-3 text-sm leading-6"
               style={{
-                background: 'var(--ht-warning-bg)',
-                borderColor: 'var(--ht-warning-border)',
-                color: 'var(--ht-warning-text)',
+                background: 'var(--oip-warning-bg)',
+                borderColor: 'var(--oip-warning-border)',
+                color: 'var(--oip-warning-text)',
               }}
             >
               若邮箱或手机号发生变更，系统会同步重置对应通道的已验证状态；账号始终需要保留至少一个已验证登录方式。
@@ -274,19 +274,19 @@ export function SettingsForm({ user }: { user: SettingsUser }) {
 
           <div className="space-y-4">
             <div className="theme-dashboard-panel-soft rounded-xl p-5">
-              <p className="text-xs uppercase tracking-[0.3em] text-[var(--ht-text-muted)]">
+              <p className="text-xs uppercase tracking-[0.3em] text-[var(--oip-text-muted)]">
                 账号概览
               </p>
-              <div className="mt-4 space-y-4 text-sm text-[var(--ht-text-secondary)]">
+              <div className="mt-4 space-y-4 text-sm text-[var(--oip-text-secondary)]">
                 <div className="flex items-center justify-between gap-3">
                   <span>角色</span>
-                  <span className="font-semibold text-[var(--ht-text-primary)]">
+                  <span className="font-semibold text-[var(--oip-text-primary)]">
                     {roleLabelMap[user.role]}
                   </span>
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <span>已验证通道</span>
-                  <span className="font-semibold text-[var(--ht-text-primary)]">
+                  <span className="font-semibold text-[var(--oip-text-primary)]">
                     {[emailVerifiedAt ? '邮箱' : null, phoneVerifiedAt ? '手机' : null]
                       .filter(Boolean)
                       .join(' / ') || '暂无'}
@@ -296,16 +296,16 @@ export function SettingsForm({ user }: { user: SettingsUser }) {
             </div>
 
             <div className="theme-dashboard-panel-soft rounded-xl p-5">
-              <p className="text-xs uppercase tracking-[0.3em] text-[var(--ht-text-muted)]">
+              <p className="text-xs uppercase tracking-[0.3em] text-[var(--oip-text-muted)]">
                 验证状态
               </p>
-              <div className="mt-4 space-y-3 text-sm text-[var(--ht-text-secondary)]">
+              <div className="mt-4 space-y-3 text-sm text-[var(--oip-text-secondary)]">
                 <div className="flex items-center justify-between gap-3">
                   <span className="inline-flex items-center gap-2">
                     <Mail size={15} />
                     邮箱
                   </span>
-                  <span className="font-semibold text-[var(--ht-text-primary)]">
+                  <span className="font-semibold text-[var(--oip-text-primary)]">
                     {emailVerifiedAt ? '已验证' : '未验证'}
                   </span>
                 </div>
@@ -314,7 +314,7 @@ export function SettingsForm({ user }: { user: SettingsUser }) {
                     <Smartphone size={15} />
                     手机
                   </span>
-                  <span className="font-semibold text-[var(--ht-text-primary)]">
+                  <span className="font-semibold text-[var(--oip-text-primary)]">
                     {phoneVerifiedAt ? '已验证' : '未验证'}
                   </span>
                 </div>

@@ -6,7 +6,7 @@ import { Blocks, BriefcaseBusiness, FileText, LayoutDashboard, Settings, Users }
 
 import type { User } from '@/payload-types'
 
-import { HetBrandLogo } from '@/components/shared/HetBrandLogo'
+import { BrandLogo } from '@/components/shared/BrandLogo'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { cn } from '@/lib/utils'
 
@@ -38,22 +38,22 @@ export function DashboardSidebar({ role }: { role: User['role'] }) {
         className="pointer-events-none absolute inset-x-0 top-0 h-24"
         style={{
           background:
-            'radial-gradient(circle at top left, var(--ht-dashboard-shell-glow), transparent 72%)',
+            'radial-gradient(circle at top left, var(--oip-dashboard-shell-glow), transparent 72%)',
         }}
       />
 
       <div className="dashboard-sidebar-brand theme-dashboard-highlight relative mb-8 rounded-lg p-4">
         <Link aria-label="返回首页" className="block" href="/">
-          <HetBrandLogo className="theme-logo-adaptive w-[152px] sm:w-[164px]" priority />
+          <BrandLogo className="theme-logo-adaptive w-[152px] sm:w-[164px]" priority />
         </Link>
         <div className="mt-3 flex items-center gap-3">
-          <span className="h-px flex-1 bg-[color:var(--ht-border-soft)]" />
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[var(--ht-text-muted)]">
+          <span className="h-px flex-1 bg-[color:var(--oip-border-soft)]" />
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[var(--oip-text-muted)]">
             Workspace
           </p>
         </div>
         <div className="mt-3 flex items-center justify-between gap-3">
-          <p className="text-[13px] leading-5 text-[var(--ht-text-secondary)]">开放创新工作台</p>
+          <p className="text-[13px] leading-5 text-[var(--oip-text-secondary)]">Innovation Workspace</p>
           <ThemeToggle className="shrink-0" />
         </div>
       </div>
@@ -85,19 +85,19 @@ export function DashboardSidebar({ role }: { role: User['role'] }) {
           })}
         </nav>
 
-        <div className="theme-dashboard-info mt-8 rounded-lg p-4 text-sm text-[var(--ht-text-secondary)]">
+        <div className="theme-dashboard-info mt-8 rounded-lg p-4 text-sm text-[var(--oip-text-secondary)]">
           <p className="text-xs uppercase tracking-[0.3em] text-ht-light-blue">Platform Ops</p>
-          <p className="mt-2 font-semibold text-[var(--ht-text-primary)]">内容与权限维护</p>
-          <p className="mt-2 leading-6 text-[var(--ht-text-secondary)]">
+          <p className="mt-2 font-semibold text-[var(--oip-text-primary)]">内容与权限维护</p>
+          <p className="mt-2 leading-6 text-[var(--oip-text-secondary)]">
             站点内容、附件资产和账号权限仍可直接在{' '}
             <span className="font-semibold text-ht-blue">/admin</span> 中维护。
           </p>
         </div>
       </div>
 
-      <div className="theme-dashboard-legal mt-6 border-t border-[color:var(--ht-border-soft)] pt-4 text-center lg:mt-4 lg:shrink-0">
-        <p>2026 HET. All rights reserved.</p>
-        <p>HET Tech Research Inst. | LGQ</p>
+      <div className="theme-dashboard-legal mt-6 border-t border-[color:var(--oip-border-soft)] pt-4 text-center lg:mt-4 lg:shrink-0">
+        <p>2026 Open Innovation Platform. All rights reserved.</p>
+        <p>Open Innovation Platform</p>
       </div>
     </aside>
   )

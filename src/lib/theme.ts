@@ -1,7 +1,7 @@
 export type AppTheme = 'dark' | 'light'
 
 export const THEME_ATTRIBUTE = 'data-theme'
-export const THEME_STORAGE_KEY = 'het-theme'
+export const THEME_STORAGE_KEY = 'oip-theme'
 
 export const THEME_BOOTSTRAP_SCRIPT = `(() => {
   try {

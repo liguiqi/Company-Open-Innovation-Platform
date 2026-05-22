@@ -1,10 +1,10 @@
 [Unit]
-Description=H&T Open Innovation Platform
+Description=Open Innovation Platform
 After=network.target
 
 [Service]
 Type=simple
-User=lgq
+User=deploy
 WorkingDirectory=/home/deploy/apps/open-innovation-platform
 Environment=HOME=/home/deploy
 Environment=PORT=3005

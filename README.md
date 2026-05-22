@@ -1,188 +1,224 @@
-# HeT Open Innovation Platform
+# Open Innovation Platform
 
-Open Innovation Platform正式版落地仓库，基于 `Next.js 16 + Payload CMS 3 + PostgreSQL + Redis` 构建，统一承载公开门户、认证中心、开放创新工作台和 Payload Admin。
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16.2.3-black)](https://nextjs.org)
+[![Payload CMS 3](https://img.shields.io/badge/Payload_CMS-3.82.1-blue)](https://payloadcms.com)
 
-## Release
+**[中文文档](README_CN.md)**
 
-- 当前正式版：`v1.0.0`
-- 发版日期：`2026-04-20`
-- 当前分支基线：`dev-bugfix`
-- 正式访问域名：`https://innovation.example.com`
-- 本机应用监听：`127.0.0.1:3005`
+An open-source enterprise innovation collaboration platform built with **Next.js 16 + Payload CMS 3 + PostgreSQL + Redis**. It unifies a public-facing portal, authentication center, innovation workspace, and admin panel into a single full-stack application.
 
-### v1.0.0 发版摘要
+---
 
-- 完成公开站首页、需求大厅、生态伙伴、案例、流程页与统一深浅主题适配
-- 完成合作伙伴注册、邮箱验证码注册、手机短信验证码注册
-- 完成邮箱/手机密码登录与邮箱/短信验证码登录，验证码登录仅允许已有账号进入
-- 完成方案提交、多附件上传下载、评审状态流转、评审意见同步更新
-- 完成当前用户在 `/dashboard/settings` 自助维护个人信息并同步更新 Payload 用户数据
-- 完成 Payload Admin 品牌化适配、域名 HTTPS 部署、systemd + nginx + standalone 落地
-- 完成 docs 全量整理，覆盖架构、部署、运维、测试、发版与进度记录
+## Screenshots
 
-## 当前已交付能力
+<table>
+  <tr>
+    <td align="center"><b>Public Homepage</b></td>
+    <td align="center"><b>Tech Needs Hall</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/assets/platform1-wechat_2026-05-22_094752_358.png" alt="Public Homepage" width="480"/></td>
+    <td><img src="docs/assets/platform2-wechat_2026-05-22_094958_705.png" alt="Tech Needs Hall" width="480"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Ecosystem Partners</b></td>
+    <td align="center"><b>Case Studies</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/assets/platform3-wechat_2026-05-22_095049_984.png" alt="Ecosystem Partners" width="480"/></td>
+    <td><img src="docs/assets/platform4-wechat_2026-05-22_095111_506.png" alt="Case Studies" width="480"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Innovation Workspace</b></td>
+    <td align="center"><b>Admin Background</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/assets/platform5-wechat_2026-05-22_095130_888.png" alt="Login Page" width="480"/></td>
+    <td><img src="docs/assets/platform6-wechat_2026-05-22_095230_604.png" alt="Registration Page" width="480"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Innovation Workspace dark-mode</b></td>
+    <td align="center"><b>Admin Panel dark-mode</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/assets/platform7-wechat_2026-05-22_095328_491.png" alt="Innovation Workspace" width="480"/></td>
+    <td><img src="docs/assets/platform8-wechat_2026-05-22_095405_620.png" alt="Admin Panel" width="480"/></td>
+  </tr>
+</table>
 
-### 公开站
+---
 
-- 首页 `/`
-- 技术需求大厅 `/needs`、需求详情 `/needs/[id]`
-- 生态伙伴 `/ecosystem`
-- 联合案例 `/cases`、案例详情 `/cases/[slug]`
-- 合作流程 `/process`
-- 提交入口 `/submit`
+## Features
 
-### 认证中心
+### Public Portal
 
-- 登录页 `/login`
-- 注册页 `/register`
-- 邮箱验证页 `/verify`
-- 登录方式：
-  - 邮箱 / 手机号 + 密码
-  - 邮箱 / 短信验证码
-- 注册方式：
-  - 基础信息 + 邮箱验证
-  - 基础信息 + 手机验证
-  - 基础信息 + 邮箱/手机双验证
-- 当前不开放用户名直接登录
+- Homepage with hero section and CTAs (`/`)
+- Tech Needs Hall with search and filtering (`/needs`, `/needs/[id]`)
+- Ecosystem Partner directory (`/ecosystem`)
+- Case Studies showcase (`/cases`, `/cases/[slug]`)
+- Collaboration process overview (`/process`)
+- Proposal submission entry (`/submit`)
 
-### 工作台
+### Authentication Center
 
-- Dashboard 概览 `/dashboard`
-- 方案管理 `/dashboard/proposals`
-- 新建方案 `/dashboard/proposals/new`
-- 方案详情与评审 `/dashboard/proposals/[id]`
-- 个人设置 `/dashboard/settings`
-- 伙伴管理 `/dashboard/partners`
-- 用户管理 `/dashboard/users`
+- Email / phone + password login
+- Email / SMS verification code login
+- Multi-channel registration (email verification, SMS verification, or both)
+- Unified light/dark theme support across all auth pages
+
+### Innovation Workspace
+
+- Dashboard overview (`/dashboard`)
+- Proposal management (`/dashboard/proposals`)
+- New proposal with multi-file upload (`/dashboard/proposals/new`)
+- Proposal detail and review workflow (`/dashboard/proposals/[id]`)
+- Profile settings (`/dashboard/settings`)
+- Partner management (`/dashboard/partners`)
+- User management (`/dashboard/users`)
 
 ### Payload Admin
 
-- 统一入口 `/admin`
-- Collection 管理：`users`、`user-groups`、`tech-needs`、`proposals`、`partners`、`case-studies`、`media`
+- Branded admin panel at `/admin`
+- Collection management: `users`, `user-groups`, `tech-needs`, `proposals`, `partners`, `case-studies`, `media`
 
-## 技术栈与运行形态
+---
 
-| 层             | 当前实现                                   |
-| -------------- | ------------------------------------------ |
-| Web 框架       | `Next.js 16.2.3`                           |
-| CMS / 数据访问 | `Payload CMS 3.82.1`                       |
-| 前端           | `React 19` + `Tailwind CSS 4`              |
-| 数据库         | `PostgreSQL`                               |
-| OTP 缓存       | `Redis`                                    |
-| 邮件           | `nodemailer + SMTP`                        |
-| 短信           | 阿里云 `Dypnsapi SendSmsVerifyCode`        |
-| 进程守护       | `systemd`                                  |
-| 反向代理       | `nginx`                                    |
-| 运行模式       | `next build` + `standalone` + `pnpm start` |
+## Tech Stack
 
-当前链路为：
+| Layer | Technology |
+|-------|-----------|
+| Web Framework | Next.js 16.2.3 |
+| CMS / Data Access | Payload CMS 3.82.1 |
+| Frontend | React 19 + Tailwind CSS 4 |
+| Database | PostgreSQL |
+| OTP Cache | Redis |
+| Email | nodemailer + SMTP |
+| SMS | Alibaba Cloud SMS |
+| Process Manager | systemd |
+| Reverse Proxy | nginx |
+| Runtime | `next build` standalone + `pnpm start` |
+
+Request flow:
 
 ```text
-Browser
-  -> nginx :443
-  -> innovation-platform.service
-  -> .next/standalone/server.js
-  -> Next.js App Router / Payload Local API
-  -> PostgreSQL / Redis / media/
+Browser -> nginx :443 -> systemd service -> .next/standalone/server.js
+  -> Next.js App Router / Payload Local API -> PostgreSQL / Redis / media/
 ```
 
-## 认证与验证码要点
+---
 
-### 登录
+## Getting Started
 
-- `/api/auth/login`：邮箱或手机号密码登录
-- `/api/auth/login-code/send`：发送邮箱验证码或短信验证码
-- `/api/auth/login-code/verify`：验证码验证后仅允许已有账号进入
-- 若验证码正确但账号不存在，前端提示前往注册，并预填邮箱或手机号
+### Prerequisites
 
-### 注册
+- Node.js >= 18.20.2 or >= 20.9.0
+- pnpm >= 9
+- Docker (for PostgreSQL and Redis)
 
-- `/api/auth/email-code`：发送注册邮箱验证码
-- `/api/sms/send`：发送注册短信验证码
-- `/api/auth/register`：要求基础信息有效，且邮箱验证码或短信验证码至少完成一种
-- 注册成功后自动跳回登录页，并透传默认登录标识
-
-### 当前短信配置结论
-
-- 当前正式可用的阿里云签名是 `平台验证码`
-- 当前模板编码是 `100001`
-- 当前业务场景名是 `平台验证码`
-- 该签名由阿里云审核决定，不能仅靠代码把短信前缀改成其他名称
-
-## 本地开发
-
-### 启动步骤
+### Installation
 
 ```bash
 pnpm install
-pnpm db:up
+pnpm db:up          # Start PostgreSQL + Redis via Docker
 pnpm generate:types
 pnpm generate:importmap
-pnpm seed
-pnpm dev
+pnpm seed           # Seed initial data
+pnpm dev            # Start development server
 ```
 
-默认开发地址：
+Default dev addresses:
 
-- 公开站：`http://localhost:3000`
-- Dashboard：`http://localhost:3000/dashboard`
-- Admin：`http://localhost:3000/admin`
+- Public portal: `http://localhost:3000`
+- Dashboard: `http://localhost:3000/dashboard`
+- Admin: `http://localhost:3000/admin`
 
-### 常用命令
+### Common Commands
 
 ```bash
-pnpm lint
-pnpm typecheck
-pnpm build
-pnpm seed
-pnpm db:up
-pnpm db:down
-pnpm test:int
-pnpm test:e2e
+pnpm lint           # Lint with ESLint + oxlint
+pnpm typecheck      # TypeScript type check
+pnpm build          # Production build
+pnpm test:int       # Integration tests
+pnpm test:e2e       # End-to-end tests (Playwright)
 ```
 
-## 生产部署摘要
+---
 
-- systemd：`deploy/systemd/innovation-platform.service`
-- nginx：`deploy/nginx/innovation.example.com.conf`
-- 域名：`innovation.example.com`
-- 应用端口：`3005`
-- 数据目录：仓库根目录 `media/`
+## Project Structure
 
-### 重要运维说明
+```text
+src/
+  app/              # Next.js App Router pages and API routes
+    (public)/       # Public portal pages
+    (auth)/         # Login, register, verify
+    (dashboard)/    # Innovation workspace
+    (payload)/      # Payload CMS admin
+    api/            # REST API routes (auth, proposals, sms, etc.)
+  collections/      # Payload CMS collection definitions
+  components/       # React components (shared, layout, auth, dashboard, payload)
+  hooks/            # Payload hooks (notifications, status changes, media sync)
+  lib/              # Utilities (auth, env, theme, validators, etc.)
+  services/         # External services (email, redis, SMS, rate limiting)
+  scripts/          # Seed data and maintenance scripts
+  migrations/       # Database migrations
+deploy/             # nginx config, systemd service file
+docs/               # Architecture, deployment, ops, and progress docs
+public/branding/    # Brand assets (logos, favicons)
+```
 
-当前生产使用 `.next/standalone` 运行，构建产物内会带一份 `.env` / `.env.local` 副本。因此：
+---
 
-1. 修改短信、邮件、数据库、域名等环境变量后，不能只改根目录 `.env`
-2. 必须重新执行 `pnpm build`
-3. 然后重启 `innovation-platform.service`
+## Environment Variables
 
-否则运行中的 standalone 仍可能读取旧配置。
+Copy `.env.example` and fill in your values:
 
-## 发版验收基线
+```bash
+PAYLOAD_SECRET=               # At least 32 characters
+NEXT_PUBLIC_SERVER_URL=       # e.g. http://localhost:3000
+DATABASE_URI=                 # PostgreSQL connection string
+REDIS_URL=                    # Redis connection string
+SMTP_HOST=                    # SMTP server
+SMTP_USER= / SMTP_PASS=       # SMTP credentials
+ALIYUN_SMS_ACCESS_KEY_ID=     # Alibaba Cloud SMS (optional)
+ALIYUN_SMS_ACCESS_KEY_SECRET= # Alibaba Cloud SMS (optional)
+```
 
-当前正式版建议至少验证以下路径：
+---
 
-1. `https://innovation.example.com/`
-2. `https://innovation.example.com/login`
-3. `https://innovation.example.com/register`
-4. `https://innovation.example.com/dashboard`
-5. `https://innovation.example.com/admin`
-6. 注册短信接口 `/api/sms/send`
-7. 当前用户设置保存 `/api/account/profile`
+## Deployment
 
-## 文档导航
+See [docs/deployment/deployment.md](docs/deployment/deployment.md) for the full guide.
 
-- 文档总索引：[docs/README.md](docs/README.md)
-- 架构文档：[docs/architecture/README.md](docs/architecture/README.md)
-- 部署说明：[docs/deployment/deployment.md](docs/deployment/deployment.md)
-- 测试与验收：[docs/testing.md](docs/testing.md)
-- 运维手册：[docs/Ops/README.md](docs/Ops/README.md)
-- 开发进度：[docs/progress/2026-04-20.md](docs/progress/2026-04-20.md)
+Quick reference:
 
-## 已知约束
+- systemd: `deploy/systemd/innovation-platform.service`
+- nginx: `deploy/nginx/innovation.example.com.conf`
+- Port: `3005`
+- Media storage: `media/` in project root
 
-- 自动化测试仍未完整覆盖短信、邮件、附件权限与评审链路
-- 邮件发送失败当前不会阻断主业务流
-- Redis 缺失时 OTP 会退回进程内存，重启后验证码丢失
-- 直接数据库改写会绕过 Payload Hook、访问控制和通知逻辑
+> **Note:** The production build uses `.next/standalone`. After changing environment variables, you must run `pnpm build` and restart the service for changes to take effect.
+
+---
+
+## Documentation
+
+- [Docs Index](docs/README.md)
+- [Architecture](docs/architecture/README.md)
+- [Deployment Guide](docs/deployment/deployment.md)
+- [Testing](docs/testing.md)
+- [Ops Manual](docs/Ops/README.md)
+- [Development Progress](docs/progress/2026-04-20.md)
+
+---
+
+## Known Limitations
+
+- Automated tests do not yet fully cover SMS, email, attachment permissions, and review workflows
+- Email send failures do not block the main business flow
+- When Redis is unavailable, OTP falls back to in-memory storage (codes lost on restart)
+- Direct database writes bypass Payload hooks, access control, and notification logic
+
+## License
+
+[MIT](LICENSE)

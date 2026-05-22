@@ -34,7 +34,7 @@ export default async function CasesPage() {
           return (
             <Link
               key={item.id}
-              className="theme-card overflow-hidden rounded-[1rem] transition hover:border-[color:var(--ht-border-strong)]"
+              className="theme-card overflow-hidden rounded-[1rem] transition hover:border-[color:var(--oip-border-strong)]"
               href={`/cases/${item.slug}`}
             >
               <div
@@ -49,13 +49,13 @@ export default async function CasesPage() {
                 <p className="text-xs uppercase tracking-[0.35em] text-ht-light-blue">
                   {item.partnerName}
                 </p>
-                <h2 className="mt-4 text-3xl font-semibold text-[var(--ht-text-primary)]">
+                <h2 className="mt-4 text-3xl font-semibold text-[var(--oip-text-primary)]">
                   {item.title}
                 </h2>
-                <p className="mt-3 text-sm text-[var(--ht-text-muted)]">
+                <p className="mt-3 text-sm text-[var(--oip-text-muted)]">
                   {getCaseDomainLabel(item.domain)} · {formatDate(item.publishedAt)}
                 </p>
-                <p className="mt-4 text-sm leading-7 text-[var(--ht-text-secondary)]">
+                <p className="mt-4 text-sm leading-7 text-[var(--oip-text-secondary)]">
                   {item.summary}
                 </p>
               </div>

@@ -17,7 +17,7 @@ function createSVGBuffer(title: string, subtitle: string, color: string) {
       <circle cx="1040" cy="520" r="180" fill="rgba(255,255,255,0.06)" />
       <text x="90" y="270" fill="white" font-size="58" font-family="Arial, Microsoft YaHei, sans-serif" font-weight="700">${title}</text>
       <text x="90" y="340" fill="rgba(255,255,255,0.78)" font-size="28" font-family="Arial, Microsoft YaHei, sans-serif">${subtitle}</text>
-      <text x="90" y="580" fill="rgba(255,255,255,0.55)" font-size="22" font-family="Arial, Microsoft YaHei, sans-serif">HeT Open Innovation Platform</text>
+      <text x="90" y="580" fill="rgba(255,255,255,0.55)" font-size="22" font-family="Arial, Microsoft YaHei, sans-serif">Open Innovation Platform</text>
     </svg>
   `
 
@@ -118,7 +118,7 @@ async function refreshCaseStudy({
 
 async function main() {
   const payload = await getPayloadClient()
-  payload.logger.info('Refreshing HeT branding content ...')
+  payload.logger.info('Refreshing OIP branding content ...')
 
   await Promise.all([
     refreshSeedMedia({
@@ -151,7 +151,7 @@ async function main() {
       color: '#004098',
       filename: 'case-washer.svg',
       module: 'case-studies',
-      subtitle: 'HeT × Partner A',
+      subtitle: 'OIP × Partner A',
     }),
     refreshSeedMedia({
       alt: '低成本离线语音控制模组',
@@ -159,7 +159,7 @@ async function main() {
       color: '#00A0E9',
       filename: 'case-voice.svg',
       module: 'case-studies',
-      subtitle: 'HeT × Partner B',
+      subtitle: 'OIP × Partner B',
     }),
     refreshCaseStudy({
       content:
@@ -172,11 +172,11 @@ async function main() {
       content:
         '整合合作伙伴的轻量级 NLP 模型，在低成本 MCU 上实现 99% 的离线命令识别率，为智能卫浴产品提供免联网语音交互能力。',
       slug: 'offline-voice-module',
-      summary: '借助轻量级 NLP 模型和 HeT 平台算法，在低成本 MCU 平台实现高识别率离线语音交互。',
+      summary: '借助轻量级 NLP 模型和 OIP 平台算法，在低成本 MCU 平台实现高识别率离线语音交互。',
     }),
   ])
 
-  payload.logger.info('HeT branding refresh completed')
+  payload.logger.info('OIP branding refresh completed')
 }
 
 main()

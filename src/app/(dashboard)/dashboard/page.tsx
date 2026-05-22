@@ -64,12 +64,12 @@ export default async function DashboardPage() {
         {cards.map((card) => (
           <div key={card.label} className="theme-dashboard-panel rounded-xl p-6">
             <div className="flex items-start justify-between gap-4">
-              <p className="text-sm text-[var(--ht-text-muted)]">{card.label}</p>
+              <p className="text-sm text-[var(--oip-text-muted)]">{card.label}</p>
               <span className="theme-dashboard-nav-icon flex h-11 w-11 items-center justify-center rounded-lg">
                 <card.icon size={18} />
               </span>
             </div>
-            <p className="mt-6 font-display text-5xl font-semibold text-[var(--ht-text-primary)]">
+            <p className="mt-6 font-display text-5xl font-semibold text-[var(--oip-text-primary)]">
               {card.value}
             </p>
           </div>
@@ -79,8 +79,8 @@ export default async function DashboardPage() {
       <div className="theme-dashboard-panel rounded-xl p-6">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-semibold text-[var(--ht-text-primary)]">最近方案</h2>
-            <p className="mt-2 text-sm text-[var(--ht-text-muted)]">
+            <h2 className="text-2xl font-semibold text-[var(--oip-text-primary)]">最近方案</h2>
+            <p className="mt-2 text-sm text-[var(--oip-text-muted)]">
               展示最近提交或最近变更状态的方案记录。
             </p>
           </div>
@@ -97,10 +97,10 @@ export default async function DashboardPage() {
                 className="theme-dashboard-panel-soft flex flex-col gap-3 rounded-lg p-5 md:flex-row md:items-center md:justify-between"
               >
                 <div>
-                  <h3 className="text-lg font-semibold text-[var(--ht-text-primary)]">
+                  <h3 className="text-lg font-semibold text-[var(--oip-text-primary)]">
                     {proposal.title}
                   </h3>
-                  <p className="mt-2 text-sm text-[var(--ht-text-muted)]">
+                  <p className="mt-2 text-sm text-[var(--oip-text-muted)]">
                     {proposal.contactCompany} · {formatDate(proposal.createdAt, '刚刚')}
                   </p>
                 </div>
@@ -128,8 +128,8 @@ export default async function DashboardPage() {
         <div className="theme-dashboard-panel rounded-xl p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-semibold text-[var(--ht-text-primary)]">最新技术需求</h2>
-              <p className="mt-2 text-sm text-[var(--ht-text-muted)]">
+              <h2 className="text-2xl font-semibold text-[var(--oip-text-primary)]">最新技术需求</h2>
+              <p className="mt-2 text-sm text-[var(--oip-text-muted)]">
                 供管理员与评审员快速查看当前公开需求状态，并进入需求发布台维护。
               </p>
             </div>
@@ -146,14 +146,14 @@ export default async function DashboardPage() {
                     <NeedPriorityBadge priority={need.priority} />
                     <NeedStatusBadge status={need.status} />
                   </div>
-                  <h3 className="mt-4 text-xl font-semibold text-[var(--ht-text-primary)]">
+                  <h3 className="mt-4 text-xl font-semibold text-[var(--oip-text-primary)]">
                     {need.title}
                   </h3>
-                  <p className="mt-2 text-sm text-[var(--ht-text-muted)]">
+                  <p className="mt-2 text-sm text-[var(--oip-text-muted)]">
                     {need.needId} · {getNeedDomainLabel(need.domain)} ·{' '}
                     {formatDate(need.publishedAt)}
                   </p>
-                  <p className="mt-4 text-sm leading-7 text-[var(--ht-text-secondary)]">
+                  <p className="mt-4 text-sm leading-7 text-[var(--oip-text-secondary)]">
                     {lexicalToPlainText(need.description).slice(0, 96) || '暂无需求描述'}
                     {lexicalToPlainText(need.description).length > 96 ? '...' : ''}
                   </p>

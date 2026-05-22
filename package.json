@@ -1,7 +1,7 @@
 {
   "name": "innovation-platform",
   "version": "2.0.0",
-  "description": "H&T Open Innovation Platform",
+  "description": "Open Innovation Platform",
   "license": "MIT",
   "type": "module",
   "scripts": {

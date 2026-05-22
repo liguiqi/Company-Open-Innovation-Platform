@@ -203,7 +203,7 @@ export function LoginPanel({
         <div className="auth-form-shell">
           <div className="auth-form-header">
             <p className="auth-form-kicker">Open Innovation Access</p>
-            <h2 className="auth-form-title">欢迎使用开放创新工作台</h2>
+            <h2 className="auth-form-title">欢迎使用Innovation Workspace</h2>
             <p className="auth-form-description">
               使用邮箱或手机号登录，进入需求跟进、方案提交、评审协同与状态流转的统一工作区。
             </p>

@@ -23,7 +23,7 @@ export function SectionHeading({
       <h2
         className={cn(
           'font-display text-4xl font-semibold tracking-wide',
-          tone === 'contrast' ? 'text-[var(--ht-contrast-text)]' : 'text-[var(--ht-text-primary)]',
+          tone === 'contrast' ? 'text-[var(--oip-contrast-text)]' : 'text-[var(--oip-text-primary)]',
         )}
       >
         {title}
@@ -32,7 +32,7 @@ export function SectionHeading({
         className={cn(
           'max-w-3xl text-base leading-7',
           align === 'center' && 'mx-auto',
-          tone === 'contrast' ? 'text-[var(--ht-contrast-muted)]' : 'text-[var(--ht-text-muted)]',
+          tone === 'contrast' ? 'text-[var(--oip-contrast-muted)]' : 'text-[var(--oip-text-muted)]',
           descriptionClassName,
         )}
       >

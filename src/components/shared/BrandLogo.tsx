@@ -2,7 +2,7 @@ import Image from 'next/image'
 
 import { cn } from '@/lib/utils'
 
-export function HetBrandLogo({
+export function BrandLogo({
   className,
   priority = false,
   variant = 'blue',
@@ -13,7 +13,7 @@ export function HetBrandLogo({
 }) {
   return (
     <Image
-      alt="Open Innovation HeT"
+      alt="Open Innovation OIP"
       className={cn(
         'h-auto w-[170px] object-contain',
         variant === 'white' && 'brightness-0 invert',
@@ -21,7 +21,7 @@ export function HetBrandLogo({
       )}
       height={460}
       priority={priority}
-      src="/branding/het-logo.png"
+      src="/branding/brand-logo.png"
       unoptimized
       width={3180}
     />

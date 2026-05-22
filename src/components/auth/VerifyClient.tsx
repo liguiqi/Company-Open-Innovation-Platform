@@ -35,8 +35,8 @@ export function VerifyClient({ token }: { token?: string }) {
 
   return (
     <div className="auth-panel w-full rounded-[1rem] p-8 text-center">
-      <p className="font-display text-3xl font-semibold text-[var(--ht-text-primary)]">邮箱验证</p>
-      <p className="mt-4 text-sm leading-7 text-[var(--ht-text-muted)]">{message}</p>
+      <p className="font-display text-3xl font-semibold text-[var(--oip-text-primary)]">邮箱验证</p>
+      <p className="mt-4 text-sm leading-7 text-[var(--oip-text-muted)]">{message}</p>
 
       <div className="mt-6 flex justify-center gap-3">
         {state === 'success' ? (

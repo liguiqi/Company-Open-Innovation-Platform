@@ -28,11 +28,11 @@ export default async function PartnersAdminPage() {
       <div className="grid gap-5 md:grid-cols-2">
         {partners.docs.map((partner) => (
           <article key={partner.id} className="theme-dashboard-panel rounded-[1rem] p-6">
-            <h3 className="text-2xl font-semibold text-[var(--ht-text-primary)]">{partner.name}</h3>
-            <p className="mt-3 text-sm text-[var(--ht-text-muted)]">
+            <h3 className="text-2xl font-semibold text-[var(--oip-text-primary)]">{partner.name}</h3>
+            <p className="mt-3 text-sm text-[var(--oip-text-muted)]">
               {getPartnerCategoryLabel(partner.category)} · {partnerTierMap[partner.tier]}
             </p>
-            <p className="mt-4 text-sm leading-7 text-[var(--ht-text-secondary)]">
+            <p className="mt-4 text-sm leading-7 text-[var(--oip-text-secondary)]">
               {partner.description || partner.products}
             </p>
           </article>

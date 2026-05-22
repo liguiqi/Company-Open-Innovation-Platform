@@ -49,7 +49,7 @@ export function AdminIcon() {
   }, [])
 
   return (
-    <div aria-label="Open Innovation HeT" className="payload-brand-icon" role="img">
+    <div aria-label="Open Innovation OIP" className="payload-brand-icon" role="img">
       <img
         alt=""
         aria-hidden="true"

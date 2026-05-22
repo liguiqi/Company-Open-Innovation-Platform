@@ -5,8 +5,8 @@ import { useEffect } from 'react'
 import { THEME_ATTRIBUTE, type AppTheme } from '@/lib/theme'
 
 const ICON_BY_THEME: Record<AppTheme, string> = {
-  dark: '/branding/het-favicon-32-white.png',
-  light: '/branding/het-favicon-32.png',
+  dark: '/branding/brand-favicon-32-white.png',
+  light: '/branding/brand-favicon-32.png',
 }
 
 const THEME_COLOR_BY_THEME: Record<AppTheme, string> = {
@@ -25,13 +25,13 @@ function getResolvedTheme(): AppTheme {
 }
 
 function upsertLink(key: string, rel: string, href: string, sizes?: string) {
-  const selector = 'link[data-het-managed="true"][data-het-key="' + key + '"]'
+  const selector = 'link[data-oip-managed="true"][data-oip-key="' + key + '"]'
   let link = document.head.querySelector(selector) as HTMLLinkElement | null
 
   if (!link) {
     link = document.createElement('link')
-    link.dataset.hetManaged = 'true'
-    link.dataset.hetKey = key
+    link.dataset.oipManaged = 'true'
+    link.dataset.oipKey = key
     link.rel = rel
     document.head.appendChild(link)
   }
@@ -55,13 +55,13 @@ function upsertLink(key: string, rel: string, href: string, sizes?: string) {
 
 function upsertThemeColor(content: string) {
   let meta = document.head.querySelector(
-    'meta[name="theme-color"][data-het-managed="true"]',
+    'meta[name="theme-color"][data-oip-managed="true"]',
   ) as HTMLMetaElement | null
 
   if (!meta) {
     meta = document.createElement('meta')
     meta.name = 'theme-color'
-    meta.dataset.hetManaged = 'true'
+    meta.dataset.oipManaged = 'true'
     document.head.appendChild(meta)
   }
 
@@ -76,7 +76,7 @@ function applyThemeAssets() {
 
   upsertLink('icon', 'icon', href, '32x32')
   upsertLink('shortcut', 'shortcut icon', href, '32x32')
-  upsertLink('apple', 'apple-touch-icon', '/branding/het-apple-touch-180.png', '180x180')
+  upsertLink('apple', 'apple-touch-icon', '/branding/brand-apple-touch-180.png', '180x180')
   upsertThemeColor(THEME_COLOR_BY_THEME[theme])
 }
 
